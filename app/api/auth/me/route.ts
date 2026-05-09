@@ -8,7 +8,7 @@ export async function GET() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.userId },
-    select: { id: true, firstName: true, lastName: true, name: true, email: true, phone: true, role: true, street: true, suburb: true, state: true, postcode: true, loyaltyPoints: true, createdAt: true, businessName: true, businessAddress: true, lat: true, lng: true, isOpen: true },
+    select: { id: true, firstName: true, lastName: true, name: true, email: true, phone: true, role: true, street: true, suburb: true, state: true, postcode: true, loyaltyPoints: true, createdAt: true, businessName: true, businessAddress: true, lat: true, lng: true, isOpen: true, isApproved: true },
   });
 
   return NextResponse.json({ user });

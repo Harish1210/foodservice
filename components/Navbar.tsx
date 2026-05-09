@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { ShoppingCart, Menu, X, Phone, MapPin, User, ChefHat, LogIn, UtensilsCrossed } from "lucide-react";
+import { ShoppingCart, Menu, X, Phone, MapPin, ChefHat, LogIn, UtensilsCrossed, ShieldCheck, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cartStore";
 
@@ -18,6 +18,9 @@ export default function Navbar() {
       }
     }).catch(() => {});
   }, []);
+
+  const isVendor = userRole === "vendor";
+  const isAdmin = userRole === "admin";
 
   return (
     <header className="sticky top-0 z-50 bg-[#1A0A00] shadow-lg">
@@ -46,16 +49,41 @@ export default function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-6 text-sm">
-          <Link href="/vendors" className="flex items-center gap-1.5 bg-[#FF6B00] text-white px-3 py-1.5 rounded-lg font-semibold hover:bg-[#CC5500] transition-colors">
-            <UtensilsCrossed size={14} /> Find Kitchens
-          </Link>
-          <Link href="/" className="text-gray-300 hover:text-[#FF6B00] transition-colors font-medium">Menu</Link>
-          <Link href="/reservations" className="text-gray-300 hover:text-[#FF6B00] transition-colors font-medium">Reservations</Link>
-          <Link href="/orders" className="text-gray-300 hover:text-[#FF6B00] transition-colors font-medium">My Orders</Link>
-          {userRole === "vendor" && (
-            <Link href="/vendor" className="flex items-center gap-1 text-gray-300 hover:text-[#FF6B00] transition-colors font-medium">
-              <ChefHat size={14} /> Vendor
+          {/* Customer / guest nav */}
+          {!isVendor && !isAdmin && (
+            <Link href="/vendors" className="flex items-center gap-1.5 bg-[#FF6B00] text-white px-3 py-1.5 rounded-lg font-semibold hover:bg-[#CC5500] transition-colors">
+              <UtensilsCrossed size={14} /> Find Kitchens
             </Link>
+          )}
+          {!isVendor && !isAdmin && (
+            <Link href="/" className="text-gray-300 hover:text-[#FF6B00] transition-colors font-medium">Menu</Link>
+          )}
+          {!isVendor && !isAdmin && (
+            <Link href="/reservations" className="text-gray-300 hover:text-[#FF6B00] transition-colors font-medium">Reservations</Link>
+          )}
+          {!isVendor && !isAdmin && (
+            <Link href="/orders" className="text-gray-300 hover:text-[#FF6B00] transition-colors font-medium">My Orders</Link>
+          )}
+          {/* Vendor nav */}
+          {isVendor && (
+            <Link href="/vendor" className="flex items-center gap-1.5 bg-[#FF6B00] text-white px-3 py-1.5 rounded-lg font-semibold hover:bg-[#CC5500] transition-colors">
+              <ChefHat size={14} /> Dashboard
+            </Link>
+          )}
+          {isVendor && (
+            <Link href="/vendor/menu" className="text-gray-300 hover:text-[#FF6B00] transition-colors font-medium">My Menu</Link>
+          )}
+          {isVendor && (
+            <Link href="/vendor/kitchen" className="text-gray-300 hover:text-[#FF6B00] transition-colors font-medium">Kitchen Display</Link>
+          )}
+          {/* Admin nav */}
+          {isAdmin && (
+            <Link href="/admin/vendors" className="flex items-center gap-1.5 bg-[#FF6B00] text-white px-3 py-1.5 rounded-lg font-semibold hover:bg-[#CC5500] transition-colors">
+              <ShieldCheck size={14} /> Approve Vendors
+            </Link>
+          )}
+          {isAdmin && (
+            <Link href="/vendors" className="text-gray-300 hover:text-[#FF6B00] transition-colors font-medium">All Vendors</Link>
           )}
         </div>
 
@@ -90,12 +118,35 @@ export default function Navbar() {
       {/* Mobile menu */}
       {open && (
         <div className="md:hidden bg-[#2A1500] border-t border-[#FF6B00]/30 px-4 py-4 flex flex-col gap-3 animate-fade-in">
-          <Link href="/vendors" onClick={() => setOpen(false)} className="text-[#FF6B00] font-semibold py-2 border-b border-[#FF6B00]/20">🍳 Find Kitchens Near You</Link>
-          <Link href="/" onClick={() => setOpen(false)} className="text-gray-300 hover:text-[#FF6B00] py-2 border-b border-[#FF6B00]/20">Menu</Link>
-          <Link href="/reservations" onClick={() => setOpen(false)} className="text-gray-300 hover:text-[#FF6B00] py-2 border-b border-[#FF6B00]/20">Reservations</Link>
-          <Link href="/orders" onClick={() => setOpen(false)} className="text-gray-300 hover:text-[#FF6B00] py-2 border-b border-[#FF6B00]/20">My Orders</Link>
-          {userRole === "vendor" && (
-            <Link href="/vendor" onClick={() => setOpen(false)} className="text-gray-300 hover:text-[#FF6B00] py-2 border-b border-[#FF6B00]/20">Vendor Dashboard</Link>
+          {/* Customer / guest links */}
+          {!isVendor && !isAdmin && (
+            <Link href="/vendors" onClick={() => setOpen(false)} className="text-[#FF6B00] font-semibold py-2 border-b border-[#FF6B00]/20">🍳 Find Kitchens Near You</Link>
+          )}
+          {!isVendor && !isAdmin && (
+            <Link href="/" onClick={() => setOpen(false)} className="text-gray-300 hover:text-[#FF6B00] py-2 border-b border-[#FF6B00]/20">Menu</Link>
+          )}
+          {!isVendor && !isAdmin && (
+            <Link href="/reservations" onClick={() => setOpen(false)} className="text-gray-300 hover:text-[#FF6B00] py-2 border-b border-[#FF6B00]/20">Reservations</Link>
+          )}
+          {!isVendor && !isAdmin && (
+            <Link href="/orders" onClick={() => setOpen(false)} className="text-gray-300 hover:text-[#FF6B00] py-2 border-b border-[#FF6B00]/20">My Orders</Link>
+          )}
+          {/* Vendor links */}
+          {isVendor && (
+            <Link href="/vendor" onClick={() => setOpen(false)} className="text-[#FF6B00] font-semibold py-2 border-b border-[#FF6B00]/20">📊 Dashboard</Link>
+          )}
+          {isVendor && (
+            <Link href="/vendor/menu" onClick={() => setOpen(false)} className="text-gray-300 hover:text-[#FF6B00] py-2 border-b border-[#FF6B00]/20">🍽️ My Menu</Link>
+          )}
+          {isVendor && (
+            <Link href="/vendor/kitchen" onClick={() => setOpen(false)} className="text-gray-300 hover:text-[#FF6B00] py-2 border-b border-[#FF6B00]/20">🍳 Kitchen Display</Link>
+          )}
+          {/* Admin links */}
+          {isAdmin && (
+            <Link href="/admin/vendors" onClick={() => setOpen(false)} className="text-[#FF6B00] font-semibold py-2 border-b border-[#FF6B00]/20">🛡️ Approve Vendors</Link>
+          )}
+          {isAdmin && (
+            <Link href="/vendors" onClick={() => setOpen(false)} className="text-gray-300 hover:text-[#FF6B00] py-2 border-b border-[#FF6B00]/20">All Vendors</Link>
           )}
           {userName ? (
             <Link href="/profile" onClick={() => setOpen(false)} className="text-gray-300 hover:text-[#FF6B00] py-2">My Profile ({userName})</Link>

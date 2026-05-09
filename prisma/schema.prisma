@@ -26,6 +26,7 @@ model User {
   lat             Float?
   lng             Float?
   isOpen          Boolean  @default(true)
+  isApproved      Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

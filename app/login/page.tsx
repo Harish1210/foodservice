@@ -116,9 +116,15 @@ function LoginForm() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Something went wrong");
 
-      toast.success(mode === "login" ? `Welcome back, ${data.user.firstName}!` : "Account created!");
+      if (mode === "register" && data.user.role === "vendor") {
+        toast.success("Account created! Your application is pending admin approval.");
+      } else {
+        toast.success(mode === "login" ? `Welcome back, ${data.user.firstName}!` : "Account created!");
+      }
       if (data.user.role === "vendor") {
-        router.push("/vendor");
+        router.push("/vendor"); // Vendor dashboard shows pending screen if not approved
+      } else if (data.user.role === "admin") {
+        router.push("/admin/vendors");
       } else {
         router.push(searchParams.get("from") ?? "/");
       }

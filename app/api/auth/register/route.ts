@@ -22,6 +22,8 @@ export async function POST(req: NextRequest) {
 
     const userRole = role === "vendor" ? "vendor" : "customer";
     const passwordHash = await bcrypt.hash(password, 10);
+    // New vendors must be approved by admin before they can operate
+    const isApproved = userRole !== "vendor";
 
     const user = await prisma.user.create({
       data: {
@@ -40,13 +42,14 @@ export async function POST(req: NextRequest) {
         lng: lng !== undefined && lng !== "" ? parseFloat(lng) : null,
         passwordHash,
         role: userRole,
+        isApproved,
       },
     });
 
     const token = signToken({ userId: user.id, email: user.email, role: user.role, firstName: user.firstName ?? undefined, lastName: user.lastName ?? undefined });
 
     const res = NextResponse.json({
-      user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, role: user.role },
+      user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, role: user.role, isApproved: user.isApproved },
     }, { status: 201 });
     res.cookies.set(COOKIE_NAME, token, { httpOnly: true, path: "/", maxAge: 60 * 60 * 24 * 30, sameSite: "lax" });
     return res;

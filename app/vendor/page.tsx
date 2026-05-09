@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import { formatCurrency } from "@/lib/utils";
-import { RefreshCw, ChefHat, Package, Truck, CheckCircle, Clock, AlertCircle, BarChart3, UtensilsCrossed } from "lucide-react";
+import { RefreshCw, ChefHat, Package, Truck, CheckCircle, Clock, AlertCircle, BarChart3, UtensilsCrossed, ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import Navbar from "@/components/Navbar";
 import toast from "react-hot-toast";
 
 const STATUS_COLORS: Record<string, string> = {
@@ -49,6 +50,20 @@ export default function VendorDashboard() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("active");
   const [updating, setUpdating] = useState<string | null>(null);
+  const [isApproved, setIsApproved] = useState<boolean | null>(null);
+  const [vendorName, setVendorName] = useState<string>("");
+
+  // Check approval status first
+  useEffect(() => {
+    fetch("/api/auth/me").then(r => r.json()).then(d => {
+      if (d.user) {
+        setIsApproved(d.user.isApproved ?? false);
+        setVendorName(d.user.businessName ?? d.user.firstName ?? "Vendor");
+      } else {
+        setIsApproved(false);
+      }
+    }).catch(() => setIsApproved(false));
+  }, []);
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -63,10 +78,44 @@ export default function VendorDashboard() {
   }, []);
 
   useEffect(() => {
-    fetchOrders();
-    const interval = setInterval(fetchOrders, 10000);
-    return () => clearInterval(interval);
-  }, [fetchOrders]);
+    if (isApproved === true) {
+      fetchOrders();
+      const interval = setInterval(fetchOrders, 10000);
+      return () => clearInterval(interval);
+    } else if (isApproved === false) {
+      setLoading(false);
+    }
+  }, [isApproved, fetchOrders]);
+
+  // Show pending approval screen
+  if (isApproved === false) {
+    return (
+      <div className="min-h-screen bg-[#FFF8F0]">
+        <Navbar />
+        <div className="flex flex-col items-center justify-center min-h-[70vh] px-4 text-center">
+          <div className="bg-white rounded-3xl border-2 border-amber-200 p-10 max-w-md w-full shadow-xl">
+            <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-5">
+              <ShieldCheck size={30} className="text-amber-500" />
+            </div>
+            <h1 className="text-2xl font-bold text-[#1A0A00] mb-2">Awaiting Approval</h1>
+            <p className="text-gray-500 text-sm mb-6">
+              Hi <strong>{vendorName}</strong>! Your vendor account is pending review by our admin team.
+              You will be able to access your dashboard and add menu items once approved.
+            </p>
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-left space-y-2 mb-6">
+              <p className="text-xs font-semibold text-amber-700 uppercase tracking-wider">What happens next?</p>
+              <p className="text-sm text-amber-800">1. Our admin reviews your registration details</p>
+              <p className="text-sm text-amber-800">2. You receive approval (usually within 24 hours)</p>
+              <p className="text-sm text-amber-800">3. You can then add your menu items and start accepting orders</p>
+            </div>
+            <Link href="/profile" className="inline-flex items-center gap-2 text-sm text-[#FF6B00] font-semibold hover:underline">
+              View my profile →
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const updateStatus = async (orderId: string, status: string) => {
     setUpdating(orderId);
