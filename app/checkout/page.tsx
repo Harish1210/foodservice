@@ -55,7 +55,7 @@ export default function CheckoutPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.phone) {
-      toast.error("Please fill in your contact details.");
+      toast.error("Please fill in your name, email and mobile number.");
       return;
     }
     if (orderType === "delivery" && (!form.street || !form.suburb || !form.postcode)) {
@@ -183,9 +183,9 @@ export default function CheckoutPage() {
                 </div>
                 <div className="grid sm:grid-cols-2 gap-4">
                   {[
-                    { key: "name", label: "Full Name", type: "text", placeholder: "John Smith" },
-                    { key: "email", label: "Email", type: "email", placeholder: "john@example.com" },
-                    { key: "phone", label: "Phone", type: "tel", placeholder: "+61 400 000 000" },
+                    { key: "name", label: "Full Name *", type: "text", placeholder: "John Smith", required: true },
+                    { key: "email", label: "Email *", type: "email", placeholder: "john@example.com", required: true },
+                    { key: "phone", label: "Mobile Number * (for SMS updates)", type: "tel", placeholder: "+61 400 000 000", required: true },
                   ].map((f) => (
                     <div key={f.key} className={f.key === "email" ? "sm:col-span-2" : ""}>
                       <label className="block text-xs font-medium text-gray-600 mb-1">{f.label}</label>
@@ -194,6 +194,7 @@ export default function CheckoutPage() {
                         value={form[f.key as keyof typeof form]}
                         onChange={(e) => update(f.key, e.target.value)}
                         placeholder={f.placeholder}
+                        required={f.required}
                         className="w-full border border-[#E8D5C0] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]"
                       />
                     </div>
