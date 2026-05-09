@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN "firstName" TEXT;
+ALTER TABLE "User" ADD COLUMN "lastName" TEXT;
+ALTER TABLE "User" ADD COLUMN "postcode" TEXT;
+ALTER TABLE "User" ADD COLUMN "state" TEXT DEFAULT 'NSW';
+ALTER TABLE "User" ADD COLUMN "street" TEXT;
+ALTER TABLE "User" ADD COLUMN "suburb" TEXT;

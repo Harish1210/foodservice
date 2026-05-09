@@ -1,0 +1,216 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id              String   @id @default(cuid())
+  firstName       String?
+  lastName        String?
+  name            String?
+  email           String   @unique
+  phone           String?
+  street          String?
+  suburb          String?
+  state           String?  @default("NSW")
+  postcode        String?
+  passwordHash    String?
+  role            String   @default("customer")
+  loyaltyPoints   Int      @default(0)
+  // Vendor-specific fields
+  businessName    String?
+  businessAddress String?
+  lat             Float?
+  lng             Float?
+  isOpen          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  orders       Order[]     @relation("CustomerOrders")
+  vendorOrders Order[]     @relation("VendorOrders")
+  reservations Reservation[]
+  addresses    Address[]
+  reviews      Review[]
+  menuItems    MenuItem[]
+}
+
+model Address {
+  id        String  @id @default(cuid())
+  userId    String?
+  label     String  @default("Home")
+  street    String
+  suburb    String
+  city      String  @default("Sydney")
+  state     String  @default("NSW")
+  postcode  String
+  isDefault Boolean @default(false)
+
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders Order[]
+}
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  icon        String?
+  sortOrder   Int        @default(0)
+  isActive    Boolean    @default(true)
+  menuItems   MenuItem[]
+}
+
+model MenuItem {
+  id           String   @id @default(cuid())
+  categoryId   String
+  vendorId     String?
+  name         String
+  description  String?
+  price        Float
+  image        String?
+  isVeg        Boolean  @default(false)
+  isSpicy      Boolean  @default(false)
+  isGlutenFree Boolean  @default(false)
+  allergens    String?
+  calories     Int?
+  prepTime     Int      @default(15)
+  isAvailable  Boolean  @default(true)
+  isFeatured   Boolean  @default(false)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  category       Category               @relation(fields: [categoryId], references: [id])
+  vendor         User?                  @relation(fields: [vendorId], references: [id])
+  orderItems     OrderItem[]
+  customizations MenuItemCustomization[]
+  reviews        Review[]
+}
+
+model MenuItemCustomization {
+  id         String  @id @default(cuid())
+  menuItemId String
+  name       String
+  options    String
+  required   Boolean @default(false)
+
+  menuItem MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id                  String    @id @default(cuid())
+  orderNumber         String    @unique
+  userId              String?
+  vendorId            String?
+  guestName           String?
+  guestEmail          String?
+  guestPhone          String?
+  type                String
+  status              String    @default("pending")
+  paymentStatus       String    @default("pending")
+  paymentMethod       String?
+  stripePaymentId     String?
+  addressId           String?
+  deliveryStreet      String?
+  deliverySuburb      String?
+  deliveryPostcode    String?
+  tableNumber         Int?
+  scheduledAt         DateTime?
+  subtotal            Float
+  deliveryFee         Float     @default(0)
+  discount            Float     @default(0)
+  tax                 Float
+  total               Float
+  loyaltyPointsUsed   Int       @default(0)
+  loyaltyPointsEarned Int       @default(0)
+  specialInstructions String?
+  pickupCode          String?
+  estimatedTime       Int?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  user    User?      @relation("CustomerOrders", fields: [userId], references: [id])
+  vendor  User?      @relation("VendorOrders", fields: [vendorId], references: [id])
+  address Address?   @relation(fields: [addressId], references: [id])
+  items   OrderItem[]
+}
+
+model OrderItem {
+  id             String  @id @default(cuid())
+  orderId        String
+  menuItemId     String
+  name           String
+  price          Float
+  quantity       Int
+  customizations String?
+  notes          String?
+
+  order    Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem MenuItem @relation(fields: [menuItemId], references: [id])
+}
+
+model Reservation {
+  id          String   @id @default(cuid())
+  userId      String?
+  guestName   String
+  guestEmail  String
+  guestPhone  String
+  date        DateTime
+  time        String
+  partySize   Int
+  tableNumber Int?
+  status      String   @default("pending")
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+}
+
+model Table {
+  id          String  @id @default(cuid())
+  number      Int     @unique
+  capacity    Int
+  isAvailable Boolean @default(true)
+  location    String?
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  userId     String
+  menuItemId String?
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now())
+
+  user     User      @relation(fields: [userId], references: [id])
+  menuItem MenuItem? @relation(fields: [menuItemId], references: [id])
+}
+
+model LoyaltyTransaction {
+  id          String   @id @default(cuid())
+  userId      String
+  points      Int
+  type        String
+  description String
+  orderId     String?
+  createdAt   DateTime @default(now())
+}
+
+model BusinessSettings {
+  id                String  @id @default(cuid())
+  name              String  @default("Home Food Service")
+  tagline           String  @default("Authentic Indian Home Cooking")
+  phone             String  @default("+61 2 9000 0000")
+  email             String  @default("hello@homefoodservice.com.au")
+  address           String  @default("Sydney, NSW, Australia")
+  openingHours      String  @default("{}")
+  deliveryRadius    Float   @default(10)
+  minOrderAmount    Float   @default(20)
+  deliveryFee       Float   @default(5)
+  freeDeliveryOver  Float   @default(60)
+  taxRate           Float   @default(0.10)
+  loyaltyRate       Float   @default(0.05)
+  isAcceptingOrders Boolean @default(true)
+  estimatedPrepTime Int     @default(20)
+}
