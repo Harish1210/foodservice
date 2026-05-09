@@ -80,13 +80,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ vendors: result });
   } catch (err) {
-    const error = err as Error;
     console.error("[/api/vendors] Error:", err);
-    return NextResponse.json({
-      error: "Failed to load vendors",
-      message: error.message,
-      stack: error.stack?.split("\n").slice(0, 3).join(" | "),
-      vendors: [],
-    }, { status: 500 });
+    return NextResponse.json({ error: "Failed to load vendors", vendors: [] }, { status: 500 });
   }
 }
