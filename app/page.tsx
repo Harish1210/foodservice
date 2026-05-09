@@ -48,12 +48,14 @@ export default async function HomePage() {
             >
               🍳 Find a Kitchen Near You →
             </Link>
-            <Link
-              href="/login"
-              className="inline-flex items-center justify-center gap-2 bg-white/10 border border-white/20 text-white px-8 py-4 rounded-2xl font-semibold text-base hover:bg-white/20 transition-all backdrop-blur-sm"
-            >
-              Sign In / Register
-            </Link>
+            {!session && (
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center gap-2 bg-white/10 border border-white/20 text-white px-8 py-4 rounded-2xl font-semibold text-base hover:bg-white/20 transition-all backdrop-blur-sm"
+              >
+                Sign In / Register
+              </Link>
+            )}
           </div>
 
           {/* Trust pills */}
