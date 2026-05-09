@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { ShoppingCart, Menu, X, Phone, MapPin, ChefHat, LogIn, UtensilsCrossed, ShieldCheck } from "lucide-react";
+import { ShoppingCart, Menu, X, Phone, MapPin, ChefHat, LogIn, UtensilsCrossed, ShieldCheck, Clock } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cartStore";
 
@@ -102,6 +102,11 @@ export default function Navbar() {
           {isVendor && (
             <Link href="/vendor/kitchen" className="text-gray-300 hover:text-[#FF6B00] transition-colors font-medium">Kitchen Display</Link>
           )}
+          {isVendor && (
+            <Link href="/vendor/hours" className="flex items-center gap-1 text-gray-300 hover:text-[#FF6B00] transition-colors font-medium">
+              <Clock size={13} /> Hours
+            </Link>
+          )}
           {/* Admin nav */}
           {isAdmin && (
             <Link href="/admin/vendors" className="flex items-center gap-1.5 bg-[#FF6B00] text-white px-3 py-1.5 rounded-lg font-semibold hover:bg-[#CC5500] transition-colors">
@@ -181,6 +186,9 @@ export default function Navbar() {
           )}
           {isVendor && (
             <Link href="/vendor/kitchen" onClick={() => setOpen(false)} className="text-gray-300 hover:text-[#FF6B00] py-2 border-b border-[#FF6B00]/20">🍳 Kitchen Display</Link>
+          )}
+          {isVendor && (
+            <Link href="/vendor/hours" onClick={() => setOpen(false)} className="text-gray-300 hover:text-[#FF6B00] py-2 border-b border-[#FF6B00]/20">🕐 Opening Hours</Link>
           )}
           {/* Admin links */}
           {isAdmin && (

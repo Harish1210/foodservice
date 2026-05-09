@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import { formatCurrency } from "@/lib/utils";
-import { RefreshCw, ChefHat, Package, Truck, CheckCircle, Clock, AlertCircle, BarChart3, UtensilsCrossed, ShieldCheck, Star } from "lucide-react";
+import { RefreshCw, ChefHat, Package, CheckCircle, Clock, AlertCircle, BarChart3, UtensilsCrossed, ShieldCheck, Star } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import toast from "react-hot-toast";
@@ -176,6 +176,9 @@ export default function VendorDashboard() {
             <Link href="/vendor/analytics" className="flex items-center gap-2 text-gray-300 hover:text-white text-sm px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors">
               <BarChart3 size={15} /> Analytics
             </Link>
+            <Link href="/vendor/hours" className="flex items-center gap-2 text-gray-300 hover:text-white text-sm px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors">
+              <Clock size={15} /> Hours
+            </Link>
             <button onClick={fetchOrders} className="flex items-center gap-2 bg-[#FF6B00] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#CC5500] transition-colors">
               <RefreshCw size={14} /> Refresh
             </button>
@@ -217,13 +220,13 @@ export default function VendorDashboard() {
               <p className="text-gray-400 text-xs">See customer feedback</p>
             </div>
           </Link>
-          <Link href="/profile" className="group bg-gray-900 border border-gray-800 hover:border-blue-500/60 rounded-2xl p-5 flex items-center gap-4 transition-all hover:bg-gray-800">
+          <Link href="/vendor/hours" className="group bg-gray-900 border border-gray-800 hover:border-blue-500/60 rounded-2xl p-5 flex items-center gap-4 transition-all hover:bg-gray-800">
             <div className="w-12 h-12 bg-blue-700 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <ChefHat className="text-white" size={22} />
+              <Clock className="text-white" size={22} />
             </div>
             <div>
-              <p className="text-white font-bold">My Profile</p>
-              <p className="text-gray-400 text-xs">Update kitchen info & hours</p>
+              <p className="text-white font-bold">Opening Hours</p>
+              <p className="text-gray-400 text-xs">Set your kitchen schedule</p>
             </div>
           </Link>
         </div>

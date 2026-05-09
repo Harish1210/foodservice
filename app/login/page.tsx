@@ -171,7 +171,7 @@ function LoginForm() {
                 role === "vendor" ? "bg-[#1A0A00] text-white shadow-md" : "text-gray-500 hover:text-[#1A0A00]"
               }`}
             >
-              <ChefHat size={16} /> Vendor / Staff
+              <ChefHat size={16} /> Chef
             </button>
           </div>
 
@@ -181,8 +181,8 @@ function LoginForm() {
             </h1>
             <p className="text-gray-500 text-sm mb-6">
               {mode === "login"
-                ? `Sign in as ${role === "vendor" ? "vendor/staff" : "customer"}`
-                : `Register as a ${role === "vendor" ? "vendor/staff member" : "customer"}`}
+                ? `Sign in as ${role === "vendor" ? "chef / kitchen" : "customer"}`
+                : `Register as a ${role === "vendor" ? "chef / kitchen" : "customer"}`}
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">

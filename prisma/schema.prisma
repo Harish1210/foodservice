@@ -26,6 +26,7 @@ model User {
   lat             Float?
   lng             Float?
   isOpen          Boolean  @default(true)
+  openingHours    String?  // JSON: { mon:{isOpen,open,close}, tue:…, …, override:"open"|"closed"|null }
   isApproved      Boolean  @default(false)
   isOnHold        Boolean  @default(false)
   createdAt       DateTime @default(now())
