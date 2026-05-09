@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
-import { MapPin, Navigation, Loader2, ChefHat, Clock, UtensilsCrossed, ChevronRight, Search, RefreshCw, Star, Filter } from "lucide-react";
+import { MapPin, Navigation, Loader2, ChefHat, Clock, UtensilsCrossed, ChevronRight, Search, RefreshCw, Star, Filter, StarHalf } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import toast from "react-hot-toast";
 
@@ -17,6 +17,8 @@ type Vendor = {
   isOpen: boolean;
   distance: number | null;
   menuItemCount: number;
+  avgRating: number | null;
+  reviewCount: number;
 };
 
 // Warm gradient avatars for vendor cards
@@ -288,7 +290,7 @@ export default function VendorsPage() {
                           <div className="flex items-start justify-between gap-2">
                             <div className="min-w-0">
                               <h3 className="font-black text-[#1A0A00] text-base truncate">{name}</h3>
-                              <div className="flex items-center gap-2 mt-1">
+                              <div className="flex items-center gap-2 mt-1 flex-wrap">
                                 <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full ${vendor.isOpen ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
                                   <span className={`w-1.5 h-1.5 rounded-full ${vendor.isOpen ? "bg-green-500" : "bg-gray-400"}`} />
                                   {vendor.isOpen ? "Open now" : "Closed"}
@@ -296,6 +298,13 @@ export default function VendorsPage() {
                                 {vendor.menuItemCount > 0 && (
                                   <span className="text-xs text-gray-400 flex items-center gap-1">
                                     <UtensilsCrossed size={11} /> {vendor.menuItemCount} dishes
+                                  </span>
+                                )}
+                                {vendor.avgRating !== null && vendor.reviewCount > 0 && (
+                                  <span className="flex items-center gap-1 text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100">
+                                    <Star size={11} className="fill-amber-500 text-amber-500" />
+                                    {vendor.avgRating.toFixed(1)}
+                                    <span className="font-normal text-gray-400">({vendor.reviewCount})</span>
                                   </span>
                                 )}
                               </div>

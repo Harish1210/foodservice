@@ -30,12 +30,13 @@ model User {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  orders       Order[]     @relation("CustomerOrders")
-  vendorOrders Order[]     @relation("VendorOrders")
-  reservations Reservation[]
-  addresses    Address[]
-  reviews      Review[]
-  menuItems    MenuItem[]
+  orders          Order[]     @relation("CustomerOrders")
+  vendorOrders    Order[]     @relation("VendorOrders")
+  reservations    Reservation[]
+  addresses       Address[]
+  customerReviews Review[]    @relation("CustomerReviews")
+  vendorReviews   Review[]    @relation("VendorReviews")
+  menuItems       MenuItem[]
 }
 
 model Address {
@@ -86,7 +87,6 @@ model MenuItem {
   vendor         User?                  @relation(fields: [vendorId], references: [id])
   orderItems     OrderItem[]
   customizations MenuItemCustomization[]
-  reviews        Review[]
 }
 
 model MenuItemCustomization {
@@ -135,6 +135,7 @@ model Order {
   vendor  User?      @relation("VendorOrders", fields: [vendorId], references: [id])
   address Address?   @relation(fields: [addressId], references: [id])
   items   OrderItem[]
+  review  Review?
 }
 
 model OrderItem {
@@ -178,14 +179,20 @@ model Table {
 
 model Review {
   id         String   @id @default(cuid())
-  userId     String
-  menuItemId String?
-  rating     Int
+  orderId    String   @unique
+  vendorId   String
+  userId     String?
+  guestName  String?
+  guestEmail String?
+  rating     Int              // overall 1-5
+  foodRating Int?             // food quality 1-5
   comment    String?
+  reply      String?          // vendor reply
   createdAt  DateTime @default(now())
 
-  user     User      @relation(fields: [userId], references: [id])
-  menuItem MenuItem? @relation(fields: [menuItemId], references: [id])
+  order    Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  vendor   User     @relation("VendorReviews", fields: [vendorId], references: [id])
+  customer User?    @relation("CustomerReviews", fields: [userId], references: [id])
 }
 
 model LoyaltyTransaction {

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import { formatCurrency } from "@/lib/utils";
-import { RefreshCw, ChefHat, Package, Truck, CheckCircle, Clock, AlertCircle, BarChart3, UtensilsCrossed, ShieldCheck } from "lucide-react";
+import { RefreshCw, ChefHat, Package, Truck, CheckCircle, Clock, AlertCircle, BarChart3, UtensilsCrossed, ShieldCheck, Star } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import toast from "react-hot-toast";
@@ -206,6 +206,15 @@ export default function VendorDashboard() {
             <div>
               <p className="text-white font-bold">Kitchen Display</p>
               <p className="text-gray-400 text-xs">View live incoming orders</p>
+            </div>
+          </Link>
+          <Link href="/vendor/reviews" className="group bg-gray-900 border border-gray-800 hover:border-yellow-500/60 rounded-2xl p-5 flex items-center gap-4 transition-all hover:bg-gray-800">
+            <div className="w-12 h-12 bg-yellow-600 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Star className="text-white" size={22} />
+            </div>
+            <div>
+              <p className="text-white font-bold">Reviews</p>
+              <p className="text-gray-400 text-xs">See customer feedback</p>
             </div>
           </Link>
           <Link href="/profile" className="group bg-gray-900 border border-gray-800 hover:border-blue-500/60 rounded-2xl p-5 flex items-center gap-4 transition-all hover:bg-gray-800">

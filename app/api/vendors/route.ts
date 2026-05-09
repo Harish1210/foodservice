@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
 
   // Fetch ALL vendors regardless of whether they have coordinates
   const vendors = await prisma.user.findMany({
-    where: { role: "vendor" },
+    where: { role: "vendor", isApproved: true },
     select: {
       id: true,
       firstName: true,
@@ -32,6 +32,9 @@ export async function GET(req: NextRequest) {
       lng: true,
       isOpen: true,
       _count: { select: { menuItems: { where: { isAvailable: true } } } },
+      vendorReviews: {
+        select: { rating: true },
+      },
     },
   });
 
@@ -43,7 +46,11 @@ export async function GET(req: NextRequest) {
         hasCustomerLocation && v.lat != null && v.lng != null
           ? haversineKm(lat, lng, v.lat, v.lng)
           : null;
-      return { ...v, distance, menuItemCount: v._count.menuItems };
+      const reviewCount = v.vendorReviews.length;
+      const avgRating = reviewCount > 0
+        ? v.vendorReviews.reduce((s: number, r: { rating: number }) => s + r.rating, 0) / reviewCount
+        : null;
+      return { ...v, distance, menuItemCount: v._count.menuItems, avgRating, reviewCount };
     })
     // When customer location is known: include vendors within radius OR vendors with no coordinates
     // When no customer location: include all vendors
