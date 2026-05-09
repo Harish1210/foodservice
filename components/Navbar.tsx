@@ -26,7 +26,7 @@ export default function Navbar() {
 
   // Build the Menu href: go to the selected vendor's menu, or ask to pick a kitchen first
   const menuHref = hydrated && selectedVendorId
-    ? `/?vendor=${selectedVendorId}`
+    ? `/menu?vendor=${selectedVendorId}`
     : "/vendors";
 
   const isVendor = userRole === "vendor";

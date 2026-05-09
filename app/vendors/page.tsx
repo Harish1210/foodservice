@@ -106,7 +106,7 @@ export default function VendorsPage() {
     const name = vendor.businessName ?? (vendor.firstName || vendor.lastName ? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() : "Kitchen");
     setSelectedVendor(vendor.id, name);
     toast.success(`Viewing menu from ${name}`);
-    router.push(`/?vendor=${vendor.id}`);
+    router.push(`/menu?vendor=${vendor.id}`);
   };
 
   const filtered = vendors.filter((v) => {
