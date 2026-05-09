@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff, Loader2, ChefHat, User } from "lucide-react";
+import { Eye, EyeOff, Loader2, ChefHat, User, Navigation, MapPin } from "lucide-react";
 import toast from "react-hot-toast";
 import { Suspense } from "react";
 
@@ -18,22 +18,89 @@ function LoginForm() {
   const [role, setRole] = useState<Role>(defaultRole);
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [detecting, setDetecting] = useState(false);
 
   const [form, setForm] = useState({
     firstName: "", lastName: "", email: "", phone: "",
     password: "", confirmPassword: "",
     street: "", suburb: "", state: "NSW", postcode: "",
     businessName: "", businessAddress: "",
+    lat: "", lng: "",
   });
 
   const update = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (mode === "register" && form.password !== form.confirmPassword) {
-      toast.error("Passwords do not match");
+  const detectLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser. Please enter your address manually.");
       return;
     }
+    setDetecting(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+            { headers: { "Accept-Language": "en" } }
+          );
+          const data = await res.json();
+          if (data?.address) {
+            const addr = data.address;
+            if (role === "vendor") {
+              const fullAddress = data.display_name ??
+                `${addr.road ?? ""} ${addr.suburb ?? addr.city ?? ""} ${addr.state ?? ""} ${addr.postcode ?? ""}`.trim();
+              setForm((f) => ({ ...f, businessAddress: fullAddress, lat: String(latitude), lng: String(longitude) }));
+            } else {
+              setForm((f) => ({
+                ...f,
+                street: [addr.house_number, addr.road].filter(Boolean).join(" "),
+                suburb: addr.suburb ?? addr.city_district ?? addr.city ?? "",
+                state: addr.state_code ?? addr.state ?? "NSW",
+                postcode: addr.postcode ?? "",
+                lat: String(latitude),
+                lng: String(longitude),
+              }));
+            }
+            toast.success("Location detected! Please review your address below.");
+          } else {
+            toast(`Coordinates captured (${latitude.toFixed(4)}, ${longitude.toFixed(4)}). Please fill in your address manually.`, { icon: "📍" });
+            setForm((f) => ({ ...f, lat: String(latitude), lng: String(longitude) }));
+          }
+        } catch {
+          toast(`Could not resolve address. Please enter it manually.`, { icon: "📍" });
+          setForm((f) => ({ ...f, lat: String(latitude), lng: String(longitude) }));
+        } finally {
+          setDetecting(false);
+        }
+      },
+      () => {
+        setDetecting(false);
+        toast.error("Location access denied. Please enter your address manually.");
+      },
+      { timeout: 10000, enableHighAccuracy: true }
+    );
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (mode === "register") {
+      if (form.password !== form.confirmPassword) {
+        toast.error("Passwords do not match");
+        return;
+      }
+      // Validate address is provided
+      if (role === "customer" && !form.street.trim()) {
+        toast.error("Street address is required");
+        return;
+      }
+      if (role === "vendor" && !form.businessAddress.trim()) {
+        toast.error("Kitchen address is required");
+        return;
+      }
+    }
+
     setLoading(true);
     try {
       const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/register";
@@ -62,6 +129,8 @@ function LoginForm() {
       setLoading(false);
     }
   };
+
+  const inputCls = "w-full border border-[#E8D5C0] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]";
 
   return (
     <div className="min-h-screen bg-[#FFF8F0] flex flex-col">
@@ -113,91 +182,133 @@ function LoginForm() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {mode === "register" && (
                 <>
+                  {/* Name */}
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-medium text-gray-600 mb-1">First Name *</label>
                       <input value={form.firstName} onChange={(e) => update("firstName", e.target.value)}
-                        placeholder="Priya" required
-                        className="w-full border border-[#E8D5C0] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]" />
+                        placeholder="Priya" required className={inputCls} />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-gray-600 mb-1">Last Name *</label>
                       <input value={form.lastName} onChange={(e) => update("lastName", e.target.value)}
-                        placeholder="Sharma" required
-                        className="w-full border border-[#E8D5C0] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]" />
+                        placeholder="Sharma" required className={inputCls} />
                     </div>
                   </div>
 
+                  {/* Phone */}
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">Phone Number</label>
                     <input value={form.phone} onChange={(e) => update("phone", e.target.value)}
-                      type="tel" placeholder="+61 400 000 000"
-                      className="w-full border border-[#E8D5C0] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]" />
+                      type="tel" placeholder="+61 400 000 000" className={inputCls} />
                   </div>
 
-                  {role === "customer" && (
-                    <>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">Street Address</label>
-                        <input value={form.street} onChange={(e) => update("street", e.target.value)}
-                          placeholder="123 George St"
-                          className="w-full border border-[#E8D5C0] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]" />
+                  {/* ── Address section ── */}
+                  <div className="border border-[#E8D5C0] rounded-2xl p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <MapPin size={14} className="text-[#FF6B00]" />
+                        <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                          {role === "vendor" ? "Kitchen Address *" : "Delivery Address *"}
+                        </p>
                       </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">Suburb</label>
-                          <input value={form.suburb} onChange={(e) => update("suburb", e.target.value)}
-                            placeholder="Sydney"
-                            className="w-full border border-[#E8D5C0] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]" />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">Postcode</label>
-                          <input value={form.postcode} onChange={(e) => update("postcode", e.target.value)}
-                            placeholder="2000"
-                            className="w-full border border-[#E8D5C0] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]" />
-                        </div>
-                      </div>
-                    </>
-                  )}
+                      <button
+                        type="button"
+                        onClick={detectLocation}
+                        disabled={detecting}
+                        className="flex items-center gap-1.5 text-xs font-semibold text-[#FF6B00] border border-[#FF6B00] px-3 py-1.5 rounded-lg hover:bg-[#FF6B00] hover:text-white transition-colors disabled:opacity-60"
+                      >
+                        {detecting
+                          ? <Loader2 size={12} className="animate-spin" />
+                          : <Navigation size={12} />}
+                        {detecting ? "Detecting..." : "📍 Use My Location"}
+                      </button>
+                    </div>
 
-                  {role === "vendor" && (
-                    <>
-                      <div className="border-t border-[#E8D5C0] pt-3 pb-1">
-                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Kitchen Details</p>
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">Kitchen / Business Name *</label>
-                        <input value={form.businessName} onChange={(e) => update("businessName", e.target.value)}
-                          placeholder="Priya's Home Kitchen" required
-                          className="w-full border border-[#E8D5C0] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]" />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">Kitchen Address *</label>
-                        <input value={form.businessAddress} onChange={(e) => update("businessAddress", e.target.value)}
-                          placeholder="123 Main St, Sydney NSW 2000" required
-                          className="w-full border border-[#E8D5C0] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]" />
-                      </div>
-                      <div className="bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5 text-xs text-amber-700">
-                        💡 You can add your exact GPS coordinates later from your profile to appear in nearby searches.
-                      </div>
-                    </>
-                  )}
+                    {role === "customer" && (
+                      <>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Street Address *</label>
+                          <input value={form.street} onChange={(e) => update("street", e.target.value)}
+                            placeholder="123 George St" required className={inputCls} />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Suburb *</label>
+                            <input value={form.suburb} onChange={(e) => update("suburb", e.target.value)}
+                              placeholder="Sydney" required className={inputCls} />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Postcode *</label>
+                            <input value={form.postcode} onChange={(e) => update("postcode", e.target.value)}
+                              placeholder="2000" required className={inputCls} />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">State</label>
+                          <select value={form.state} onChange={(e) => update("state", e.target.value)}
+                            className={inputCls}>
+                            {["NSW","VIC","QLD","WA","SA","TAS","ACT","NT"].map((s) => (
+                              <option key={s} value={s}>{s}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </>
+                    )}
+
+                    {role === "vendor" && (
+                      <>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Kitchen / Business Name *</label>
+                          <input value={form.businessName} onChange={(e) => update("businessName", e.target.value)}
+                            placeholder="Priya's Home Kitchen" required className={inputCls} />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Full Kitchen Address *</label>
+                          <input value={form.businessAddress} onChange={(e) => update("businessAddress", e.target.value)}
+                            placeholder="123 Main St, Sydney NSW 2000" required className={inputCls} />
+                        </div>
+                        {/* Show auto-detected coordinates if available */}
+                        {(form.lat || form.lng) && (
+                          <div className="flex gap-3">
+                            <div className="flex-1">
+                              <label className="block text-xs font-medium text-gray-600 mb-1">Latitude</label>
+                              <input value={form.lat} onChange={(e) => update("lat", e.target.value)}
+                                placeholder="-33.8688" className={inputCls} />
+                            </div>
+                            <div className="flex-1">
+                              <label className="block text-xs font-medium text-gray-600 mb-1">Longitude</label>
+                              <input value={form.lng} onChange={(e) => update("lng", e.target.value)}
+                                placeholder="151.2093" className={inputCls} />
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    <p className="text-xs text-gray-400 flex items-center gap-1">
+                      <span>💡</span>
+                      {detecting
+                        ? "Getting your location…"
+                        : 'Click "Use My Location" to auto-fill, or type your address above.'}
+                    </p>
+                  </div>
                 </>
               )}
 
+              {/* Email */}
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Email *</label>
                 <input value={form.email} onChange={(e) => update("email", e.target.value)}
-                  type="email" placeholder="you@example.com" required
-                  className="w-full border border-[#E8D5C0] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]" />
+                  type="email" placeholder="you@example.com" required className={inputCls} />
               </div>
 
+              {/* Password */}
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Password *</label>
                 <div className="relative">
                   <input value={form.password} onChange={(e) => update("password", e.target.value)}
-                    type={showPw ? "text" : "password"} placeholder="Min. 6 characters" required
-                    className="w-full border border-[#E8D5C0] rounded-xl px-3 py-2.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]" />
+                    type={showPw ? "text" : "password"} placeholder="Min. 6 characters" required className={`${inputCls} pr-10`} />
                   <button type="button" onClick={() => setShowPw(!showPw)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                     {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -209,8 +320,7 @@ function LoginForm() {
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1">Confirm Password *</label>
                   <input value={form.confirmPassword} onChange={(e) => update("confirmPassword", e.target.value)}
-                    type={showPw ? "text" : "password"} placeholder="Repeat password" required
-                    className="w-full border border-[#E8D5C0] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]" />
+                    type={showPw ? "text" : "password"} placeholder="Repeat password" required className={inputCls} />
                 </div>
               )}
 
