@@ -98,6 +98,7 @@ export async function GET(req: NextRequest) {
     const type = searchParams.get("type");
     const limit = parseInt(searchParams.get("limit") ?? "50");
     const email = searchParams.get("email");
+    const orderNumber = searchParams.get("orderNumber");
 
     // Vendors only see their own orders
     const session = await getSession();
@@ -109,6 +110,7 @@ export async function GET(req: NextRequest) {
         ...(status ? { status } : {}),
         ...(type ? { type } : {}),
         ...(email ? { guestEmail: email } : {}),
+        ...(orderNumber ? { orderNumber: { contains: orderNumber.toUpperCase() } } : {}),
       },
       include: { items: true },
       orderBy: { createdAt: "desc" },
