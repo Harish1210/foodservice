@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Star, ChevronLeft, Loader2, MessageSquare, Send, TrendingUp } from "lucide-react";
 import toast from "react-hot-toast";
+import Navbar from "@/components/Navbar";
 
 type Review = {
   id: string;
@@ -107,6 +108,7 @@ export default function VendorReviewsPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
+      <Navbar />
       {/* Header */}
       <div className="bg-gray-900 border-b border-gray-800 px-6 py-4 flex items-center gap-4">
         <button onClick={() => router.push("/vendor")} className="text-gray-400 hover:text-white">

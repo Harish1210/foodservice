@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { formatCurrency } from "@/lib/utils";
 import { TrendingUp, ShoppingBag, DollarSign, BarChart3, Star, Truck, Package, UtensilsCrossed, RefreshCw } from "lucide-react";
 import Link from "next/link";
+import Navbar from "@/components/Navbar";
 
 type Analytics = {
   stats: {
@@ -38,6 +39,7 @@ export default function AnalyticsPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 p-6">
+      <Navbar />
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">

@@ -46,12 +46,14 @@ export async function POST(req: NextRequest) {
 
     // Image upload is best-effort — item is created even if upload fails
     let imageUrl: string | null = null;
+    let imageWarning: string | null = null;
     const imageFile = formData.get("image") as File | null;
     if (imageFile && imageFile.size > 0) {
       try {
         imageUrl = await uploadImage(imageFile);
       } catch (imgErr) {
         console.warn("Image upload failed (item will be created without image):", imgErr);
+        imageWarning = "Image could not be uploaded — item saved without photo";
       }
     }
 
@@ -60,7 +62,7 @@ export async function POST(req: NextRequest) {
       include: { category: true },
     });
 
-    return NextResponse.json({ item }, { status: 201 });
+    return NextResponse.json({ item, imageWarning }, { status: 201 });
   } catch (err) {
     console.error("Create menu item error:", err);
     const message = err instanceof Error ? err.message : "Unknown error";

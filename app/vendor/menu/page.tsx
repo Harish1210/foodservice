@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Plus, Edit2, Trash2, X, Save, Loader2, ImageIcon, ToggleLeft, ToggleRight, ChevronLeft } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import toast from "react-hot-toast";
+import Navbar from "@/components/Navbar";
 
 type Category = { id: string; name: string };
 type MenuItem = {
@@ -82,6 +83,7 @@ export default function VendorMenuPage() {
       if (!res.ok) throw new Error(data.error);
 
       toast.success(editItem ? "Item updated!" : "Item added!");
+      if (data.imageWarning) toast("⚠️ " + data.imageWarning, { icon: "📸" });
       setShowForm(false);
       await loadItems();
     } catch (err) {
@@ -114,6 +116,7 @@ export default function VendorMenuPage() {
 
   return (
     <div className="min-h-screen bg-[#0D0D0D] text-white">
+      <Navbar />
       {/* Header */}
       <div className="bg-[#1A1A1A] border-b border-white/10 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">

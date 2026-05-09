@@ -4,6 +4,7 @@ import { formatCurrency } from "@/lib/utils";
 import { ChefHat, RefreshCw, Clock, AlertCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import Navbar from "@/components/Navbar";
 
 type Order = {
   id: string;
@@ -54,6 +55,7 @@ export default function KitchenDisplay() {
 
   return (
     <div className="min-h-screen bg-gray-950 p-4">
+      <Navbar />
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <ChefHat className="text-[#FF6B00]" size={28} />
