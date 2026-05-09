@@ -1,16 +1,21 @@
 "use client";
 import Link from "next/link";
-import { ShoppingCart, Menu, X, Phone, MapPin, ChefHat, LogIn, UtensilsCrossed, ShieldCheck, User } from "lucide-react";
+import { ShoppingCart, Menu, X, Phone, MapPin, ChefHat, LogIn, UtensilsCrossed, ShieldCheck } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cartStore";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const count = useCartStore((s) => s.getItemCount());
+  const selectedVendorId   = useCartStore((s) => s.selectedVendorId);
+  const selectedVendorName = useCartStore((s) => s.selectedVendorName);
   const [userName, setUserName] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  // Avoid hydration mismatch — zustand/persist loads from localStorage after mount
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    setHydrated(true);
     fetch("/api/auth/me").then((r) => r.json()).then((d) => {
       if (d.user) {
         setUserName(d.user.firstName ?? d.user.email);
@@ -18,6 +23,11 @@ export default function Navbar() {
       }
     }).catch(() => {});
   }, []);
+
+  // Build the Menu href: go to the selected vendor's menu, or ask to pick a kitchen first
+  const menuHref = hydrated && selectedVendorId
+    ? `/?vendor=${selectedVendorId}`
+    : "/vendors";
 
   const isVendor = userRole === "vendor";
   const isAdmin = userRole === "admin";
@@ -56,7 +66,23 @@ export default function Navbar() {
             </Link>
           )}
           {!isVendor && !isAdmin && (
-            <Link href="/" className="text-gray-300 hover:text-[#FF6B00] transition-colors font-medium">Menu</Link>
+            <Link
+              href={menuHref}
+              className="flex items-center gap-1.5 text-gray-300 hover:text-[#FF6B00] transition-colors font-medium group relative"
+              title={hydrated && selectedVendorId ? `View menu from ${selectedVendorName ?? "selected kitchen"}` : "Select a kitchen first"}
+            >
+              Menu
+              {hydrated && selectedVendorId && (
+                <span className="text-[10px] font-bold text-[#FF6B00] bg-[#FF6B00]/10 border border-[#FF6B00]/30 px-1.5 py-0.5 rounded-full max-w-[90px] truncate leading-tight">
+                  {selectedVendorName ?? "Kitchen"}
+                </span>
+              )}
+              {hydrated && !selectedVendorId && (
+                <span className="text-[9px] font-semibold text-gray-500 bg-gray-800 border border-gray-700 px-1.5 py-0.5 rounded-full leading-tight">
+                  pick first
+                </span>
+              )}
+            </Link>
           )}
           {!isVendor && !isAdmin && (
             <Link href="/reservations" className="text-gray-300 hover:text-[#FF6B00] transition-colors font-medium">Reservations</Link>
@@ -123,7 +149,22 @@ export default function Navbar() {
             <Link href="/vendors" onClick={() => setOpen(false)} className="text-[#FF6B00] font-semibold py-2 border-b border-[#FF6B00]/20">🍳 Find Kitchens Near You</Link>
           )}
           {!isVendor && !isAdmin && (
-            <Link href="/" onClick={() => setOpen(false)} className="text-gray-300 hover:text-[#FF6B00] py-2 border-b border-[#FF6B00]/20">Menu</Link>
+            <Link
+              href={menuHref}
+              onClick={() => setOpen(false)}
+              className="flex items-center justify-between text-gray-300 hover:text-[#FF6B00] py-2 border-b border-[#FF6B00]/20"
+            >
+              <span>🍽️ Menu</span>
+              {hydrated && selectedVendorId ? (
+                <span className="text-[10px] font-bold text-[#FF6B00] bg-[#FF6B00]/10 border border-[#FF6B00]/30 px-2 py-0.5 rounded-full max-w-[120px] truncate">
+                  {selectedVendorName ?? "Kitchen selected"}
+                </span>
+              ) : (
+                <span className="text-[10px] text-gray-500 bg-gray-800 border border-gray-700 px-2 py-0.5 rounded-full">
+                  Select a kitchen first
+                </span>
+              )}
+            </Link>
           )}
           {!isVendor && !isAdmin && (
             <Link href="/reservations" onClick={() => setOpen(false)} className="text-gray-300 hover:text-[#FF6B00] py-2 border-b border-[#FF6B00]/20">Reservations</Link>
