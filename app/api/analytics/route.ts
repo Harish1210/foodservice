@@ -27,22 +27,25 @@ export async function GET() {
       prisma.menuItem.findMany({ include: { category: true } }),
     ]);
 
-    const monthOrders = allOrders.filter((o) => o.createdAt >= monthStart);
+    type OrderWithItems = (typeof allOrders)[number];
+
+    const monthOrders = allOrders.filter((o: OrderWithItems) => o.createdAt >= monthStart);
 
     // Revenue stats
-    const todayRevenue = todayOrders.reduce((s, o) => s + o.total, 0);
-    const weekRevenue = weekOrders.reduce((s, o) => s + o.total, 0);
-    const monthRevenue = monthOrders.reduce((s, o) => s + o.total, 0);
+    const todayRevenue = todayOrders.reduce((s: number, o: OrderWithItems) => s + o.total, 0);
+    const weekRevenue  = weekOrders.reduce((s: number, o: OrderWithItems) => s + o.total, 0);
+    const monthRevenue = monthOrders.reduce((s: number, o: OrderWithItems) => s + o.total, 0);
 
-    // Popular items
+    // Popular items (menuItemId is nullable after schema change — skip nulls)
     const itemCounts: Record<string, { name: string; count: number; revenue: number }> = {};
     for (const order of allOrders) {
       for (const item of order.items) {
-        if (!itemCounts[item.menuItemId]) {
-          itemCounts[item.menuItemId] = { name: item.name, count: 0, revenue: 0 };
+        const key = item.menuItemId ?? item.name; // fallback to name for deleted items
+        if (!itemCounts[key]) {
+          itemCounts[key] = { name: item.name, count: 0, revenue: 0 };
         }
-        itemCounts[item.menuItemId].count += item.quantity;
-        itemCounts[item.menuItemId].revenue += item.price * item.quantity;
+        itemCounts[key].count += item.quantity;
+        itemCounts[key].revenue += item.price * item.quantity;
       }
     }
     const popularItems = Object.entries(itemCounts)
@@ -52,9 +55,9 @@ export async function GET() {
 
     // Order type breakdown
     const typeBreakdown = {
-      delivery: allOrders.filter((o) => o.type === "delivery").length,
-      pickup: allOrders.filter((o) => o.type === "pickup").length,
-      "dine-in": allOrders.filter((o) => o.type === "dine-in").length,
+      delivery: allOrders.filter((o: OrderWithItems) => o.type === "delivery").length,
+      pickup:   allOrders.filter((o: OrderWithItems) => o.type === "pickup").length,
+      "dine-in": allOrders.filter((o: OrderWithItems) => o.type === "dine-in").length,
     };
 
     // Daily revenue (last 7 days)
@@ -64,10 +67,10 @@ export async function GET() {
       day.setDate(day.getDate() - i);
       const nextDay = new Date(day);
       nextDay.setDate(nextDay.getDate() + 1);
-      const dayOrders = allOrders.filter((o) => o.createdAt >= day && o.createdAt < nextDay);
+      const dayOrders = allOrders.filter((o: OrderWithItems) => o.createdAt >= day && o.createdAt < nextDay);
       dailyRevenue.push({
         date: day.toLocaleDateString("en-AU", { weekday: "short", day: "numeric" }),
-        revenue: dayOrders.reduce((s, o) => s + o.total, 0),
+        revenue: dayOrders.reduce((s: number, o: OrderWithItems) => s + o.total, 0),
         orders: dayOrders.length,
       });
     }
@@ -75,9 +78,9 @@ export async function GET() {
     return NextResponse.json({
       stats: {
         today: { orders: todayOrders.length, revenue: todayRevenue },
-        week: { orders: weekOrders.length, revenue: weekRevenue },
+        week:  { orders: weekOrders.length,  revenue: weekRevenue },
         month: { orders: monthOrders.length, revenue: monthRevenue },
-        total: { orders: allOrders.length, revenue: allOrders.reduce((s, o) => s + o.total, 0) },
+        total: { orders: allOrders.length,   revenue: allOrders.reduce((s: number, o: OrderWithItems) => s + o.total, 0) },
       },
       popularItems,
       typeBreakdown,
