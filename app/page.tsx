@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import MenuClient from "@/components/MenuClient";
+import VendorReviewsSection from "@/components/VendorReviewsSection";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -214,6 +215,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
       </div>
 
       <MenuClient categories={categories} settings={settings} vendorId={vendorId} />
+      <VendorReviewsSection vendorId={vendorId} />
     </div>
   );
 }
