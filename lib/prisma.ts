@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaNeon } from "@prisma/adapter-neon";
+import { PrismaNeonHttp } from "@prisma/adapter-neon";
 import { neon } from "@neondatabase/serverless";
 
 function createPrismaClient(): PrismaClient {
@@ -9,9 +9,9 @@ function createPrismaClient(): PrismaClient {
       `DATABASE_URL is not set. NODE_ENV=${process.env.NODE_ENV}`
     );
   }
-  // Use HTTP-based Neon driver — optimal for serverless (no persistent connection needed)
+  // HTTP-based Neon driver — ideal for Vercel serverless (no WebSocket pool needed)
   const sql = neon(connectionString);
-  const adapter = new PrismaNeon(sql);
+  const adapter = new PrismaNeonHttp(sql);
   return new PrismaClient({ adapter });
 }
 
