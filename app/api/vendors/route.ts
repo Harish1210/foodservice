@@ -14,58 +14,73 @@ function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number) {
 }
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const lat = parseFloat(searchParams.get("lat") ?? "");
-  const lng = parseFloat(searchParams.get("lng") ?? "");
-  const radius = parseFloat(searchParams.get("radius") ?? "5");
+  try {
+    const { searchParams } = new URL(req.url);
+    const lat    = parseFloat(searchParams.get("lat") ?? "");
+    const lng    = parseFloat(searchParams.get("lng") ?? "");
+    const radius = parseFloat(searchParams.get("radius") ?? "5");
 
-  // Fetch ALL vendors regardless of whether they have coordinates
-  const vendors = await prisma.user.findMany({
-    where: { role: "vendor", isApproved: true },
-    select: {
-      id: true,
-      firstName: true,
-      lastName: true,
-      businessName: true,
-      businessAddress: true,
-      lat: true,
-      lng: true,
-      isOpen: true,
-      _count: { select: { menuItems: { where: { isAvailable: true } } } },
-      vendorReviews: {
-        select: { rating: true },
+    // Fetch approved vendors
+    const vendors = await prisma.user.findMany({
+      where: { role: "vendor", isApproved: true },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        businessName: true,
+        businessAddress: true,
+        lat: true,
+        lng: true,
+        isOpen: true,
+        _count: { select: { menuItems: { where: { isAvailable: true } } } },
+        vendorReviews: { select: { rating: true } },
       },
-    },
-  });
-
-  const hasCustomerLocation = !isNaN(lat) && !isNaN(lng);
-
-  const result = vendors
-    .map((v) => {
-      const distance =
-        hasCustomerLocation && v.lat != null && v.lng != null
-          ? haversineKm(lat, lng, v.lat, v.lng)
-          : null;
-      const reviewCount = v.vendorReviews.length;
-      const avgRating = reviewCount > 0
-        ? v.vendorReviews.reduce((s: number, r: { rating: number }) => s + r.rating, 0) / reviewCount
-        : null;
-      return { ...v, distance, menuItemCount: v._count.menuItems, avgRating, reviewCount };
-    })
-    // When customer location is known: include vendors within radius OR vendors with no coordinates
-    // When no customer location: include all vendors
-    .filter((v) => {
-      if (!hasCustomerLocation) return true;
-      if (v.distance === null) return true; // no coords — always show
-      return v.distance <= radius;
-    })
-    // Sort: vendors with distance first (nearest first), then no-location vendors at end
-    .sort((a, b) => {
-      if (a.distance === null && b.distance === null) return 0;
-      if (a.distance === null) return 1;
-      if (b.distance === null) return -1;
-      return a.distance - b.distance;
     });
 
-  return NextResponse.json({ vendors: result });
+    const hasLocation = !isNaN(lat) && !isNaN(lng);
+
+    const result = vendors
+      .map((v) => {
+        const distance =
+          hasLocation && v.lat != null && v.lng != null
+            ? haversineKm(lat, lng, v.lat, v.lng)
+            : null;
+
+        const reviewCount = v.vendorReviews.length;
+        const avgRating   = reviewCount > 0
+          ? v.vendorReviews.reduce((s, r) => s + r.rating, 0) / reviewCount
+          : null;
+
+        return {
+          id:              v.id,
+          firstName:       v.firstName,
+          lastName:        v.lastName,
+          businessName:    v.businessName,
+          businessAddress: v.businessAddress,
+          lat:             v.lat,
+          lng:             v.lng,
+          isOpen:          v.isOpen,
+          menuItemCount:   v._count.menuItems,
+          distance,
+          avgRating,
+          reviewCount,
+        };
+      })
+      .filter((v) => {
+        if (!hasLocation) return true;
+        if (v.distance === null) return true; // no coords — always show
+        return v.distance <= radius;
+      })
+      .sort((a, b) => {
+        if (a.distance === null && b.distance === null) return 0;
+        if (a.distance === null) return 1;
+        if (b.distance === null) return -1;
+        return a.distance - b.distance;
+      });
+
+    return NextResponse.json({ vendors: result });
+  } catch (err) {
+    console.error("[/api/vendors] Error:", err);
+    return NextResponse.json({ error: "Failed to load vendors", vendors: [] }, { status: 500 });
+  }
 }
