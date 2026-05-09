@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { getSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import MenuClient from "@/components/MenuClient";
 import Link from "next/link";
@@ -6,6 +8,11 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage({ searchParams }: { searchParams: Promise<{ vendor?: string }> }) {
+  // Vendors and admins don't belong on the customer home page
+  const session = await getSession();
+  if (session?.role === "vendor") redirect("/vendor");
+  if (session?.role === "admin") redirect("/admin/vendors");
+
   const { vendor: vendorId } = await searchParams;
 
   const [categories, settings, vendor] = await Promise.all([
