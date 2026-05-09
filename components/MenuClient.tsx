@@ -257,10 +257,28 @@ export default function MenuClient({ categories, settings, vendorId }: Props) {
             ))}
           </div>
 
-          {search || filter !== "all" || activeCategory !== "all" ? (
+          {categories.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="text-6xl mb-4">🍽️</div>
+              <h3 className="text-lg font-bold text-[#1A0A00] mb-2">No menu items yet</h3>
+              <p className="text-gray-500 text-sm max-w-xs">
+                This kitchen hasn&apos;t added any dishes yet. Check back soon or choose a different kitchen.
+              </p>
+              <a
+                href="/vendors"
+                className="mt-5 inline-flex items-center gap-2 bg-[#FF6B00] text-white px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-[#CC5500] transition-colors"
+              >
+                ← Browse other kitchens
+              </a>
+            </div>
+          ) : search || filter !== "all" || activeCategory !== "all" ? (
             <div>
               <p className="text-sm text-gray-500 mb-4">{displayItems.length} item{displayItems.length !== 1 ? "s" : ""} found</p>
-              <ItemGrid items={displayItems} onSelect={setSelectedItem} getQty={getItemQtyInCart} onAdd={handleAddToCart} />
+              {displayItems.length === 0 ? (
+                <div className="text-center py-12 text-gray-400">No items match your filter.</div>
+              ) : (
+                <ItemGrid items={displayItems} onSelect={setSelectedItem} getQty={getItemQtyInCart} onAdd={handleAddToCart} />
+              )}
             </div>
           ) : (
             categories.map((cat) => (

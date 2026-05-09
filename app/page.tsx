@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Navbar from "@/components/Navbar";
 import MenuClient from "@/components/MenuClient";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -8,19 +9,19 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   const { vendor: vendorId } = await searchParams;
 
   const [categories, settings, vendor] = await Promise.all([
-    prisma.category.findMany({
-      where: { isActive: true },
-      include: {
-        menuItems: {
-          where: {
-            isAvailable: true,
-            ...(vendorId ? { vendorId } : {}),
+    // Only fetch menu items when a vendor is selected
+    vendorId
+      ? prisma.category.findMany({
+          where: { isActive: true },
+          include: {
+            menuItems: {
+              where: { isAvailable: true, vendorId },
+              orderBy: [{ isFeatured: "desc" }, { sortOrder: "asc" }],
+            },
           },
-          orderBy: [{ isFeatured: "desc" }, { sortOrder: "asc" }],
-        },
-      },
-      orderBy: { sortOrder: "asc" },
-    }).then((cats) => vendorId ? cats.filter((c) => c.menuItems.length > 0) : cats),
+          orderBy: { sortOrder: "asc" },
+        }).then((cats) => cats.filter((c) => c.menuItems.length > 0))
+      : Promise.resolve([]),
     prisma.businessSettings.findFirst(),
     vendorId
       ? prisma.user.findUnique({
@@ -34,27 +35,103 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
     ? vendor.businessName ?? `${vendor.firstName} ${vendor.lastName}`
     : null;
 
+  // No vendor selected — show landing / kitchen-finder page
+  if (!vendorId) {
+    return (
+      <div className="min-h-screen bg-[#FFF8F0]">
+        <Navbar />
+        {/* Hero */}
+        <div
+          className="relative py-16 px-4 text-center overflow-hidden"
+          style={{ background: "linear-gradient(135deg, #1A0A00 0%, #4A1500 50%, #7C2D12 100%)" }}
+        >
+          <div className="relative z-10 max-w-2xl mx-auto">
+            <div className="text-6xl mb-4">🍛</div>
+            <h1 className="text-3xl md:text-5xl font-bold text-white mb-3">
+              {settings?.name ?? "Home Food Service"}
+            </h1>
+            <p className="text-[#FF8C38] text-lg mb-6">
+              {settings?.tagline ?? "Authentic Indian Home Cooking — Delivered to Your Door"}
+            </p>
+            <Link
+              href="/vendors"
+              className="inline-flex items-center gap-2 bg-[#FF6B00] text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-[#CC5500] transition-colors shadow-lg shadow-orange-900/40"
+            >
+              🍳 Find a Kitchen Near You →
+            </Link>
+          </div>
+        </div>
+
+        {/* How it works */}
+        <div className="max-w-4xl mx-auto px-4 py-14">
+          <h2 className="text-2xl font-bold text-[#1A0A00] text-center mb-10">How It Works</h2>
+          <div className="grid sm:grid-cols-3 gap-6">
+            {[
+              { step: "1", icon: "📍", title: "Find a Kitchen", desc: "Browse home cooks near you and pick one that's open." },
+              { step: "2", icon: "🍽️", title: "Choose Your Dishes", desc: "Browse that kitchen's menu and add items to your cart." },
+              { step: "3", icon: "🚚", title: "Get It Delivered", desc: "Place your order and track it to your door." },
+            ].map((s) => (
+              <div key={s.step} className="bg-white rounded-2xl border border-[#E8D5C0] p-6 text-center shadow-sm">
+                <div className="w-10 h-10 bg-[#FF6B00] text-white rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-3">
+                  {s.step}
+                </div>
+                <div className="text-4xl mb-3">{s.icon}</div>
+                <h3 className="font-bold text-[#1A0A00] mb-1">{s.title}</h3>
+                <p className="text-gray-500 text-sm">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-10 text-center">
+            <Link
+              href="/vendors"
+              className="inline-flex items-center gap-2 bg-[#1A0A00] text-white px-8 py-4 rounded-2xl font-bold hover:bg-[#2D1200] transition-colors"
+            >
+              🍳 Browse Kitchens Near You →
+            </Link>
+          </div>
+        </div>
+
+        {/* Info pills */}
+        <div className="bg-white border-t border-[#E8D5C0] py-6">
+          <div className="max-w-4xl mx-auto px-4 flex flex-wrap justify-center gap-4 text-sm">
+            <span className="flex items-center gap-2 text-gray-600">
+              🚚 Delivery from ${settings?.deliveryFee?.toFixed(2) ?? "5.00"}
+            </span>
+            <span className="flex items-center gap-2 text-gray-600">
+              🎁 Free delivery over ${settings?.freeDeliveryOver?.toFixed(0) ?? "60"}
+            </span>
+            <span className="flex items-center gap-2 text-gray-600">
+              ⏱ Ready in ~{settings?.estimatedPrepTime ?? 20} mins
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Vendor selected — show that vendor's menu
   return (
     <div className="min-h-screen bg-[#FFF8F0]">
       <Navbar />
-      {/* Hero Banner */}
+      {/* Vendor hero banner */}
       <div
-        className="relative py-14 px-4 text-center overflow-hidden"
+        className="relative py-12 px-4 text-center overflow-hidden"
         style={{ background: "linear-gradient(135deg, #1A0A00 0%, #4A1500 50%, #7C2D12 100%)" }}
       >
         <div className="relative z-10 max-w-2xl mx-auto">
-          <div className="text-5xl mb-3">🍛</div>
-          <h1 className="text-3xl md:text-5xl font-bold text-white mb-3">
-            {vendorName ?? settings?.name ?? "Home Food Service"}
+          <div className="text-5xl mb-3">🍳</div>
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+            {vendorName ?? "Kitchen Menu"}
           </h1>
-          <p className="text-[#FF8C38] text-lg mb-2">
-            {vendor ? (vendor.businessAddress ?? "Authentic Indian Home Cooking") : (settings?.tagline ?? "Authentic Indian Home Cooking")}
-          </p>
+          {vendor?.businessAddress && (
+            <p className="text-[#FF8C38] text-base mb-2">{vendor.businessAddress}</p>
+          )}
           {vendor && (
             <div className="flex items-center justify-center gap-2 mb-4">
               <span className={`w-2 h-2 rounded-full ${vendor.isOpen ? "bg-green-400" : "bg-gray-400"}`} />
               <span className={`text-sm font-medium ${vendor.isOpen ? "text-green-300" : "text-gray-400"}`}>
-                {vendor.isOpen ? "Open now" : "Currently closed"}
+                {vendor.isOpen ? "Open now — accepting orders" : "Currently closed"}
               </span>
             </div>
           )}
@@ -71,30 +148,8 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
           </div>
         </div>
       </div>
-      {/* Vendor selector prompt — shown when no vendor is selected */}
-      {!vendorId && (
-        <div className="max-w-7xl mx-auto px-4 pt-6 pb-2">
-          <div className="bg-gradient-to-r from-[#1A0A00] to-[#3D1500] rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-[#FF6B00] rounded-xl flex items-center justify-center text-2xl shrink-0">
-                🍳
-              </div>
-              <div>
-                <p className="text-white font-bold text-base">Choose a Kitchen Near You</p>
-                <p className="text-orange-300 text-sm">Browse home cooks in your area and see their menu</p>
-              </div>
-            </div>
-            <a
-              href="/vendors"
-              className="shrink-0 flex items-center gap-2 bg-[#FF6B00] text-white px-5 py-3 rounded-xl font-bold hover:bg-[#CC5500] transition-colors text-sm whitespace-nowrap"
-            >
-              Find Kitchens →
-            </a>
-          </div>
-        </div>
-      )}
 
-      <MenuClient categories={categories} settings={settings} vendorId={vendorId ?? null} />
+      <MenuClient categories={categories} settings={settings} vendorId={vendorId} />
     </div>
   );
 }
