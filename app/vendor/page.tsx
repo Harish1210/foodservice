@@ -156,83 +156,52 @@ export default function VendorDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-950">
-      {/* Header */}
-      <header className="bg-gray-900 border-b border-gray-800 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src="/logo.jpg" alt="Logo" className="w-10 h-10 rounded-full object-cover ring-2 ring-[#FF6B00]/50" />
-            <div>
-              <h1 className="text-white font-bold text-lg">{vendorName || "My Kitchen"}</h1>
-              <p className="text-gray-400 text-xs">Vendor Dashboard</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link href="/vendor/menu" className="flex items-center gap-2 text-gray-300 hover:text-white text-sm px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors font-medium">
-              <UtensilsCrossed size={15} /> My Menu
-            </Link>
-            <Link href="/vendor/kitchen" className="flex items-center gap-2 text-gray-300 hover:text-white text-sm px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors">
-              <Package size={15} /> Kitchen Display
-            </Link>
-            <Link href="/vendor/analytics" className="flex items-center gap-2 text-gray-300 hover:text-white text-sm px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors">
-              <BarChart3 size={15} /> Analytics
-            </Link>
-            <Link href="/vendor/hours" className="flex items-center gap-2 text-gray-300 hover:text-white text-sm px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors">
-              <Clock size={15} /> Hours
-            </Link>
-            <button onClick={fetchOrders} className="flex items-center gap-2 bg-[#FF6B00] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#CC5500] transition-colors">
-              <RefreshCw size={14} /> Refresh
-            </button>
-            <Link href="/profile" className="flex items-center gap-2 text-gray-400 hover:text-white text-sm px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors">
-              <ChefHat size={15} /> Profile
-            </Link>
-          </div>
-        </div>
-      </header>
+      {/* Navbar handles all navigation + mobile hamburger */}
+      <Navbar />
 
-      <div className="max-w-7xl mx-auto px-6 py-6">
+      {/* Slim page title bar */}
+      <div className="bg-gray-900 border-b border-gray-800 px-4 py-3">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-white font-bold text-base sm:text-lg truncate">
+              {vendorName || "My Kitchen"}
+            </h1>
+            <p className="text-gray-400 text-xs">Chef Dashboard</p>
+          </div>
+          <button
+            onClick={fetchOrders}
+            className="shrink-0 flex items-center gap-2 bg-[#FF6B00] text-white px-3 sm:px-4 py-2 rounded-lg text-sm hover:bg-[#CC5500] transition-colors"
+          >
+            <RefreshCw size={14} />
+            <span className="hidden sm:inline">Refresh</span>
+          </button>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
 
         {/* Quick Action Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <Link href="/vendor/menu" className="group bg-gray-900 border border-gray-800 hover:border-[#FF6B00]/60 rounded-2xl p-5 flex items-center gap-4 transition-all hover:bg-gray-800">
-            <div className="w-12 h-12 bg-[#FF6B00] rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <UtensilsCrossed className="text-white" size={22} />
-            </div>
-            <div>
-              <p className="text-white font-bold">My Menu</p>
-              <p className="text-gray-400 text-xs">Add, edit & manage your dishes</p>
-            </div>
-          </Link>
-          <Link href="/vendor/kitchen" className="group bg-gray-900 border border-gray-800 hover:border-green-500/60 rounded-2xl p-5 flex items-center gap-4 transition-all hover:bg-gray-800">
-            <div className="w-12 h-12 bg-green-700 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <Package className="text-white" size={22} />
-            </div>
-            <div>
-              <p className="text-white font-bold">Kitchen Display</p>
-              <p className="text-gray-400 text-xs">View live incoming orders</p>
-            </div>
-          </Link>
-          <Link href="/vendor/reviews" className="group bg-gray-900 border border-gray-800 hover:border-yellow-500/60 rounded-2xl p-5 flex items-center gap-4 transition-all hover:bg-gray-800">
-            <div className="w-12 h-12 bg-yellow-600 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <Star className="text-white" size={22} />
-            </div>
-            <div>
-              <p className="text-white font-bold">Reviews</p>
-              <p className="text-gray-400 text-xs">See customer feedback</p>
-            </div>
-          </Link>
-          <Link href="/vendor/hours" className="group bg-gray-900 border border-gray-800 hover:border-blue-500/60 rounded-2xl p-5 flex items-center gap-4 transition-all hover:bg-gray-800">
-            <div className="w-12 h-12 bg-blue-700 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <Clock className="text-white" size={22} />
-            </div>
-            <div>
-              <p className="text-white font-bold">Opening Hours</p>
-              <p className="text-gray-400 text-xs">Set your kitchen schedule</p>
-            </div>
-          </Link>
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          {[
+            { href: "/vendor/menu",    icon: UtensilsCrossed, bg: "bg-[#FF6B00]", border: "hover:border-[#FF6B00]/60", label: "My Menu",         desc: "Add & manage dishes" },
+            { href: "/vendor/kitchen", icon: Package,         bg: "bg-green-700",  border: "hover:border-green-500/60", label: "Kitchen Display", desc: "Live order queue" },
+            { href: "/vendor/reviews", icon: Star,            bg: "bg-yellow-600", border: "hover:border-yellow-500/60", label: "Reviews",         desc: "Customer feedback" },
+            { href: "/vendor/hours",   icon: Clock,           bg: "bg-blue-700",   border: "hover:border-blue-500/60",  label: "Opening Hours",   desc: "Set your schedule" },
+          ].map(({ href, icon: Icon, bg, border, label, desc }) => (
+            <Link key={href} href={href} className={`group bg-gray-900 border border-gray-800 ${border} rounded-2xl p-3 sm:p-5 flex flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-4 transition-all hover:bg-gray-800 text-center sm:text-left`}>
+              <div className={`w-10 h-10 sm:w-12 sm:h-12 ${bg} rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}>
+                <Icon className="text-white" size={20} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-white font-bold text-sm sm:text-base leading-tight">{label}</p>
+                <p className="text-gray-400 text-xs hidden sm:block">{desc}</p>
+              </div>
+            </Link>
+          ))}
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
           {[
             { label: "Active Orders", value: stats.active, icon: AlertCircle, color: "text-yellow-400" },
             { label: "Preparing", value: stats.preparing, icon: ChefHat, color: "text-orange-400" },
@@ -288,7 +257,7 @@ export default function VendorDashboard() {
             <p className="text-gray-400 text-lg">No orders here!</p>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
             {filteredOrders.map((order) => (
               <div key={order.id} className={`bg-gray-900 rounded-2xl border overflow-hidden transition-all ${
                 order.status === "preparing" ? "border-orange-500/50 shadow-lg shadow-orange-500/10" :
