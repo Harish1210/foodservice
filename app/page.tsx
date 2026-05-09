@@ -30,15 +30,12 @@ export default async function HomePage() {
             <img src="/logo.jpg" alt="Dishly" className="w-24 h-24 rounded-full object-cover shadow-2xl shadow-orange-900/60 ring-4 ring-[#FF6B00]/30" />
           </div>
 
-          <span className="inline-block bg-[#FF6B00]/20 border border-[#FF6B00]/40 text-[#FF8C38] text-xs font-semibold px-4 py-1.5 rounded-full mb-5 tracking-widest uppercase">
-            🍽️ Every Dish, Every Kitchen
-          </span>
-
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-4 leading-tight tracking-tight">
+          <h1 className="text-5xl md:text-7xl font-black text-white mb-3 leading-tight tracking-tight">
             {settings?.name ?? "Dishly"}
           </h1>
-          <p className="text-[#FFB87A] text-lg md:text-xl mb-8 max-w-xl leading-relaxed">
-            {settings?.tagline ?? "Order from local home kitchens and restaurants near you — pickup, delivery or dine-in."}
+
+          <p className="text-white/60 text-sm md:text-base font-medium tracking-[0.2em] uppercase mb-8">
+            Every dish, every kitchen, delivered
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 mb-10">
@@ -128,8 +125,8 @@ export default async function HomePage() {
       <div className="py-16 text-center bg-gradient-to-b from-[#FFF8F0] to-orange-50">
         <div className="max-w-2xl mx-auto px-4">
           <img src="/logo.jpg" alt="Logo" className="w-16 h-16 rounded-full object-cover mx-auto mb-5 shadow-lg" />
-          <h2 className="text-3xl font-black text-[#1A0A00] mb-3">Ready to Order?</h2>
-          <p className="text-gray-500 mb-8 text-base">Discover local kitchens and restaurants near you. Real food from real chefs.</p>
+          <h2 className="text-3xl font-black text-[#1A0A00] mb-2">Ready to Order?</h2>
+          <p className="text-[#FF6B00] text-xs font-medium tracking-[0.2em] uppercase mb-6">Every dish, every kitchen, delivered</p>
           <Link
             href="/vendors"
             className="inline-flex items-center gap-2 bg-[#FF6B00] text-white px-10 py-4 rounded-2xl font-bold text-base hover:bg-[#E05E00] transition-all shadow-lg shadow-orange-200 hover:scale-105 active:scale-95"

@@ -53,7 +53,7 @@ export default function Navbar() {
             <div className="text-white font-bold text-base sm:text-lg leading-tight group-hover:text-[#FF6B00] transition-colors truncate">
               Dishly
             </div>
-            <div className="text-[#FF6B00] text-xs truncate">Local Kitchens & Restaurants</div>
+            <div className="text-[#FF8C38] text-[10px] tracking-wider uppercase truncate">Every dish, every kitchen</div>
           </div>
         </Link>
 
