@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       include: { items: true },
     });
 
-    // ── SMS notifications (fire-and-forget, never block the response) ──
+    // ── SMS notifications (awaited so they complete before response) ──
     const smsPromises: Promise<boolean>[] = [];
 
     // 1. Confirm to customer
@@ -81,8 +81,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Run all SMS sends in parallel (don't await — non-blocking)
-    Promise.allSettled(smsPromises).catch(() => {});
+    // Await with a 10s safety timeout so SMS never blocks the order response indefinitely
+    await Promise.race([
+      Promise.allSettled(smsPromises),
+      new Promise((resolve) => setTimeout(resolve, 10000)),
+    ]);
 
     return NextResponse.json({ order }, { status: 201 });
   } catch (err) {

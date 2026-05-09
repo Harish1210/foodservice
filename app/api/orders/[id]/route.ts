@@ -27,37 +27,38 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       include: { items: true },
     });
 
-    // ── SMS on status change (fire-and-forget) ──
+    // ── SMS on status change ──
     const customerPhone = order.guestPhone;
+    let smsPromise: Promise<boolean> | null = null;
 
-    const sendCustomerSMS = (msg: string) => {
-      if (customerPhone) sendSMS(customerPhone, msg).catch(() => {});
-    };
+    if (customerPhone) {
+      switch (status) {
+        case "preparing":
+          smsPromise = sendSMS(customerPhone, SMS.orderPreparing(order.orderNumber));
+          break;
+        case "ready":
+          smsPromise = order.type === "pickup" && order.pickupCode
+            ? sendSMS(customerPhone, SMS.orderReadyPickup(order.orderNumber, order.pickupCode))
+            : sendSMS(customerPhone, SMS.orderReadyDelivery(order.orderNumber));
+          break;
+        case "out_for_delivery":
+          smsPromise = sendSMS(customerPhone, SMS.orderOutForDelivery(order.orderNumber));
+          break;
+        case "delivered":
+          smsPromise = sendSMS(customerPhone, SMS.orderDelivered(order.orderNumber));
+          break;
+        case "cancelled":
+          smsPromise = sendSMS(customerPhone, SMS.orderCancelled(order.orderNumber));
+          break;
+      }
+    }
 
-    switch (status) {
-      case "preparing":
-        sendCustomerSMS(SMS.orderPreparing(order.orderNumber));
-        break;
-
-      case "ready":
-        if (order.type === "pickup" && order.pickupCode) {
-          sendCustomerSMS(SMS.orderReadyPickup(order.orderNumber, order.pickupCode));
-        } else {
-          sendCustomerSMS(SMS.orderReadyDelivery(order.orderNumber));
-        }
-        break;
-
-      case "out_for_delivery":
-        sendCustomerSMS(SMS.orderOutForDelivery(order.orderNumber));
-        break;
-
-      case "delivered":
-        sendCustomerSMS(SMS.orderDelivered(order.orderNumber));
-        break;
-
-      case "cancelled":
-        sendCustomerSMS(SMS.orderCancelled(order.orderNumber));
-        break;
+    // Await SMS with timeout
+    if (smsPromise) {
+      await Promise.race([
+        smsPromise,
+        new Promise((resolve) => setTimeout(resolve, 10000)),
+      ]);
     }
 
     return NextResponse.json({ order });
