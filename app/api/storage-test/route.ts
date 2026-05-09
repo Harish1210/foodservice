@@ -9,7 +9,9 @@ export async function GET() {
     return NextResponse.json({ error: "Supabase env vars missing", urlPresent: !!url, keyPresent: !!key });
   }
 
-  const supabase = createClient(url, key);
+  // Strip BOM characters that can sneak into env vars via copy-paste
+  const stripBom = (s: string) => s.charCodeAt(0) === 0xfeff ? s.slice(1) : s;
+  const supabase = createClient(stripBom(url), stripBom(key));
   const results: Record<string, unknown> = {
     supabaseUrl: url.substring(0, 50) + "...",
     urlPresent: true,

@@ -2,6 +2,11 @@ import { createClient } from "@supabase/supabase-js";
 
 const BUCKET = "menu-images";
 
+/** Strip BOM (﻿) that some editors/copy-paste add to the start of strings. */
+function stripBom(s: string): string {
+  return s.charCodeAt(0) === 0xfeff ? s.slice(1) : s;
+}
+
 /** Lazily create the Supabase client so env vars are always available at call time. */
 function getClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -9,7 +14,8 @@ function getClient() {
   if (!supabaseUrl || !serviceKey) {
     throw new Error(`Supabase env vars missing: URL=${!!supabaseUrl} KEY=${!!serviceKey}`);
   }
-  return createClient(supabaseUrl, serviceKey);
+  // Strip any leading BOM characters — these break HTTP header encoding
+  return createClient(stripBom(supabaseUrl), stripBom(serviceKey));
 }
 
 /** Ensure the storage bucket exists (creates it as public if missing). */
