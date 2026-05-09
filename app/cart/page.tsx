@@ -49,20 +49,21 @@ export default function CartPage() {
             {/* Order type selector */}
             <div className="bg-white rounded-2xl border border-[#E8D5C0] p-5">
               <h3 className="font-semibold text-[#1A0A00] mb-3">How would you like your order?</h3>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 {ORDER_TYPES.map(({ type, label, icon, desc }) => (
                   <button
                     key={type}
                     onClick={() => setOrderType(type)}
-                    className={`flex flex-col items-center gap-2 py-4 rounded-xl border-2 transition-all ${
+                    className={`flex flex-col items-center gap-1.5 py-3 sm:py-4 rounded-xl border-2 transition-all ${
                       orderType === type
                         ? "border-[#FF6B00] bg-orange-50 text-[#FF6B00]"
                         : "border-[#E8D5C0] text-gray-600 hover:border-[#FF6B00]/50"
                     }`}
                   >
                     {icon}
-                    <span className="font-semibold text-sm">{label}</span>
-                    <span className="text-xs text-gray-400">{desc}</span>
+                    <span className="font-semibold text-xs sm:text-sm">{label}</span>
+                    <span className="hidden sm:block text-xs text-gray-400">{desc}</span>
+                    <span className="sm:hidden text-[10px] text-gray-400">{desc.split(" ")[0]}</span>
                   </button>
                 ))}
               </div>
@@ -81,8 +82,8 @@ export default function CartPage() {
             {/* Items list */}
             <div className="bg-white rounded-2xl border border-[#E8D5C0] divide-y divide-[#E8D5C0]">
               {items.map((item) => (
-                <div key={item.id} className="flex items-center gap-4 p-4">
-                  <div className="w-12 h-12 bg-[#FFF0E0] rounded-xl flex items-center justify-center text-2xl shrink-0">
+                <div key={item.id} className="flex items-center gap-3 p-3 sm:p-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#FFF0E0] rounded-xl flex items-center justify-center text-xl sm:text-2xl shrink-0">
                     {item.isVeg ? "🥘" : "🍗"}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -90,7 +91,7 @@ export default function CartPage() {
                     {item.notes && <p className="text-xs text-gray-400 truncate">{item.notes}</p>}
                     <p className="text-[#FF6B00] font-bold text-sm">{formatCurrency(item.price)}</p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="w-7 h-7 rounded-lg border border-[#E8D5C0] flex items-center justify-center hover:border-[#FF6B00] transition-colors">
                       <Minus size={12} />
                     </button>
@@ -99,7 +100,7 @@ export default function CartPage() {
                       <Plus size={12} />
                     </button>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right shrink-0">
                     <p className="font-bold text-sm text-[#1A0A00]">{formatCurrency(item.price * item.quantity)}</p>
                     <button onClick={() => removeItem(item.id)} className="text-red-400 hover:text-red-600 transition-colors mt-1">
                       <Trash2 size={14} />

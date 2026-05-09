@@ -8,9 +8,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Pass ?to=+61xxxxxxxxx" }, { status: 400 });
   }
 
-  const sid   = process.env.TWILIO_ACCOUNT_SID ?? "";
-  const token = process.env.TWILIO_AUTH_TOKEN  ?? "";
-  const from  = process.env.TWILIO_PHONE_NUMBER ?? "";
+  const stripBom = (s: string) => s.charCodeAt(0) === 0xfeff ? s.slice(1) : s;
+  const sid   = stripBom(process.env.TWILIO_ACCOUNT_SID  ?? "");
+  const token = stripBom(process.env.TWILIO_AUTH_TOKEN   ?? "");
+  const from  = stripBom(process.env.TWILIO_PHONE_NUMBER ?? "");
   const toNum = toE164(to);
 
   if (!sid || !token || !from) {

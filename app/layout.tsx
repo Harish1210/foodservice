@@ -22,7 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-[#FFF8F0]">
+      <body className="min-h-full flex flex-col bg-[#FFF8F0] overflow-x-hidden">
         {children}
         <VoiceAssistant />
         <Toaster

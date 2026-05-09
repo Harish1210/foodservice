@@ -47,13 +47,13 @@ export default function Navbar() {
 
       {/* Main nav */}
       <nav className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <img src="/logo.jpg" alt="Logo" className="w-9 h-9 rounded-full object-cover ring-2 ring-[#FF6B00]/40 group-hover:ring-[#FF6B00] transition-all" />
-          <div>
-            <div className="text-white font-bold text-lg leading-tight group-hover:text-[#FF6B00] transition-colors">
+        <Link href="/" className="flex items-center gap-2.5 group min-w-0">
+          <img src="/logo.jpg" alt="Logo" className="w-9 h-9 rounded-full object-cover ring-2 ring-[#FF6B00]/40 group-hover:ring-[#FF6B00] transition-all shrink-0" />
+          <div className="min-w-0 overflow-hidden">
+            <div className="text-white font-bold text-base sm:text-lg leading-tight group-hover:text-[#FF6B00] transition-colors truncate">
               Home Food Service
             </div>
-            <div className="text-[#FF6B00] text-xs">Authentic Indian Home Cooking</div>
+            <div className="text-[#FF6B00] text-xs truncate">Authentic Indian Home Cooking</div>
           </div>
         </Link>
 

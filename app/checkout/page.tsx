@@ -258,7 +258,7 @@ export default function CheckoutPage() {
                 <h3 className="font-semibold text-[#1A0A00] mb-4 flex items-center gap-2">
                   <CreditCard size={16} className="text-[#FF6B00]" /> Payment Method
                 </h3>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
                   {[
                     { key: "card", label: "💳 Card", desc: "Visa / Mastercard" },
                     { key: "cash", label: "💵 Cash", desc: "Pay on arrival" },
@@ -268,13 +268,13 @@ export default function CheckoutPage() {
                       key={p.key}
                       type="button"
                       onClick={() => update("paymentMethod", p.key)}
-                      className={`flex flex-col items-center p-3 rounded-xl border-2 transition-all text-center ${
+                      className={`flex flex-col items-center p-2 sm:p-3 rounded-xl border-2 transition-all text-center ${
                         form.paymentMethod === p.key ? "border-[#FF6B00] bg-orange-50" : "border-[#E8D5C0] hover:border-[#FF6B00]/50"
                       }`}
                     >
                       <span className="text-lg">{p.label.split(" ")[0]}</span>
-                      <span className="text-xs font-medium mt-1">{p.label.split(" ").slice(1).join(" ")}</span>
-                      <span className="text-xs text-gray-400">{p.desc}</span>
+                      <span className="text-[11px] sm:text-xs font-medium mt-1 leading-tight">{p.label.split(" ").slice(1).join(" ")}</span>
+                      <span className="hidden sm:block text-xs text-gray-400">{p.desc}</span>
                     </button>
                   ))}
                 </div>

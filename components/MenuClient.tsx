@@ -297,15 +297,15 @@ export default function MenuClient({ categories, settings, vendorId }: Props) {
 
       {/* Floating cart bar */}
       {cartCount > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 animate-slide-up">
-          <Link href="/cart" className="flex items-center gap-4 bg-[#1A0A00] text-white px-6 py-4 rounded-2xl shadow-2xl hover:bg-[#2A1500] transition-colors">
-            <div className="bg-[#FF6B00] rounded-lg p-1.5">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 animate-slide-up w-max max-w-[calc(100vw-2rem)]">
+          <Link href="/cart" className="flex items-center gap-2 sm:gap-4 bg-[#1A0A00] text-white px-4 sm:px-6 py-3 sm:py-4 rounded-2xl shadow-2xl hover:bg-[#2A1500] transition-colors">
+            <div className="bg-[#FF6B00] rounded-lg p-1.5 shrink-0">
               <ShoppingCart size={18} />
             </div>
-            <span className="font-semibold">{cartCount} item{cartCount !== 1 ? "s" : ""}</span>
+            <span className="font-semibold text-sm sm:text-base whitespace-nowrap">{cartCount} item{cartCount !== 1 ? "s" : ""}</span>
             <span className="text-gray-400 text-sm">•</span>
-            <span className="text-[#FF8C38] font-bold">{formatCurrency(cartTotal)}</span>
-            <span className="text-sm text-gray-300">View Cart →</span>
+            <span className="text-[#FF8C38] font-bold text-sm sm:text-base whitespace-nowrap">{formatCurrency(cartTotal)}</span>
+            <span className="hidden sm:inline text-sm text-gray-300 whitespace-nowrap">View Cart →</span>
           </Link>
         </div>
       )}

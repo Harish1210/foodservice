@@ -1,15 +1,24 @@
 /**
  * SMS notifications via Twilio.
  *
- * Set these in your .env file:
+ * Set these in your Vercel / .env file:
  *   TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
  *   TWILIO_AUTH_TOKEN=your_auth_token
  *   TWILIO_PHONE_NUMBER=+61xxxxxxxxx   (your Twilio number)
  */
 
-const ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID ?? "";
-const AUTH_TOKEN  = process.env.TWILIO_AUTH_TOKEN  ?? "";
-const FROM_NUMBER = process.env.TWILIO_PHONE_NUMBER ?? "";
+/** Strip BOM (U+FEFF) that some editors/copy-paste add — it breaks HTTP headers. */
+function stripBom(s: string): string {
+  return s.charCodeAt(0) === 0xfeff ? s.slice(1) : s;
+}
+
+function getCreds() {
+  return {
+    sid:   stripBom(process.env.TWILIO_ACCOUNT_SID  ?? ""),
+    token: stripBom(process.env.TWILIO_AUTH_TOKEN   ?? ""),
+    from:  stripBom(process.env.TWILIO_PHONE_NUMBER ?? ""),
+  };
+}
 
 /** Convert an AU local number to E.164 (+61…) */
 export function toE164(phone: string): string {
@@ -22,7 +31,9 @@ export function toE164(phone: string): string {
 
 /** Send one SMS. Returns true on success, false on failure (never throws). */
 export async function sendSMS(to: string, body: string): Promise<boolean> {
-  if (!ACCOUNT_SID || !AUTH_TOKEN || !FROM_NUMBER) {
+  const { sid, token, from } = getCreds();
+
+  if (!sid || !token || !from) {
     console.warn("[SMS] Twilio env vars not set — skipping SMS to", to);
     return false;
   }
@@ -31,17 +42,17 @@ export async function sendSMS(to: string, body: string): Promise<boolean> {
   const toE164Number = toE164(to);
 
   try {
-    const url = `https://api.twilio.com/2010-04-01/Accounts/${ACCOUNT_SID}/Messages.json`;
-    const credentials = Buffer.from(`${ACCOUNT_SID}:${AUTH_TOKEN}`).toString("base64");
+    const url  = `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`;
+    const creds = Buffer.from(`${sid}:${token}`).toString("base64");
 
     const res = await fetch(url, {
       method: "POST",
       headers: {
-        Authorization: `Basic ${credentials}`,
+        Authorization: `Basic ${creds}`,
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: new URLSearchParams({
-        From: FROM_NUMBER,
+        From: from,
         To:   toE164Number,
         Body: body,
       }),
