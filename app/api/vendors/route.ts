@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
 
     // Fetch approved vendors
     const vendors = await prisma.user.findMany({
-      where: { role: "vendor", isApproved: true },
+      where: { role: "vendor", isApproved: true, isOnHold: false },
       select: {
         id: true,
         firstName: true,

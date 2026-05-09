@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import {
   CheckCircle, XCircle, Clock, MapPin, Phone, Mail,
-  ChefHat, Loader2, RefreshCw, ShieldCheck,
+  ChefHat, Loader2, RefreshCw, ShieldCheck, PauseCircle,
+  PlayCircle, Trash2, AlertTriangle,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -17,15 +18,19 @@ type Vendor = {
   businessName: string | null;
   businessAddress: string | null;
   isApproved: boolean;
+  isOnHold: boolean;
   createdAt: string;
   _count: { menuItems: number };
 };
+
+type Action = "approve" | "disapprove" | "hold" | "unhold" | "delete";
 
 export default function AdminVendorsPage() {
   const router = useRouter();
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionId, setActionId] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<Vendor | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -43,7 +48,7 @@ export default function AdminVendorsPage() {
 
   useEffect(() => { load(); }, []);
 
-  const act = async (vendorId: string, action: "approve" | "reject") => {
+  const act = async (vendorId: string, action: Action) => {
     setActionId(vendorId);
     try {
       const res = await fetch("/api/admin/vendors", {
@@ -53,7 +58,16 @@ export default function AdminVendorsPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      toast.success(action === "approve" ? "✅ Vendor approved!" : "❌ Vendor rejected");
+
+      const messages: Record<Action, string> = {
+        approve:    "✅ Vendor approved!",
+        disapprove: "↩️ Approval revoked",
+        hold:       "⏸️ Vendor put on hold",
+        unhold:     "▶️ Hold removed",
+        delete:     "🗑️ Vendor permanently deleted",
+      };
+      toast.success(messages[action]);
+      setConfirmDelete(null);
       await load();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Action failed");
@@ -62,8 +76,9 @@ export default function AdminVendorsPage() {
     }
   };
 
-  const pending = vendors.filter((v) => !v.isApproved);
-  const approved = vendors.filter((v) => v.isApproved);
+  const pending  = vendors.filter((v) => !v.isApproved && !v.isOnHold);
+  const onHold   = vendors.filter((v) => v.isOnHold);
+  const approved = vendors.filter((v) => v.isApproved && !v.isOnHold);
 
   return (
     <div className="min-h-screen bg-[#FFF8F0]">
@@ -77,26 +92,24 @@ export default function AdminVendorsPage() {
               <ShieldCheck size={22} className="text-orange-400" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-[#1A0A00]">Vendor Approvals</h1>
-              <p className="text-gray-500 text-sm">Review and approve vendor registrations</p>
+              <h1 className="text-2xl font-bold text-[#1A0A00]">Vendor Management</h1>
+              <p className="text-gray-500 text-sm">Approve, hold, or remove vendor accounts</p>
             </div>
           </div>
-          <button
-            onClick={load}
-            disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 border border-[#E8D5C0] rounded-xl text-sm text-gray-600 hover:bg-white transition-colors disabled:opacity-60"
-          >
+          <button onClick={load} disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 border border-[#E8D5C0] rounded-xl text-sm text-gray-600 hover:bg-white transition-colors disabled:opacity-60">
             <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
             Refresh
           </button>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-4 gap-3 mb-8">
           {[
-            { label: "Pending Approval", value: pending.length, color: "bg-amber-50 border-amber-200 text-amber-700", icon: Clock },
-            { label: "Approved Vendors", value: approved.length, color: "bg-green-50 border-green-200 text-green-700", icon: CheckCircle },
-            { label: "Total Vendors", value: vendors.length, color: "bg-blue-50 border-blue-200 text-blue-700", icon: ChefHat },
+            { label: "Pending",   value: pending.length,  color: "bg-amber-50 border-amber-200 text-amber-700",   icon: Clock },
+            { label: "On Hold",   value: onHold.length,   color: "bg-orange-50 border-orange-200 text-orange-700", icon: PauseCircle },
+            { label: "Approved",  value: approved.length, color: "bg-green-50 border-green-200 text-green-700",   icon: CheckCircle },
+            { label: "Total",     value: vendors.length,  color: "bg-blue-50 border-blue-200 text-blue-700",      icon: ChefHat },
           ].map(({ label, value, color, icon: Icon }) => (
             <div key={label} className={`rounded-2xl border p-4 text-center ${color}`}>
               <Icon size={20} className="mx-auto mb-1" />
@@ -113,89 +126,157 @@ export default function AdminVendorsPage() {
         ) : (
           <>
             {/* Pending Vendors */}
-            <section className="mb-10">
-              <h2 className="font-bold text-[#1A0A00] mb-4 flex items-center gap-2">
-                <Clock size={16} className="text-amber-500" />
-                Pending Approval
-                {pending.length > 0 && (
-                  <span className="bg-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                    {pending.length}
-                  </span>
-                )}
-              </h2>
-
+            <Section title="Pending Approval" icon={<Clock size={16} className="text-amber-500" />} badge={pending.length}>
               {pending.length === 0 ? (
-                <div className="bg-white rounded-2xl border border-[#E8D5C0] p-8 text-center text-gray-400">
-                  <CheckCircle size={32} className="mx-auto mb-2 text-green-300" />
-                  <p className="font-medium">No pending approvals</p>
-                  <p className="text-sm">All vendor registrations have been reviewed.</p>
-                </div>
+                <EmptyState icon={<CheckCircle size={32} className="text-green-300" />} title="No pending approvals" sub="All vendor registrations have been reviewed." />
               ) : (
-                <div className="space-y-4">
-                  {pending.map((vendor) => (
-                    <VendorCard
-                      key={vendor.id}
-                      vendor={vendor}
-                      actionId={actionId}
-                      onApprove={() => act(vendor.id, "approve")}
-                      onReject={() => act(vendor.id, "reject")}
-                      showActions
-                    />
-                  ))}
-                </div>
+                pending.map((v) => (
+                  <VendorCard key={v.id} vendor={v} actionId={actionId}
+                    onDelete={() => setConfirmDelete(v)}
+                    actions={[
+                      { label: "Approve", icon: <CheckCircle size={13} />, color: "bg-green-600 hover:bg-green-700 text-white", action: "approve" },
+                      { label: "Reject & Delete", icon: <Trash2 size={13} />, color: "bg-red-50 hover:bg-red-100 text-red-600 border border-red-200", action: "delete", confirm: true },
+                    ]}
+                    act={act}
+                    setConfirmDelete={setConfirmDelete}
+                  />
+                ))
               )}
-            </section>
+            </Section>
+
+            {/* On Hold Vendors */}
+            {onHold.length > 0 && (
+              <Section title="On Hold" icon={<PauseCircle size={16} className="text-orange-500" />} badge={onHold.length}>
+                {onHold.map((v) => (
+                  <VendorCard key={v.id} vendor={v} actionId={actionId}
+                    onDelete={() => setConfirmDelete(v)}
+                    actions={[
+                      { label: "Reinstate", icon: <PlayCircle size={13} />, color: "bg-green-600 hover:bg-green-700 text-white", action: "unhold" },
+                      { label: "Delete", icon: <Trash2 size={13} />, color: "bg-red-50 hover:bg-red-100 text-red-600 border border-red-200", action: "delete", confirm: true },
+                    ]}
+                    act={act}
+                    setConfirmDelete={setConfirmDelete}
+                  />
+                ))}
+              </Section>
+            )}
 
             {/* Approved Vendors */}
-            <section>
-              <h2 className="font-bold text-[#1A0A00] mb-4 flex items-center gap-2">
-                <CheckCircle size={16} className="text-green-500" />
-                Approved Vendors ({approved.length})
-              </h2>
+            <Section title={`Approved Vendors (${approved.length})`} icon={<CheckCircle size={16} className="text-green-500" />}>
               {approved.length === 0 ? (
-                <p className="text-gray-400 text-sm">No approved vendors yet.</p>
+                <EmptyState icon={<ChefHat size={32} className="text-gray-300" />} title="No approved vendors yet." sub="" />
               ) : (
-                <div className="space-y-3">
-                  {approved.map((vendor) => (
-                    <VendorCard
-                      key={vendor.id}
-                      vendor={vendor}
-                      actionId={actionId}
-                      showActions={false}
-                    />
-                  ))}
-                </div>
+                approved.map((v) => (
+                  <VendorCard key={v.id} vendor={v} actionId={actionId}
+                    onDelete={() => setConfirmDelete(v)}
+                    actions={[
+                      { label: "Disapprove", icon: <XCircle size={13} />, color: "bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200", action: "disapprove" },
+                      { label: "Put on Hold", icon: <PauseCircle size={13} />, color: "bg-orange-50 hover:bg-orange-100 text-orange-600 border border-orange-200", action: "hold" },
+                      { label: "Delete", icon: <Trash2 size={13} />, color: "bg-red-50 hover:bg-red-100 text-red-600 border border-red-200", action: "delete", confirm: true },
+                    ]}
+                    act={act}
+                    setConfirmDelete={setConfirmDelete}
+                  />
+                ))
               )}
-            </section>
+            </Section>
           </>
         )}
       </div>
+
+      {/* Delete confirmation modal */}
+      {confirmDelete && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-red-200 p-6 max-w-sm w-full shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
+                <AlertTriangle size={20} className="text-red-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-[#1A0A00]">Permanently Delete?</h3>
+                <p className="text-xs text-gray-500">This cannot be undone</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 mb-5">
+              You are about to permanently delete{" "}
+              <span className="font-semibold text-[#1A0A00]">
+                {confirmDelete.businessName ?? `${confirmDelete.firstName} ${confirmDelete.lastName}`.trim()}
+              </span>
+              . All their data will be lost.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmDelete(null)}
+                className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
+                Cancel
+              </button>
+              <button
+                onClick={() => act(confirmDelete.id, "delete")}
+                disabled={actionId === confirmDelete.id}
+                className="flex-1 py-2.5 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 disabled:opacity-60 transition-colors flex items-center justify-center gap-2">
+                {actionId === confirmDelete.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                Delete Permanently
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
+function Section({ title, icon, badge, children }: { title: string; icon: React.ReactNode; badge?: number; children: React.ReactNode }) {
+  return (
+    <section className="mb-10">
+      <h2 className="font-bold text-[#1A0A00] mb-4 flex items-center gap-2">
+        {icon}
+        {title}
+        {badge != null && badge > 0 && (
+          <span className="bg-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{badge}</span>
+        )}
+      </h2>
+      <div className="space-y-3">{children}</div>
+    </section>
+  );
+}
+
+function EmptyState({ icon, title, sub }: { icon: React.ReactNode; title: string; sub: string }) {
+  return (
+    <div className="bg-white rounded-2xl border border-[#E8D5C0] p-8 text-center text-gray-400">
+      <div className="mx-auto mb-2 flex justify-center">{icon}</div>
+      <p className="font-medium">{title}</p>
+      {sub && <p className="text-sm">{sub}</p>}
+    </div>
+  );
+}
+
+type ActionDef = { label: string; icon: React.ReactNode; color: string; action: Action; confirm?: boolean };
+
 function VendorCard({
-  vendor,
-  actionId,
-  onApprove,
-  onReject,
-  showActions,
+  vendor, actionId, actions, act, setConfirmDelete,
 }: {
   vendor: Vendor;
   actionId: string | null;
-  onApprove?: () => void;
-  onReject?: () => void;
-  showActions: boolean;
+  actions: ActionDef[];
+  act: (id: string, action: Action) => void;
+  setConfirmDelete: (v: Vendor) => void;
+  onDelete: () => void;
 }) {
   const name = vendor.businessName ?? (`${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed Kitchen");
   const isBusy = actionId === vendor.id;
 
+  const statusBadge = vendor.isOnHold
+    ? { label: "On Hold", cls: "bg-orange-100 text-orange-700", icon: <PauseCircle size={10} /> }
+    : vendor.isApproved
+    ? { label: "Approved", cls: "bg-green-100 text-green-700", icon: <CheckCircle size={10} /> }
+    : { label: "Pending", cls: "bg-amber-100 text-amber-700", icon: <Clock size={10} /> };
+
   return (
     <div className={`bg-white rounded-2xl border-2 p-5 transition-all ${
-      vendor.isApproved ? "border-[#E8D5C0]" : "border-amber-200 bg-amber-50/30"
+      vendor.isOnHold ? "border-orange-200 bg-orange-50/20" :
+      vendor.isApproved ? "border-[#E8D5C0]" : "border-amber-200 bg-amber-50/20"
     }`}>
       <div className="flex items-start gap-4">
-        {/* Avatar */}
         <div className="w-12 h-12 bg-gradient-to-br from-[#FF6B00] to-[#CC5500] rounded-xl flex items-center justify-center text-white font-bold text-lg shrink-0">
           {name[0].toUpperCase()}
         </div>
@@ -204,56 +285,33 @@ function VendorCard({
           <div className="flex items-start justify-between gap-3 flex-wrap">
             <div>
               <h3 className="font-bold text-[#1A0A00]">{name}</h3>
-              <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full mt-0.5 ${
-                vendor.isApproved ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
-              }`}>
-                {vendor.isApproved ? <CheckCircle size={10} /> : <Clock size={10} />}
-                {vendor.isApproved ? "Approved" : "Pending Approval"}
+              <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full mt-0.5 ${statusBadge.cls}`}>
+                {statusBadge.icon} {statusBadge.label}
               </span>
             </div>
 
-            {showActions && (
-              <div className="flex gap-2 shrink-0">
+            <div className="flex flex-wrap gap-2 shrink-0">
+              {actions.map((a) => (
                 <button
-                  onClick={onApprove}
+                  key={a.action}
+                  onClick={() => a.confirm ? setConfirmDelete(vendor) : act(vendor.id, a.action)}
                   disabled={isBusy}
-                  className="flex items-center gap-1.5 bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-green-700 disabled:opacity-60 transition-colors"
-                >
-                  {isBusy ? <Loader2 size={13} className="animate-spin" /> : <CheckCircle size={13} />}
-                  Approve
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold disabled:opacity-60 transition-colors ${a.color}`}>
+                  {isBusy && !a.confirm ? <Loader2 size={12} className="animate-spin" /> : a.icon}
+                  {a.label}
                 </button>
-                <button
-                  onClick={onReject}
-                  disabled={isBusy}
-                  className="flex items-center gap-1.5 bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-red-100 disabled:opacity-60 transition-colors"
-                >
-                  <XCircle size={13} />
-                  Reject
-                </button>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
 
           <div className="mt-2 grid sm:grid-cols-2 gap-1.5 text-xs text-gray-500">
-            <span className="flex items-center gap-1.5">
-              <Mail size={11} className="text-gray-400" /> {vendor.email}
-            </span>
-            {vendor.phone && (
-              <span className="flex items-center gap-1.5">
-                <Phone size={11} className="text-gray-400" /> {vendor.phone}
-              </span>
-            )}
+            <span className="flex items-center gap-1.5"><Mail size={11} className="text-gray-400" />{vendor.email}</span>
+            {vendor.phone && <span className="flex items-center gap-1.5"><Phone size={11} className="text-gray-400" />{vendor.phone}</span>}
             {vendor.businessAddress && (
-              <span className="flex items-center gap-1.5 sm:col-span-2">
-                <MapPin size={11} className="text-gray-400" /> {vendor.businessAddress}
-              </span>
+              <span className="flex items-center gap-1.5 sm:col-span-2"><MapPin size={11} className="text-gray-400" />{vendor.businessAddress}</span>
             )}
-            <span className="flex items-center gap-1.5">
-              <ChefHat size={11} className="text-gray-400" /> {vendor._count.menuItems} menu items
-            </span>
-            <span className="text-gray-400">
-              Registered {new Date(vendor.createdAt).toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" })}
-            </span>
+            <span className="flex items-center gap-1.5"><ChefHat size={11} className="text-gray-400" />{vendor._count.menuItems} menu items</span>
+            <span className="text-gray-400">Registered {new Date(vendor.createdAt).toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" })}</span>
           </div>
         </div>
       </div>

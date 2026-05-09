@@ -27,6 +27,7 @@ model User {
   lng             Float?
   isOpen          Boolean  @default(true)
   isApproved      Boolean  @default(false)
+  isOnHold        Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -141,15 +142,15 @@ model Order {
 model OrderItem {
   id             String  @id @default(cuid())
   orderId        String
-  menuItemId     String
+  menuItemId     String?
   name           String
   price          Float
   quantity       Int
   customizations String?
   notes          String?
 
-  order    Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  menuItem MenuItem @relation(fields: [menuItemId], references: [id])
+  order    Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem MenuItem? @relation(fields: [menuItemId], references: [id], onDelete: SetNull)
 }
 
 model Reservation {

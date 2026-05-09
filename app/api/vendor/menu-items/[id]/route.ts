@@ -63,10 +63,18 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   if (!session) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
 
   const { id } = await params;
-  const item = await prisma.menuItem.findUnique({ where: { id }, select: { image: true } });
-  if (item?.image?.startsWith("/uploads/")) {
-    try { await unlink(path.join(process.cwd(), "public", item.image)); } catch { /* ignore */ }
+  try {
+    const item = await prisma.menuItem.findUnique({ where: { id }, select: { image: true, vendorId: true } });
+    if (!item) return NextResponse.json({ error: "Item not found" }, { status: 404 });
+    if (item.vendorId !== session.userId) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+    if (item.image?.startsWith("/uploads/")) {
+      try { await unlink(path.join(process.cwd(), "public", item.image)); } catch { /* ignore */ }
+    }
+    await prisma.menuItem.delete({ where: { id } });
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error("Delete menu item error:", err);
+    return NextResponse.json({ error: "Failed to delete item" }, { status: 500 });
   }
-  await prisma.menuItem.delete({ where: { id } });
-  return NextResponse.json({ ok: true });
 }

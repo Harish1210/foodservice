@@ -1,28 +1,46 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sendSMS, toE164 } from "@/lib/sms";
+import { toE164 } from "@/lib/sms";
 
-/** GET /api/test-sms?to=+61400000000  — quick credential & delivery test */
+/** GET /api/test-sms?to=+61400000000  — raw Twilio test with full error detail */
 export async function GET(req: NextRequest) {
   const to = req.nextUrl.searchParams.get("to");
   if (!to) {
     return NextResponse.json({ error: "Pass ?to=+61xxxxxxxxx" }, { status: 400 });
   }
 
-  const formatted = toE164(to);
-  const sid  = process.env.TWILIO_ACCOUNT_SID;
-  const from = process.env.TWILIO_PHONE_NUMBER;
+  const sid   = process.env.TWILIO_ACCOUNT_SID ?? "";
+  const token = process.env.TWILIO_AUTH_TOKEN  ?? "";
+  const from  = process.env.TWILIO_PHONE_NUMBER ?? "";
+  const toNum = toE164(to);
 
-  if (!sid || sid.startsWith("AC") === false) {
-    return NextResponse.json({ error: "TWILIO_ACCOUNT_SID missing or invalid (must start with AC)" }, { status: 500 });
+  if (!sid || !token || !from) {
+    return NextResponse.json({ error: "Twilio env vars missing", sid: !!sid, token: !!token, from: !!from }, { status: 500 });
   }
 
-  const ok = await sendSMS(to, `✅ Home Food Service: SMS test successful! Your number ${formatted} is working correctly.`);
+  const url = `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`;
+  const creds = Buffer.from(`${sid}:${token}`).toString("base64");
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${creds}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams({
+      From: from,
+      To:   toNum,
+      Body: "✅ Home Food Service: SMS test — your notifications are working!",
+    }),
+  });
+
+  const data = await res.json() as Record<string, unknown>;
 
   return NextResponse.json({
-    success: ok,
-    to: formatted,
+    httpStatus: res.status,
+    success:    res.ok,
+    twilioSid:  data.sid,
+    twilioError: res.ok ? null : { code: data.code, message: data.message, moreInfo: data.more_info },
     from,
-    accountSid: sid?.slice(0, 8) + "...",
-    message: ok ? "SMS sent! Check your phone." : "SMS failed — check server logs and Twilio verified numbers.",
+    to: toNum,
   });
 }
