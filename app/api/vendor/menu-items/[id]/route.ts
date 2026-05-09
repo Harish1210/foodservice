@@ -35,19 +35,24 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       if (v !== null) updates[flag] = v === "true";
     }
 
-    // Handle image replacement
+    // Handle image replacement — best-effort, update proceeds even if upload fails
     const imageFile = formData.get("image") as File | null;
     if (imageFile && imageFile.size > 0) {
-      const existing = await prisma.menuItem.findUnique({ where: { id }, select: { image: true } });
-      if (existing?.image) await deleteImage(existing.image);
-      updates.image = await uploadImage(imageFile);
+      try {
+        const existing = await prisma.menuItem.findUnique({ where: { id }, select: { image: true } });
+        if (existing?.image) await deleteImage(existing.image);
+        updates.image = await uploadImage(imageFile);
+      } catch (imgErr) {
+        console.warn("Image upload failed during update (keeping existing image):", imgErr);
+      }
     }
 
     const item = await prisma.menuItem.update({ where: { id }, data: updates, include: { category: true } });
     return NextResponse.json({ item });
   } catch (err) {
     console.error("Update menu item error:", err);
-    return NextResponse.json({ error: "Failed to update item" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json({ error: `Failed to update item: ${message}` }, { status: 500 });
   }
 }
 

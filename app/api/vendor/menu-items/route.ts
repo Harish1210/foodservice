@@ -44,10 +44,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Name, category and price are required" }, { status: 400 });
     }
 
+    // Image upload is best-effort — item is created even if upload fails
     let imageUrl: string | null = null;
     const imageFile = formData.get("image") as File | null;
     if (imageFile && imageFile.size > 0) {
-      imageUrl = await uploadImage(imageFile);
+      try {
+        imageUrl = await uploadImage(imageFile);
+      } catch (imgErr) {
+        console.warn("Image upload failed (item will be created without image):", imgErr);
+      }
     }
 
     const item = await prisma.menuItem.create({
@@ -58,6 +63,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ item }, { status: 201 });
   } catch (err) {
     console.error("Create menu item error:", err);
-    return NextResponse.json({ error: "Failed to create item" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json({ error: `Failed to create item: ${message}` }, { status: 500 });
   }
 }
