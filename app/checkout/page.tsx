@@ -22,6 +22,13 @@ export default function CheckoutPage() {
     scheduledAt: "", paymentMethod: "card",
   });
 
+  // Redirect to cart if empty (must be in useEffect, not render body)
+  useEffect(() => {
+    if (items.length === 0 && step !== "success") {
+      router.push("/cart");
+    }
+  }, [items.length, step, router]);
+
   // Auto-fill from logged-in user's profile
   useEffect(() => {
     fetch("/api/auth/me")
@@ -99,10 +106,7 @@ export default function CheckoutPage() {
     }
   };
 
-  if (items.length === 0 && step !== "success") {
-    router.push("/cart");
-    return null;
-  }
+  if (items.length === 0 && step !== "success") return null;
 
   if (step === "success") {
     return (
