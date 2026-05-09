@@ -47,7 +47,7 @@ export default function AnalyticsPage() {
             <h1 className="text-white font-bold text-2xl flex items-center gap-2">
               <BarChart3 className="text-[#FF6B00]" /> Analytics
             </h1>
-            <p className="text-gray-400 text-sm mt-1">Home Food Service — Sydney</p>
+            <p className="text-gray-400 text-sm mt-1">Dishly Analytics</p>
           </div>
           <div className="flex gap-3">
             <button onClick={fetchData} className="flex items-center gap-2 bg-gray-800 text-gray-300 px-4 py-2 rounded-lg text-sm hover:bg-gray-700 transition-colors">

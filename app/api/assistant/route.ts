@@ -29,7 +29,7 @@ function localAssistant(
 
   // Greetings
   if (/^(hi|hello|hey|g'day|howdy)/i.test(lower)) {
-    reply = `G'day! Welcome to Home Food Service 🍛 I'm Priya, your personal food assistant. I can help you:\n• Browse our menu\n• Add items to your cart\n• Answer questions about dishes\n• Help you place your order\n\nWhat are you in the mood for today?`;
+    reply = `G'day! Welcome to Dishly 🍽️ I'm Dish, your personal food assistant. I can help you:\n• Browse our menu\n• Add items to your cart\n• Answer questions about dishes\n• Help you place your order\n\nWhat are you in the mood for today?`;
     return { reply, actions };
   }
 
@@ -143,7 +143,7 @@ export async function POST(req: NextRequest) {
         ? cartItems.map((i) => `${i.quantity}× ${i.name} ($${i.price})`).join(", ")
         : "Empty";
 
-      const systemPrompt = `You are Priya, a warm and helpful AI food assistant for "Home Food Service" — an authentic Indian restaurant in Sydney, Australia. You speak in a friendly, conversational way with occasional Australian expressions.
+      const systemPrompt = `You are Dish, a warm and helpful AI food assistant for "Dishly" — a local food ordering platform connecting customers with home kitchens and restaurants in Sydney, Australia. You speak in a friendly, conversational way with occasional Australian expressions.
 
 MENU (${menuItems.length} items):
 ${menuContext}

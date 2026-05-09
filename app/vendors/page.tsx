@@ -137,7 +137,7 @@ export default function VendorsPage() {
             Find Your Perfect Kitchen
           </h1>
           <p className="text-[#FFB87A] text-base mb-6">
-            Authentic Indian home cooking from local chefs — order fresh, eat happy.
+            Local kitchens & restaurants near you — order fresh, eat happy.
           </p>
 
           {/* Stats row */}

@@ -22,10 +22,10 @@ interface CartItem {
 
 type SpeechRecognitionType = typeof SpeechRecognition;
 
-const GREETING = `G'day! 👋 I'm Priya, your personal food assistant at Home Food Service.
+const GREETING = `G'day! 👋 I'm Dish, your personal food assistant at Dishly.
 
 I can help you:
-🍛 Discover dishes & recommendations
+🍽️ Discover dishes & recommendations
 🥗 Find vegetarian or allergy-friendly options
 🛒 Add items to your cart by voice or text
 💬 Answer any questions about our menu

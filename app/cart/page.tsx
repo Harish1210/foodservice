@@ -26,7 +26,7 @@ export default function CartPage() {
         <div className="max-w-2xl mx-auto px-4 py-20 text-center">
           <div className="text-6xl mb-4">🛒</div>
           <h2 className="text-2xl font-bold text-[#1A0A00] mb-2">Your cart is empty</h2>
-          <p className="text-gray-500 mb-8">Add some delicious Indian dishes to get started!</p>
+          <p className="text-gray-500 mb-8">Browse local kitchens and add your favourite dishes to get started!</p>
           <Link href="/" className="inline-flex items-center gap-2 bg-[#FF6B00] text-white px-8 py-3 rounded-xl font-semibold hover:bg-[#CC5500] transition-colors">
             <ShoppingBag size={18} /> Browse Menu
           </Link>

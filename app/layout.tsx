@@ -10,8 +10,8 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Home Food Service — Authentic Indian Home Cooking",
-  description: "Order delicious authentic Indian food for delivery, pickup or dine-in. Sydney's favourite Indian home cooking.",
+  title: "Dishly — Local Kitchens & Restaurants, Delivered",
+  description: "Order from local home kitchens and restaurants near you. Pickup, delivery or dine-in. Fresh food from real chefs.",
   icons: { icon: "/favicon.ico" },
 };
 

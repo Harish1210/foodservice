@@ -51,9 +51,9 @@ export default function Navbar() {
           <img src="/logo.jpg" alt="Logo" className="w-9 h-9 rounded-full object-cover ring-2 ring-[#FF6B00]/40 group-hover:ring-[#FF6B00] transition-all shrink-0" />
           <div className="min-w-0 overflow-hidden">
             <div className="text-white font-bold text-base sm:text-lg leading-tight group-hover:text-[#FF6B00] transition-colors truncate">
-              Home Food Service
+              Dishly
             </div>
-            <div className="text-[#FF6B00] text-xs truncate">Authentic Indian Home Cooking</div>
+            <div className="text-[#FF6B00] text-xs truncate">Local Kitchens & Restaurants</div>
           </div>
         </Link>
 

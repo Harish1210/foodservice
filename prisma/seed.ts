@@ -15,8 +15,8 @@ async function main() {
     update: {},
     create: {
       id: "default",
-      name: "Home Food Service",
-      tagline: "Authentic Indian Home Cooking",
+      name: "Dishly",
+      tagline: "Every dish, every kitchen, delivered",
       phone: "+61 2 9000 1234",
       email: "hello@homefoodservice.com.au",
       address: "123 George Street, Sydney NSW 2000",

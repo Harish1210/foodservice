@@ -72,7 +72,7 @@ export async function sendSMS(to: string, body: string): Promise<boolean> {
 }
 
 /** ── Message templates ── */
-const APP = "Home Food Service";
+const APP = "Dishly";
 
 export const SMS = {
   /** Sent to customer immediately after placing an order */

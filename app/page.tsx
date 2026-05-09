@@ -27,18 +27,18 @@ export default async function HomePage() {
         <div className="relative z-10 max-w-5xl mx-auto px-4 py-20 flex flex-col items-center text-center">
           {/* Logo */}
           <div className="mb-6">
-            <img src="/logo.jpg" alt="Home Food Service" className="w-24 h-24 rounded-full object-cover shadow-2xl shadow-orange-900/60 ring-4 ring-[#FF6B00]/30" />
+            <img src="/logo.jpg" alt="Dishly" className="w-24 h-24 rounded-full object-cover shadow-2xl shadow-orange-900/60 ring-4 ring-[#FF6B00]/30" />
           </div>
 
           <span className="inline-block bg-[#FF6B00]/20 border border-[#FF6B00]/40 text-[#FF8C38] text-xs font-semibold px-4 py-1.5 rounded-full mb-5 tracking-widest uppercase">
-            🏠 Home-Cooked &amp; Delivered
+            🍽️ Every Dish, Every Kitchen
           </span>
 
           <h1 className="text-4xl md:text-6xl font-black text-white mb-4 leading-tight tracking-tight">
-            {settings?.name ?? "Home Food Service"}
+            {settings?.name ?? "Dishly"}
           </h1>
           <p className="text-[#FFB87A] text-lg md:text-xl mb-8 max-w-xl leading-relaxed">
-            {settings?.tagline ?? "Authentic Indian home cooking from local kitchens, delivered fresh to your door."}
+            {settings?.tagline ?? "Order from local home kitchens and restaurants near you — pickup, delivery or dine-in."}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 mb-10">
@@ -64,7 +64,7 @@ export default async function HomePage() {
               { icon: "🚚", label: `Delivery from $${settings?.deliveryFee?.toFixed(2) ?? "5.00"}` },
               { icon: "🎁", label: `Free over $${settings?.freeDeliveryOver?.toFixed(0) ?? "60"}` },
               { icon: "⏱", label: `Ready in ~${settings?.estimatedPrepTime ?? 20} mins` },
-              { icon: "🌶️", label: "Fresh & Authentic" },
+              { icon: "⭐", label: "Verified Chefs" },
             ].map((p) => (
               <span key={p.label} className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm border border-white/15 text-white/80 text-xs px-4 py-2 rounded-full font-medium">
                 {p.icon} {p.label}
@@ -105,14 +105,14 @@ export default async function HomePage() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-10">
             <span className="text-[#FF6B00] text-sm font-bold uppercase tracking-widest">Why Us</span>
-            <h2 className="text-3xl font-black text-white mt-2">Real Home Cooks. Real Food.</h2>
+            <h2 className="text-3xl font-black text-white mt-2">Real Chefs. Real Food. Real Local.</h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {[
-              { icon: "🏠", title: "Home Kitchen Quality", desc: "Every dish made with love in a real home kitchen, not a factory." },
+              { icon: "🏠", title: "Home Kitchens & Restaurants", desc: "From home cooks to local restaurants — all in one place." },
               { icon: "🌿", title: "Fresh Ingredients", desc: "Local, fresh ingredients sourced daily for every meal." },
-              { icon: "⭐", title: "Verified Cooks", desc: "All vendors are verified and approved before listing." },
-              { icon: "💰", title: "Fair Prices", desc: "Support local cooks and enjoy authentic food at great prices." },
+              { icon: "⭐", title: "Verified Chefs", desc: "All vendors are verified and approved before listing." },
+              { icon: "💰", title: "Fair Prices", desc: "No 30% platform fees — support local chefs at honest prices." },
             ].map((f) => (
               <div key={f.title} className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 transition-colors">
                 <div className="text-3xl mb-3">{f.icon}</div>
@@ -129,7 +129,7 @@ export default async function HomePage() {
         <div className="max-w-2xl mx-auto px-4">
           <img src="/logo.jpg" alt="Logo" className="w-16 h-16 rounded-full object-cover mx-auto mb-5 shadow-lg" />
           <h2 className="text-3xl font-black text-[#1A0A00] mb-3">Ready to Order?</h2>
-          <p className="text-gray-500 mb-8 text-base">Discover home kitchens in your area and enjoy a real home-cooked meal.</p>
+          <p className="text-gray-500 mb-8 text-base">Discover local kitchens and restaurants near you. Real food from real chefs.</p>
           <Link
             href="/vendors"
             className="inline-flex items-center gap-2 bg-[#FF6B00] text-white px-10 py-4 rounded-2xl font-bold text-base hover:bg-[#E05E00] transition-all shadow-lg shadow-orange-200 hover:scale-105 active:scale-95"

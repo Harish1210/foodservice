@@ -145,8 +145,8 @@ function LoginForm() {
         <Link href="/" className="flex items-center gap-2.5">
           <img src="/logo.jpg" alt="Logo" className="w-9 h-9 rounded-full object-cover ring-2 ring-[#FF6B00]/40" />
           <div>
-            <p className="text-white font-bold text-sm">Home Food Service</p>
-            <p className="text-orange-300 text-xs">Authentic Indian Home Cooking</p>
+            <p className="text-white font-bold text-sm">Dishly</p>
+            <p className="text-orange-300 text-xs">Local Kitchens & Restaurants</p>
           </div>
         </Link>
       </div>

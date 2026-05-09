@@ -209,8 +209,8 @@ model LoyaltyTransaction {
 
 model BusinessSettings {
   id                String  @id @default(cuid())
-  name              String  @default("Home Food Service")
-  tagline           String  @default("Authentic Indian Home Cooking")
+  name              String  @default("Dishly")
+  tagline           String  @default("Every dish, every kitchen, delivered")
   phone             String  @default("+61 2 9000 0000")
   email             String  @default("hello@homefoodservice.com.au")
   address           String  @default("Sydney, NSW, Australia")

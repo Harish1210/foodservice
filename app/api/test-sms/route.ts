@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
     body: new URLSearchParams({
       From: from,
       To:   toNum,
-      Body: "✅ Home Food Service: SMS test — your notifications are working!",
+      Body: "✅ Dishly: SMS test — your notifications are working!",
     }),
   });
 
