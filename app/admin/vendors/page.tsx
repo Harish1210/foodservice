@@ -187,7 +187,7 @@ function VendorCard({
   onReject?: () => void;
   showActions: boolean;
 }) {
-  const name = vendor.businessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed Kitchen";
+  const name = vendor.businessName ?? (`${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed Kitchen");
   const isBusy = actionId === vendor.id;
 
   return (
