@@ -1,0 +1,683 @@
+▲ Next.js 16.2.5 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.20.18:3000
+- Environments: .env
+✓ Ready in 656ms
+
+[browser] ./app/admin/vendors/page.tsx:190:16
+Nullish coalescing operator(??) requires parens when mixing with logical operators
+  188 | ...
+  189 | ...
+> 190 | ...usinessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed...
+      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  191 | ...Id === vendor.id;
+  192 | ...
+  193 | ...
+
+Parsing ecmascript source code failed 
+    at handleErrors (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+    at processMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13914:21)
+    at WebSocket.handleMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13358:52) (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+[browser] ./app/admin/vendors/page.tsx:190:16
+Nullish coalescing operator(??) requires parens when mixing with logical operators
+  188 | ...
+  189 | ...
+> 190 | ...usinessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed...
+      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  191 | ...Id === vendor.id;
+  192 | ...
+  193 | ...
+
+Parsing ecmascript source code failed 
+    at handleErrors (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+    at processMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13914:21)
+    at WebSocket.handleMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13358:52) (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+[browser] ./app/admin/vendors/page.tsx:190:16
+Nullish coalescing operator(??) requires parens when mixing with logical operators
+  188 | ...
+  189 | ...
+> 190 | ...usinessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed...
+      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  191 | ...Id === vendor.id;
+  192 | ...
+  193 | ...
+
+Parsing ecmascript source code failed 
+    at handleErrors (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+    at processMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13914:21)
+    at WebSocket.handleMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13358:52) (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+[browser] ./app/admin/vendors/page.tsx:190:16
+Nullish coalescing operator(??) requires parens when mixing with logical operators
+  188 | ...
+  189 | ...
+> 190 | ...usinessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed...
+      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  191 | ...Id === vendor.id;
+  192 | ...
+  193 | ...
+
+Parsing ecmascript source code failed 
+    at handleErrors (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+    at processMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13914:21)
+    at WebSocket.handleMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13358:52) (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+[browser] ./app/admin/vendors/page.tsx:190:16
+Nullish coalescing operator(??) requires parens when mixing with logical operators
+  188 | ...
+  189 | ...
+> 190 | ...usinessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed...
+      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  191 | ...Id === vendor.id;
+  192 | ...
+  193 | ...
+
+Parsing ecmascript source code failed 
+    at handleErrors (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+    at processMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13914:21)
+    at WebSocket.handleMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13358:52) (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+[browser] ./app/admin/vendors/page.tsx:190:16
+Nullish coalescing operator(??) requires parens when mixing with logical operators
+  188 | ...
+  189 | ...
+> 190 | ...usinessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed...
+      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  191 | ...Id === vendor.id;
+  192 | ...
+  193 | ...
+
+Parsing ecmascript source code failed 
+    at handleErrors (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+    at processMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13914:21)
+    at WebSocket.handleMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13358:52) (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+[browser] ./app/admin/vendors/page.tsx:190:16
+Nullish coalescing operator(??) requires parens when mixing with logical operators
+  188 | ...
+  189 | ...
+> 190 | ...usinessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed...
+      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  191 | ...Id === vendor.id;
+  192 | ...
+  193 | ...
+
+Parsing ecmascript source code failed 
+    at handleErrors (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+    at processMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13914:21)
+    at WebSocket.handleMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13358:52) (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+[browser] ./app/admin/vendors/page.tsx:190:16
+Nullish coalescing operator(??) requires parens when mixing with logical operators
+  188 | ...
+  189 | ...
+> 190 | ...usinessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed...
+      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  191 | ...Id === vendor.id;
+  192 | ...
+  193 | ...
+
+Parsing ecmascript source code failed 
+    at handleErrors (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+    at processMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13914:21)
+    at WebSocket.handleMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13358:52) (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+[browser] ./app/admin/vendors/page.tsx:190:16
+Nullish coalescing operator(??) requires parens when mixing with logical operators
+  188 | ...
+  189 | ...
+> 190 | ...usinessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed...
+      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  191 | ...Id === vendor.id;
+  192 | ...
+  193 | ...
+
+Parsing ecmascript source code failed 
+    at handleErrors (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+    at processMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13914:21)
+    at WebSocket.handleMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13358:52) (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+[browser] ./app/admin/vendors/page.tsx:190:16
+Nullish coalescing operator(??) requires parens when mixing with logical operators
+  188 | ...
+  189 | ...
+> 190 | ...usinessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed...
+      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  191 | ...Id === vendor.id;
+  192 | ...
+  193 | ...
+
+Parsing ecmascript source code failed 
+    at handleErrors (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+    at processMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13914:21)
+    at WebSocket.handleMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13358:52) (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2477:13)
+[browser] ./app/admin/vendors/page.tsx:190:16
+Nullish coalescing operator(??) requires parens when mixing with logical operators
+  188 | ...
+  189 | ...
+> 190 | ...usinessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed...
+      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  191 | ...Id === vendor.id;
+  192 | ...
+  193 | ...
+
+Parsing ecmascript source code failed 
+    at handleErrors (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+    at processMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13914:21)
+    at WebSocket.handleMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13358:52) (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+[browser] ./app/admin/vendors/page.tsx:190:16
+Nullish coalescing operator(??) requires parens when mixing with logical operators
+  188 | ...
+  189 | ...
+> 190 | ...usinessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed...
+      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  191 | ...Id === vendor.id;
+  192 | ...
+  193 | ...
+
+Parsing ecmascript source code failed 
+    at handleErrors (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+    at processMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13914:21)
+    at WebSocket.handleMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13358:52) (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+[browser] ./app/admin/vendors/page.tsx:190:16
+Nullish coalescing operator(??) requires parens when mixing with logical operators
+  188 | ...
+  189 | ...
+> 190 | ...usinessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed...
+      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  191 | ...Id === vendor.id;
+  192 | ...
+  193 | ...
+
+Parsing ecmascript source code failed 
+    at handleErrors (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+    at processMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13914:21)
+    at WebSocket.handleMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13358:52) (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+[browser] ./app/admin/vendors/page.tsx:190:16
+Nullish coalescing operator(??) requires parens when mixing with logical operators
+  188 | ...
+  189 | ...
+> 190 | ...usinessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed...
+      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  191 | ...Id === vendor.id;
+  192 | ...
+  193 | ...
+
+Parsing ecmascript source code failed 
+    at handleErrors (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+    at processMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13914:21)
+    at WebSocket.handleMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13358:52) (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+[browser] ./app/admin/vendors/page.tsx:190:16
+Nullish coalescing operator(??) requires parens when mixing with logical operators
+  188 | ...
+  189 | ...
+> 190 | ...usinessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed...
+      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  191 | ...Id === vendor.id;
+  192 | ...
+  193 | ...
+
+Parsing ecmascript source code failed 
+    at handleErrors (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+    at processMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13914:21)
+    at WebSocket.handleMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13358:52) (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2477:13)
+[browser] ./app/admin/vendors/page.tsx:190:16
+Nullish coalescing operator(??) requires parens when mixing with logical operators
+  188 | ...
+  189 | ...
+> 190 | ...usinessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed...
+      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  191 | ...Id === vendor.id;
+  192 | ...
+  193 | ...
+
+Parsing ecmascript source code failed 
+    at handleErrors (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+    at processMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13914:21)
+    at WebSocket.handleMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13358:52) (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+[browser] ./app/admin/vendors/page.tsx:190:16
+Nullish coalescing operator(??) requires parens when mixing with logical operators
+  188 | ...
+  189 | ...
+> 190 | ...usinessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed...
+      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  191 | ...Id === vendor.id;
+  192 | ...
+  193 | ...
+
+Parsing ecmascript source code failed 
+    at handleErrors (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+    at processMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13914:21)
+    at WebSocket.handleMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13358:52) (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+[browser] ./app/admin/vendors/page.tsx:190:16
+Nullish coalescing operator(??) requires parens when mixing with logical operators
+  188 | ...
+  189 | ...
+> 190 | ...usinessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed...
+      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  191 | ...Id === vendor.id;
+  192 | ...
+  193 | ...
+
+Parsing ecmascript source code failed 
+    at handleErrors (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+    at processMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13914:21)
+    at WebSocket.handleMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13358:52) (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+[browser] ./app/admin/vendors/page.tsx:190:16
+Nullish coalescing operator(??) requires parens when mixing with logical operators
+  188 | ...
+  189 | ...
+> 190 | ...usinessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed...
+      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  191 | ...Id === vendor.id;
+  192 | ...
+  193 | ...
+
+Parsing ecmascript source code failed 
+    at handleErrors (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+    at processMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13914:21)
+    at WebSocket.handleMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13358:52) (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+[browser] ./app/admin/vendors/page.tsx:190:16
+Nullish coalescing operator(??) requires parens when mixing with logical operators
+  188 | ...
+  189 | ...
+> 190 | ...usinessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed...
+      |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  191 | ...Id === vendor.id;
+  192 | ...
+  193 | ...
+
+Parsing ecmascript source code failed 
+    at handleErrors (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+    at processMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13914:21)
+    at WebSocket.handleMessage (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13358:52) (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:13851:21)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2477:13)
+ GET /api/orders?limit=100 200 in 1665ms (next.js: 1350ms, application-code: 315ms)
+ GET /api/orders?limit=100 200 in 2.2s (next.js: 1386ms, application-code: 796ms)
+○ Compiling /vendor ...
+ GET /api/orders?limit=100 200 in 108ms (next.js: 83ms, application-code: 24ms)
+ GET /api/orders?limit=100 200 in 53ms (next.js: 37ms, application-code: 17ms)
+ GET /vendor 200 in 4.4s (next.js: 3.5s, application-code: 948ms)
+ GET /vendor 200 in 4.4s (next.js: 3.5s, application-code: 856ms)
+ GET /vendor 200 in 401ms (next.js: 14ms, application-code: 387ms)
+ GET / 200 in 4.5s (next.js: 3.8s, application-code: 631ms)
+ GET /vendor 200 in 274ms (next.js: 14ms, application-code: 261ms)
+ GET /vendor 200 in 206ms (next.js: 18ms, application-code: 188ms)
+ GET /api/auth/me 200 in 276ms (next.js: 260ms, application-code: 16ms)
+ GET /api/auth/me 401 in 296ms (next.js: 275ms, application-code: 21ms)
+ GET /api/auth/me 200 in 226ms (next.js: 208ms, application-code: 18ms)
+ GET /api/auth/me 200 in 16ms (next.js: 5ms, application-code: 11ms)
+ GET /api/orders?limit=100 200 in 19ms (next.js: 8ms, application-code: 11ms)
+ GET /api/auth/me 200 in 21ms (next.js: 6ms, application-code: 15ms)
+ GET /api/orders?limit=100 200 in 25ms (next.js: 11ms, application-code: 14ms)
+ GET /api/orders?limit=100 200 in 13ms (next.js: 3ms, application-code: 10ms)
+ GET /api/auth/me 200 in 17ms (next.js: 9ms, application-code: 8ms)
+ GET /api/orders?limit=100 200 in 24ms (next.js: 4ms, application-code: 21ms)
+ GET /api/orders?limit=100 200 in 16ms (next.js: 3ms, application-code: 13ms)
+ GET /api/orders?limit=100 200 in 16ms (next.js: 4ms, application-code: 12ms)
+ GET /api/orders?limit=100 200 in 27ms (next.js: 5ms, application-code: 22ms)
+ GET /api/orders?limit=100 200 in 15ms (next.js: 6ms, application-code: 10ms)
+ GET /api/orders?limit=100 200 in 25ms (next.js: 4ms, application-code: 21ms)
+ GET /api/orders?limit=100 200 in 27ms (next.js: 5ms, application-code: 22ms)
+ GET /api/orders?limit=100 200 in 18ms (next.js: 6ms, application-code: 13ms)
+ GET /api/orders?limit=100 200 in 19ms (next.js: 4ms, application-code: 15ms)
+ GET /api/orders?limit=100 200 in 13ms (next.js: 5ms, application-code: 9ms)
+ GET /api/orders?limit=100 200 in 12ms (next.js: 3ms, application-code: 9ms)
+ GET /api/orders?limit=100 200 in 28ms (next.js: 3ms, application-code: 25ms)
+ GET /api/orders?limit=100 200 in 15ms (next.js: 4ms, application-code: 10ms)
+ GET /api/orders?limit=100 200 in 26ms (next.js: 4ms, application-code: 23ms)
+ GET /api/orders?limit=100 200 in 9ms (next.js: 2ms, application-code: 7ms)
+ GET / 307 in 134ms (next.js: 7ms, application-code: 127ms)
+ GET /vendor 200 in 60ms (next.js: 5ms, application-code: 55ms)
+ GET /api/auth/me 200 in 15ms (next.js: 4ms, application-code: 10ms)
+ GET /api/orders?limit=100 200 in 14ms (next.js: 4ms, application-code: 10ms)
+ GET /profile 200 in 539ms (next.js: 510ms, application-code: 29ms)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2477:13)
+ GET /api/auth/me 200 in 12ms (next.js: 3ms, application-code: 9ms)
+ GET /api/auth/me 200 in 12ms (next.js: 3ms, application-code: 9ms)
+ GET /api/auth/me 200 in 11ms (next.js: 3ms, application-code: 8ms)
+ GET /api/orders?email=harish.lambu%40makesense.com&limit=10 200 in 13ms (next.js: 3ms, application-code: 10ms)
+ GET /api/auth/me 200 in 25ms (next.js: 9ms, application-code: 16ms)
+ GET /api/orders?email=harish.lambu%40makesense.com&limit=10 200 in 14ms (next.js: 4ms, application-code: 10ms)
+ GET /api/orders?limit=100 200 in 14ms (next.js: 4ms, application-code: 10ms)
+ GET /api/orders?limit=100 200 in 14ms (next.js: 2ms, application-code: 11ms)
+ GET /api/orders?limit=100 200 in 13ms (next.js: 2ms, application-code: 11ms)
+ GET /api/orders?limit=100 200 in 14ms (next.js: 4ms, application-code: 11ms)
+ GET /api/orders?limit=100 200 in 13ms (next.js: 3ms, application-code: 10ms)
+ GET /api/orders?limit=100 200 in 13ms (next.js: 3ms, application-code: 11ms)
+ GET /vendor/kitchen 200 in 436ms (next.js: 404ms, application-code: 31ms)
+ GET /api/orders?limit=50 200 in 22ms (next.js: 4ms, application-code: 18ms)
+ GET /api/orders?limit=50 200 in 11ms (next.js: 3ms, application-code: 9ms)
+ GET /vendor 200 in 36ms (next.js: 6ms, application-code: 30ms)
+ GET /api/auth/me 200 in 13ms (next.js: 5ms, application-code: 9ms)
+ GET /api/auth/me 200 in 15ms (next.js: 3ms, application-code: 12ms)
+ GET /api/orders?limit=100 200 in 18ms (next.js: 3ms, application-code: 15ms)
+ GET /vendor/menu 200 in 383ms (next.js: 358ms, application-code: 25ms)
+ GET /api/auth/me 200 in 24ms (next.js: 8ms, application-code: 15ms)
+ GET /api/auth/me 200 in 30ms (next.js: 3ms, application-code: 26ms)
+ GET /api/menu 200 in 182ms (next.js: 171ms, application-code: 11ms)
+ GET /api/vendor/menu-items 200 in 242ms (next.js: 231ms, application-code: 10ms)
+ GET /api/menu 200 in 32ms (next.js: 6ms, application-code: 26ms)
+ GET /api/vendor/menu-items 200 in 14ms (next.js: 3ms, application-code: 11ms)
+ GET /api/orders?limit=100 200 in 23ms (next.js: 6ms, application-code: 17ms)
+ GET /api/orders?limit=100 200 in 29ms (next.js: 4ms, application-code: 24ms)
+ GET /api/orders?limit=100 200 in 16ms (next.js: 5ms, application-code: 11ms)
+ POST /api/vendor/menu-items 201 in 53ms (next.js: 4ms, application-code: 49ms)
+ GET /api/vendor/menu-items 200 in 20ms (next.js: 3ms, application-code: 17ms)
+ GET /vendor 200 in 34ms (next.js: 5ms, application-code: 29ms)
+ GET /api/auth/me 200 in 19ms (next.js: 4ms, application-code: 15ms)
+ GET /api/auth/me 200 in 13ms (next.js: 4ms, application-code: 10ms)
+ GET /api/orders?limit=100 200 in 27ms (next.js: 4ms, application-code: 23ms)
+ GET /profile 200 in 36ms (next.js: 7ms, application-code: 29ms)
+ GET /api/auth/me 200 in 25ms (next.js: 4ms, application-code: 21ms)
+ GET /api/auth/me 200 in 13ms (next.js: 3ms, application-code: 10ms)
+ GET /api/auth/me 200 in 16ms (next.js: 4ms, application-code: 12ms)
+ GET /api/orders?email=harish.lambu%40makesense.com&limit=10 200 in 12ms (next.js: 3ms, application-code: 9ms)
+ GET /api/auth/me 200 in 13ms (next.js: 4ms, application-code: 9ms)
+ GET /api/orders?email=harish.lambu%40makesense.com&limit=10 200 in 26ms (next.js: 3ms, application-code: 23ms)
+ POST /api/auth/logout 200 in 185ms (next.js: 178ms, application-code: 7ms)
+ GET / 200 in 63ms (next.js: 6ms, application-code: 58ms)
+ GET / 200 in 52ms (next.js: 5ms, application-code: 46ms)
+ GET /api/auth/me 401 in 32ms (next.js: 12ms, application-code: 20ms)
+ GET /api/auth/me 401 in 26ms (next.js: 4ms, application-code: 23ms)
+ GET /login 200 in 535ms (next.js: 493ms, application-code: 42ms)
+ POST /api/auth/login 200 in 277ms (next.js: 181ms, application-code: 95ms)
+ GET / 200 in 124ms (next.js: 5ms, application-code: 119ms)
+ GET / 200 in 81ms (next.js: 11ms, application-code: 70ms)
+ GET /api/auth/me 200 in 33ms (next.js: 5ms, application-code: 28ms)
+ GET /api/auth/me 200 in 10ms (next.js: 3ms, application-code: 8ms)
+ GET /vendors 200 in 543ms (next.js: 515ms, application-code: 29ms)
+ GET /api/auth/me 200 in 25ms (next.js: 5ms, application-code: 20ms)
+ GET /api/auth/me 200 in 29ms (next.js: 4ms, application-code: 25ms)
+ GET /api/vendors?radius=5 200 in 198ms (next.js: 184ms, application-code: 14ms)
+ GET /api/vendors?radius=5 200 in 11ms (next.js: 4ms, application-code: 7ms)
+ GET /api/vendors?radius=5&lat=-33.821895838085396&lng=151.00236424445745 200 in 14ms (next.js: 4ms, application-code: 10ms)
+ GET /api/vendors?radius=5&lat=-33.821895838085396&lng=151.00236424445745 200 in 11ms (next.js: 3ms, application-code: 8ms)
+ GET /api/orders?limit=100 200 in 30ms (next.js: 7ms, application-code: 23ms)
+ GET /api/orders?limit=100 200 in 17ms (next.js: 4ms, application-code: 13ms)
+ GET /api/orders?limit=100 200 in 16ms (next.js: 3ms, application-code: 12ms)
+ GET /?vendor=cmoxzjqf90000osuyaborlkur 200 in 53ms (next.js: 6ms, application-code: 46ms)
+ GET /api/auth/me 200 in 30ms (next.js: 9ms, application-code: 21ms)
+ GET /api/auth/me 200 in 28ms (next.js: 5ms, application-code: 22ms)
+ GET /cart 200 in 529ms (next.js: 498ms, application-code: 31ms)
+ GET /api/auth/me 200 in 24ms (next.js: 5ms, application-code: 20ms)
+ GET /api/auth/me 200 in 22ms (next.js: 5ms, application-code: 18ms)
+ GET /checkout 200 in 589ms (next.js: 553ms, application-code: 36ms)
+ GET /api/auth/me 200 in 21ms (next.js: 5ms, application-code: 15ms)
+ GET /api/auth/me 200 in 21ms (next.js: 6ms, application-code: 15ms)
+ GET /api/orders?limit=100 200 in 24ms (next.js: 6ms, application-code: 19ms)
+ GET /api/orders?limit=100 200 in 12ms (next.js: 3ms, application-code: 10ms)
+ GET /api/orders?limit=100 200 in 13ms (next.js: 3ms, application-code: 11ms)
+ GET /api/orders?limit=100 200 in 29ms (next.js: 6ms, application-code: 24ms)
+ GET /api/orders?limit=100 200 in 13ms (next.js: 2ms, application-code: 11ms)
+ GET /api/orders?limit=100 200 in 15ms (next.js: 2ms, application-code: 12ms)
+✓ Compiled in 146ms
+ GET /api/auth/me 200 in 281ms (next.js: 248ms, application-code: 33ms)
+ GET /api/auth/me 200 in 20ms (next.js: 5ms, application-code: 14ms)
+ GET /checkout 200 in 703ms (next.js: 140ms, application-code: 563ms)
+ GET /vendor 200 in 703ms (next.js: 240ms, application-code: 463ms)
+ GET /vendor 200 in 237ms (next.js: 121ms, application-code: 116ms)
+ GET / 200 in 409ms (next.js: 62ms, application-code: 347ms)
+ GET /vendor 200 in 70ms (next.js: 15ms, application-code: 56ms)
+ GET /api/orders?limit=100 200 in 70ms (next.js: 56ms, application-code: 14ms)
+ GET /api/orders?limit=100 200 in 17ms (next.js: 5ms, application-code: 12ms)
+ GET /api/orders?limit=100 200 in 23ms (next.js: 6ms, application-code: 17ms)
+✓ Compiled in 181ms
+ GET /checkout 200 in 765ms (next.js: 155ms, application-code: 609ms)
+ GET /vendor 200 in 764ms (next.js: 396ms, application-code: 367ms)
+ GET / 200 in 812ms (next.js: 279ms, application-code: 533ms)
+ GET /vendor 200 in 397ms (next.js: 13ms, application-code: 384ms)
+ GET /checkout 200 in 398ms (next.js: 78ms, application-code: 320ms)
+ GET / 200 in 402ms (next.js: 114ms, application-code: 288ms)
+ GET /vendor 200 in 275ms (next.js: 9ms, application-code: 266ms)
+ GET / 200 in 319ms (next.js: 49ms, application-code: 270ms)
+ GET /vendor 200 in 274ms (next.js: 9ms, application-code: 265ms)
+ GET /vendor 200 in 242ms (next.js: 10ms, application-code: 232ms)
+ GET /vendor 200 in 242ms (next.js: 39ms, application-code: 203ms)
+ GET /vendor 200 in 230ms (next.js: 7ms, application-code: 223ms)
+ GET /vendor 200 in 232ms (next.js: 42ms, application-code: 190ms)
+ GET /vendor 200 in 156ms (next.js: 13ms, application-code: 143ms)
+ GET /checkout 200 in 77ms (next.js: 10ms, application-code: 67ms)
+ GET /api/orders?limit=100 200 in 121ms (next.js: 95ms, application-code: 25ms)
+ GET /api/orders?limit=100 200 in 24ms (next.js: 4ms, application-code: 20ms)
+ GET /api/orders?limit=100 200 in 24ms (next.js: 4ms, application-code: 21ms)
+✓ Compiled in 80ms
+ GET /checkout 200 in 644ms (next.js: 109ms, application-code: 535ms)
+ GET /vendor 200 in 645ms (next.js: 212ms, application-code: 433ms)
+ GET / 200 in 378ms (next.js: 60ms, application-code: 318ms)
+ GET /vendor 200 in 169ms (next.js: 15ms, application-code: 154ms)
+ GET /vendor 200 in 104ms (next.js: 8ms, application-code: 96ms)
+ GET /api/orders?limit=100 200 in 87ms (next.js: 66ms, application-code: 21ms)
+ GET /api/orders?limit=100 200 in 15ms (next.js: 4ms, application-code: 11ms)
+ GET /api/orders?limit=100 200 in 18ms (next.js: 3ms, application-code: 15ms)
+ POST /api/orders 201 in 45ms (next.js: 7ms, application-code: 37ms)
+ GET /orders/cmoy06dio0001xouyrgd6d4c8 200 in 1029ms (next.js: 986ms, application-code: 43ms)
+ GET /api/auth/me 200 in 58ms (next.js: 46ms, application-code: 12ms)
+ GET /api/auth/me 200 in 16ms (next.js: 4ms, application-code: 12ms)
+ GET /api/orders/cmoy06dio0001xouyrgd6d4c8 200 in 1039ms (next.js: 1024ms, application-code: 15ms)
+ GET /api/orders/cmoy06dio0001xouyrgd6d4c8 200 in 23ms (next.js: 11ms, application-code: 12ms)
+ GET /api/orders/cmoy06dio0001xouyrgd6d4c8 200 in 22ms (next.js: 11ms, application-code: 10ms)
+ GET /api/orders?limit=100 200 in 15ms (next.js: 5ms, application-code: 10ms)
+ GET /api/orders?limit=100 200 in 14ms (next.js: 2ms, application-code: 11ms)
+ GET /api/orders?limit=100 200 in 13ms (next.js: 2ms, application-code: 11ms)
+ GET / 200 in 283ms (next.js: 6ms, application-code: 277ms)
+ GET /api/auth/me 401 in 14ms (next.js: 4ms, application-code: 10ms)
+ GET /login 200 in 39ms (next.js: 17ms, application-code: 23ms)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior (file://C:/Users/haris/home-food-service/.next/dev/static/chunks/node_modules_next_dist_115brz8._.js:2477:13)
+ GET /api/orders/cmoy06dio0001xouyrgd6d4c8 200 in 23ms (next.js: 12ms, application-code: 12ms)
+ POST /api/auth/login 200 in 177ms (next.js: 73ms, application-code: 104ms)
+ GET /vendor 200 in 31ms (next.js: 5ms, application-code: 26ms)
+ GET /vendor 200 in 32ms (next.js: 6ms, application-code: 27ms)
+ GET /api/auth/me 200 in 15ms (next.js: 5ms, application-code: 10ms)
+ GET /api/auth/me 200 in 13ms (next.js: 3ms, application-code: 10ms)
+ GET /api/orders?limit=100 200 in 10ms (next.js: 2ms, application-code: 8ms)
+ GET /api/orders/cmoy06dio0001xouyrgd6d4c8 200 in 27ms (next.js: 12ms, application-code: 14ms)
+ GET /api/orders?limit=100 200 in 14ms (next.js: 4ms, application-code: 9ms)
+ PATCH /api/orders/cmoy06dio0001xouyrgd6d4c8 200 in 33ms (next.js: 12ms, application-code: 20ms)
+ GET /api/orders/cmoy06dio0001xouyrgd6d4c8 200 in 25ms (next.js: 11ms, application-code: 14ms)
+ PATCH /api/orders/cmoy06dio0001xouyrgd6d4c8 200 in 43ms (next.js: 15ms, application-code: 28ms)
+ GET /api/orders?limit=100 200 in 15ms (next.js: 4ms, application-code: 11ms)
+ PATCH /api/orders/cmoy06dio0001xouyrgd6d4c8 200 in 46ms (next.js: 16ms, application-code: 30ms)
+ PATCH /api/orders/cmoy06dio0001xouyrgd6d4c8 200 in 33ms (next.js: 12ms, application-code: 21ms)
+ GET /api/orders?limit=100 200 in 28ms (next.js: 7ms, application-code: 21ms)
+ GET /api/orders/cmoy06dio0001xouyrgd6d4c8 200 in 22ms (next.js: 12ms, application-code: 10ms)
+ GET /api/orders?limit=100 200 in 14ms (next.js: 4ms, application-code: 9ms)
+ GET /api/orders?limit=100 200 in 9ms (next.js: 2ms, application-code: 7ms)
+ GET /api/orders?limit=100 200 in 11ms (next.js: 3ms, application-code: 9ms)
+ GET /api/orders?limit=100 200 in 15ms (next.js: 3ms, application-code: 11ms)
+ GET /api/orders/cmoy06dio0001xouyrgd6d4c8 200 in 23ms (next.js: 11ms, application-code: 12ms)
+ GET /api/orders?limit=100 200 in 11ms (next.js: 4ms, application-code: 7ms)
+ GET /profile 200 in 47ms (next.js: 16ms, application-code: 31ms)
+ GET /api/auth/me 200 in 27ms (next.js: 18ms, application-code: 9ms)
+ GET /api/auth/me 200 in 22ms (next.js: 5ms, application-code: 17ms)
+ GET /api/auth/me 200 in 11ms (next.js: 3ms, application-code: 9ms)
+ GET /api/orders?email=harishlambu12%40gmail.com&limit=10 200 in 12ms (next.js: 3ms, application-code: 9ms)
+ GET /api/auth/me 200 in 21ms (next.js: 3ms, application-code: 18ms)
+ GET /api/orders?email=harishlambu12%40gmail.com&limit=10 200 in 22ms (next.js: 3ms, application-code: 19ms)
+ GET /cart 200 in 43ms (next.js: 19ms, application-code: 24ms)
+ GET /api/auth/me 200 in 16ms (next.js: 4ms, application-code: 11ms)
+ GET /api/auth/me 200 in 18ms (next.js: 3ms, application-code: 15ms)
+ GET /api/orders?limit=100 200 in 27ms (next.js: 4ms, application-code: 22ms)
+ GET /orders 200 in 467ms (next.js: 444ms, application-code: 23ms)
+ GET /api/auth/me 200 in 21ms (next.js: 3ms, application-code: 18ms)
+ GET /api/auth/me 200 in 14ms (next.js: 3ms, application-code: 10ms)
+ GET / 200 in 47ms (next.js: 7ms, application-code: 40ms)
+ GET /api/auth/me 200 in 13ms (next.js: 4ms, application-code: 9ms)
+ GET /api/auth/me 200 in 13ms (next.js: 3ms, application-code: 10ms)
+ GET /api/orders?limit=100 200 in 14ms (next.js: 3ms, application-code: 11ms)
+ GET /api/orders?limit=100 200 in 16ms (next.js: 3ms, application-code: 12ms)
+ GET /api/orders?limit=100 200 in 18ms (next.js: 7ms, application-code: 11ms)
+ GET /api/orders?limit=100 200 in 12ms (next.js: 2ms, application-code: 10ms)
+ GET /api/orders?limit=100 200 in 13ms (next.js: 3ms, application-code: 9ms)
+ GET /api/orders?limit=100 200 in 13ms (next.js: 3ms, application-code: 10ms)
+ GET /vendors 200 in 43ms (next.js: 17ms, application-code: 26ms)
+ GET /api/vendors?radius=5 200 in 49ms (next.js: 41ms, application-code: 8ms)
+ GET /api/auth/me 200 in 54ms (next.js: 4ms, application-code: 49ms)
+ GET /api/vendors?radius=5 200 in 23ms (next.js: 15ms, application-code: 7ms)
+ GET /api/auth/me 200 in 30ms (next.js: 8ms, application-code: 23ms)
+ GET /api/vendors?radius=5&lat=-33.82197343177388&lng=151.00241443564022 200 in 15ms (next.js: 5ms, application-code: 11ms)
+ GET /api/vendors?radius=5&lat=-33.82197343177388&lng=151.00241443564022 200 in 8ms (next.js: 3ms, application-code: 6ms)
+ GET / 200 in 53ms (next.js: 6ms, application-code: 47ms)
+ GET /api/auth/me 200 in 15ms (next.js: 5ms, application-code: 10ms)
+ GET /api/auth/me 200 in 14ms (next.js: 3ms, application-code: 11ms)
+ GET /api/orders?limit=100 200 in 18ms (next.js: 5ms, application-code: 13ms)
+ GET /api/orders?limit=100 200 in 14ms (next.js: 3ms, application-code: 10ms)
+ GET /api/orders?limit=100 200 in 23ms (next.js: 10ms, application-code: 13ms)
+ GET /api/orders?limit=100 200 in 13ms (next.js: 3ms, application-code: 10ms)
+ GET /api/orders?limit=100 200 in 16ms (next.js: 5ms, application-code: 11ms)
+ GET /api/orders?limit=100 200 in 28ms (next.js: 18ms, application-code: 10ms)
+ GET /api/orders?limit=100 200 in 28ms (next.js: 3ms, application-code: 25ms)
+ GET /api/orders?limit=100 200 in 13ms (next.js: 3ms, application-code: 10ms)
+ GET /api/orders?limit=100 200 in 22ms (next.js: 7ms, application-code: 14ms)
+ GET /api/orders?limit=100 200 in 19ms (next.js: 3ms, application-code: 16ms)
+ GET /api/orders?limit=100 200 in 14ms (next.js: 3ms, application-code: 10ms)
+ GET /api/orders?limit=100 200 in 14ms (next.js: 2ms, application-code: 11ms)
+ GET /api/orders?limit=100 200 in 20ms (next.js: 8ms, application-code: 13ms)
+ GET /api/orders?limit=100 200 in 22ms (next.js: 10ms, application-code: 12ms)
+ GET /api/orders?limit=100 200 in 16ms (next.js: 4ms, application-code: 11ms)
+ GET /api/orders?limit=100 200 in 23ms (next.js: 3ms, application-code: 20ms)
+ GET /api/orders?limit=100 200 in 16ms (next.js: 7ms, application-code: 9ms)
+ GET /api/orders?limit=100 200 in 16ms (next.js: 7ms, application-code: 9ms)
+ GET /api/orders?limit=100 200 in 13ms (next.js: 3ms, application-code: 10ms)
+ GET /api/orders?limit=100 200 in 14ms (next.js: 3ms, application-code: 11ms)
+ GET /api/orders?limit=100 200 in 14ms (next.js: 4ms, application-code: 10ms)
+ GET /api/orders?limit=100 200 in 21ms (next.js: 9ms, application-code: 13ms)
+ GET /api/orders?limit=100 200 in 11ms (next.js: 2ms, application-code: 9ms)
+ GET /api/orders?limit=100 200 in 11ms (next.js: 2ms, application-code: 8ms)
+ GET /api/orders?limit=100 200 in 16ms (next.js: 5ms, application-code: 11ms)
+ GET /api/orders?limit=100 200 in 13ms (next.js: 5ms, application-code: 8ms)
+ GET /api/orders?limit=100 200 in 28ms (next.js: 3ms, application-code: 25ms)
+ GET /api/orders?limit=100 200 in 15ms (next.js: 3ms, application-code: 12ms)
+ GET /api/orders?limit=100 200 in 34ms (next.js: 10ms, application-code: 24ms)
+ GET /api/orders?limit=100 200 in 39ms (next.js: 12ms, application-code: 28ms)
+ GET /api/orders?limit=100 200 in 36ms (next.js: 11ms, application-code: 25ms)
+ GET /api/orders?limit=100 200 in 37ms (next.js: 13ms, application-code: 24ms)
+ GET /api/orders?limit=100 200 in 24ms (next.js: 9ms, application-code: 15ms)
+ GET /api/orders?limit=100 200 in 21ms (next.js: 6ms, application-code: 16ms)
+ GET /api/orders?limit=100 200 in 34ms (next.js: 8ms, application-code: 26ms)
+ GET /api/orders?limit=100 200 in 38ms (next.js: 6ms, application-code: 33ms)
+ GET /api/orders?limit=100 200 in 71ms (next.js: 10ms, application-code: 61ms)
+ GET /api/orders?limit=100 200 in 83ms (next.js: 16ms, application-code: 67ms)
+ GET /api/orders?limit=100 200 in 65ms (next.js: 18ms, application-code: 47ms)
+ GET /api/orders?limit=100 200 in 57ms (next.js: 15ms, application-code: 42ms)
+ GET /api/orders?limit=100 200 in 95ms (next.js: 22ms, application-code: 73ms)
+ GET /api/orders?limit=100 200 in 53ms (next.js: 11ms, application-code: 42ms)
+ GET /api/orders?limit=100 200 in 32ms (next.js: 9ms, application-code: 23ms)
+✓ Compiled in 475ms
+ GET /api/orders?limit=100 200 in 901ms (next.js: 487ms, application-code: 414ms)
+ GET /vendor 200 in 4.6s (next.js: 1604ms, application-code: 3.0s)
+ GET /vendor 200 in 4.6s (next.js: 2.1s, application-code: 2.5s)
+ GET / 200 in 4.8s (next.js: 859ms, application-code: 4.0s)
+ GET / 200 in 4.8s (next.js: 1862ms, application-code: 3.0s)
+ GET /vendor 200 in 2.6s (next.js: 542ms, application-code: 2.1s)
+ GET / 200 in 3.4s (next.js: 34ms, application-code: 3.3s)
+ GET / 200 in 3.4s (next.js: 670ms, application-code: 2.7s)
+ GET /vendor 200 in 2.5s (next.js: 95ms, application-code: 2.4s)
+ GET / 200 in 2.9s (next.js: 221ms, application-code: 2.7s)
+ GET / 200 in 2.9s (next.js: 65ms, application-code: 2.8s)
+ GET / 200 in 2.9s (next.js: 434ms, application-code: 2.5s)
+ GET /vendor 200 in 2.1s (next.js: 108ms, application-code: 1954ms)
+ GET / 200 in 2.9s (next.js: 588ms, application-code: 2.3s)
+ GET /vendor 200 in 2.1s (next.js: 61ms, application-code: 2.0s)
+ GET / 200 in 2.3s (next.js: 33ms, application-code: 2.2s)
+ GET / 200 in 2.2s (next.js: 83ms, application-code: 2.1s)
+ GET / 200 in 2.2s (next.js: 380ms, application-code: 1828ms)
+ GET /vendor 200 in 1569ms (next.js: 286ms, application-code: 1283ms)
+ GET / 200 in 1613ms (next.js: 162ms, application-code: 1451ms)
+ GET / 200 in 1222ms (next.js: 45ms, application-code: 1177ms)
+ GET /vendor 200 in 1078ms (next.js: 349ms, application-code: 729ms)
+ GET / 200 in 1589ms (next.js: 134ms, application-code: 1454ms)
+ GET / 200 in 1591ms (next.js: 216ms, application-code: 1375ms)
+ GET / 200 in 1507ms (next.js: 268ms, application-code: 1239ms)
+ GET /vendor 200 in 1161ms (next.js: 24ms, application-code: 1137ms)
+ GET /vendor 200 in 1262ms (next.js: 38ms, application-code: 1223ms)
+ GET /vendor 200 in 1260ms (next.js: 197ms, application-code: 1063ms)
+ GET /vendor 200 in 1074ms (next.js: 33ms, application-code: 1041ms)
+ GET /vendor 200 in 1073ms (next.js: 235ms, application-code: 837ms)
+ GET /vendor 200 in 657ms (next.js: 45ms, application-code: 613ms)
+ GET /vendor 200 in 763ms (next.js: 32ms, application-code: 730ms)
+ GET /vendor 200 in 791ms (next.js: 148ms, application-code: 643ms)
+ GET /vendor 200 in 973ms (next.js: 19ms, application-code: 954ms)
+ GET /vendor 200 in 948ms (next.js: 36ms, application-code: 912ms)
+ GET /vendor 200 in 945ms (next.js: 179ms, application-code: 767ms)
+ GET /vendor 200 in 646ms (next.js: 23ms, application-code: 623ms)
+ GET /vendor 200 in 757ms (next.js: 217ms, application-code: 540ms)
+ GET /vendor 200 in 762ms (next.js: 77ms, application-code: 685ms)
+ GET /vendor 200 in 760ms (next.js: 17ms, application-code: 742ms)
+ GET /vendor 200 in 642ms (next.js: 23ms, application-code: 618ms)
+ GET /vendor 200 in 642ms (next.js: 128ms, application-code: 514ms)
+ GET /vendor 200 in 499ms (next.js: 28ms, application-code: 471ms)
+ GET /vendor 200 in 572ms (next.js: 23ms, application-code: 549ms)
+ GET /vendor 200 in 572ms (next.js: 122ms, application-code: 451ms)
+ GET /vendor 200 in 420ms (next.js: 21ms, application-code: 399ms)
+ GET /vendor 200 in 325ms (next.js: 21ms, application-code: 304ms)
+ GET /vendor 200 in 325ms (next.js: 112ms, application-code: 213ms)
+ GET /vendor 200 in 118ms (next.js: 15ms, application-code: 102ms)
+ GET /api/orders?limit=100 200 in 45ms (next.js: 11ms, application-code: 34ms)
+ GET /api/orders?limit=100 200 in 44ms (next.js: 10ms, application-code: 34ms)
+ GET /api/orders?limit=100 200 in 50ms (next.js: 11ms, application-code: 39ms)
+ GET /api/orders?limit=100 200 in 49ms (next.js: 12ms, application-code: 37ms)
+ GET /api/orders?limit=100 200 in 52ms (next.js: 9ms, application-code: 43ms)
+ GET /api/orders?limit=100 200 in 39ms (next.js: 10ms, application-code: 29ms)
+ GET /api/orders?limit=100 200 in 51ms (next.js: 13ms, application-code: 38ms)
+ GET /api/orders?limit=100 200 in 22ms (next.js: 6ms, application-code: 16ms)
+ GET /api/orders?limit=100 200 in 21ms (next.js: 5ms, application-code: 16ms)
+ GET /api/orders?limit=100 200 in 23ms (next.js: 7ms, application-code: 16ms)
+ GET /api/orders?limit=100 200 in 25ms (next.js: 6ms, application-code: 19ms)
+✓ Compiled in 372ms
+ GET /vendor 200 in 1445ms (next.js: 224ms, application-code: 1221ms)
+ GET /vendor 200 in 1444ms (next.js: 366ms, application-code: 1078ms)
+ GET /vendor 200 in 529ms (next.js: 67ms, application-code: 463ms)
+ GET /vendor 200 in 481ms (next.js: 73ms, application-code: 408ms)
+ GET / 200 in 1598ms (next.js: 673ms, application-code: 925ms)
+ GET / 200 in 1599ms (next.js: 850ms, application-code: 749ms)
+ GET /vendor 200 in 246ms (next.js: 15ms, application-code: 230ms)
+ GET / 200 in 578ms (next.js: 135ms, application-code: 443ms)
+ GET / 200 in 580ms (next.js: 189ms, application-code: 391ms)
+ GET /vendor 200 in 195ms (next.js: 15ms, application-code: 180ms)
+ GET /api/orders?limit=100 200 in 233ms (next.js: 177ms, application-code: 56ms)
+ GET /vendor 200 in 433ms (next.js: 10ms, application-code: 423ms)
+ GET /vendor 200 in 351ms (next.js: 16ms, application-code: 335ms)
+ GET /api/orders?limit=100 200 in 18ms (next.js: 5ms, application-code: 14ms)
+ GET /api/orders?limit=100 200 in 22ms (next.js: 6ms, application-code: 16ms)
+ GET /api/orders?limit=100 200 in 19ms (next.js: 4ms, application-code: 16ms)
+ GET /api/orders?limit=100 200 in 29ms (next.js: 6ms, application-code: 22ms)
+ GET /api/orders?limit=100 200 in 29ms (next.js: 5ms, application-code: 23ms)
+ GET /api/orders?limit=100 200 in 31ms (next.js: 4ms, application-code: 27ms)
+ GET /api/orders?limit=100 200 in 21ms (next.js: 5ms, application-code: 17ms)
+✓ Compiled in 317ms
+ GET /vendor 200 in 1455ms (next.js: 557ms, application-code: 897ms)
+ GET /vendor 200 in 1455ms (next.js: 649ms, application-code: 806ms)
+ GET /vendor 200 in 415ms (next.js: 36ms, application-code: 379ms)
+ GET /vendor 200 in 416ms (next.js: 208ms, application-code: 208ms)
+ GET / 200 in 1490ms (next.js: 312ms, application-code: 1178ms)
+ GET / 200 in 1486ms (next.js: 755ms, application-code: 731ms)
+ GET / 200 in 628ms (next.js: 158ms, application-code: 470ms)
+ GET / 200 in 635ms (next.js: 270ms, application-code: 365ms)
+ GET /vendor 200 in 211ms (next.js: 17ms, application-code: 195ms)
+ GET /vendor 200 in 150ms (next.js: 13ms, application-code: 137ms)
+ GET /vendor 200 in 146ms (next.js: 49ms, application-code: 97ms)
+ GET /vendor 200 in 147ms (next.js: 92ms, application-code: 55ms)
+ GET /api/orders?limit=100 200 in 173ms (next.js: 125ms, application-code: 48ms)
+ GET /api/orders?limit=100 200 in 180ms (next.js: 143ms, application-code: 36ms)
+ GET /api/orders?limit=100 200 in 27ms (next.js: 5ms, application-code: 23ms)
+ GET /api/orders?limit=100 200 in 27ms (next.js: 3ms, application-code: 23ms)
+✓ Compiled in 190ms
+ GET /api/orders?limit=100 200 in 150ms (next.js: 124ms, application-code: 26ms)
+ GET /api/orders?limit=100 200 in 72ms (next.js: 61ms, application-code: 11ms)
+ GET /vendor 200 in 968ms (next.js: 560ms, application-code: 408ms)
+ GET /vendor 200 in 969ms (next.js: 615ms, application-code: 354ms)
+ GET /api/orders?limit=100 200 in 31ms (next.js: 8ms, application-code: 23ms)
+ GET /vendor 200 in 137ms (next.js: 22ms, application-code: 114ms)
+ GET / 200 in 1097ms (next.js: 370ms, application-code: 727ms)
+ GET / 200 in 1101ms (next.js: 220ms, application-code: 882ms)
+ GET /api/orders?limit=100 200 in 33ms (next.js: 13ms, application-code: 20ms)
+ GET /vendor 200 in 170ms (next.js: 10ms, application-code: 160ms)
+✓ Compiled in 105ms
+ GET /vendor 200 in 845ms (next.js: 361ms, application-code: 484ms)
+ GET /vendor 200 in 846ms (next.js: 482ms, application-code: 364ms)
+ GET /vendor 200 in 146ms (next.js: 8ms, application-code: 138ms)
+ GET / 200 in 861ms (next.js: 171ms, application-code: 689ms)
+ GET / 200 in 857ms (next.js: 535ms, application-code: 322ms)
+ GET /vendor 200 in 83ms (next.js: 12ms, application-code: 71ms)
+ GET /api/orders?limit=100 200 in 140ms (next.js: 99ms, application-code: 40ms)
+ GET /api/orders?limit=100 200 in 145ms (next.js: 116ms, application-code: 29ms)
+ GET /api/orders?limit=100 200 in 29ms (next.js: 5ms, application-code: 24ms)
+ GET /api/orders?limit=100 200 in 28ms (next.js: 6ms, application-code: 22ms)
+
+C:\Users\haris\home-food-service>

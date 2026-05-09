@@ -160,9 +160,7 @@ export default function VendorDashboard() {
       <header className="bg-gray-900 border-b border-gray-800 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#FF6B00] rounded-xl flex items-center justify-center">
-              <ChefHat className="text-white" size={20} />
-            </div>
+            <img src="/logo.jpg" alt="Logo" className="w-10 h-10 rounded-full object-cover ring-2 ring-[#FF6B00]/50" />
             <div>
               <h1 className="text-white font-bold text-lg">{vendorName || "My Kitchen"}</h1>
               <p className="text-gray-400 text-xs">Vendor Dashboard</p>

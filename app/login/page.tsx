@@ -142,8 +142,8 @@ function LoginForm() {
     <div className="min-h-screen bg-[#FFF8F0] flex flex-col">
       {/* Top bar */}
       <div className="bg-[#1A0A00] px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-2xl">🍛</span>
+        <Link href="/" className="flex items-center gap-2.5">
+          <img src="/logo.jpg" alt="Logo" className="w-9 h-9 rounded-full object-cover ring-2 ring-[#FF6B00]/40" />
           <div>
             <p className="text-white font-bold text-sm">Home Food Service</p>
             <p className="text-orange-300 text-xs">Authentic Indian Home Cooking</p>

@@ -37,8 +37,8 @@ export default function Navbar() {
 
       {/* Main nav */}
       <nav className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group">
-          <span className="text-2xl">🍛</span>
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <img src="/logo.jpg" alt="Logo" className="w-9 h-9 rounded-full object-cover ring-2 ring-[#FF6B00]/40 group-hover:ring-[#FF6B00] transition-all" />
           <div>
             <div className="text-white font-bold text-lg leading-tight group-hover:text-[#FF6B00] transition-colors">
               Home Food Service
