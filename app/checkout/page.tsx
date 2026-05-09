@@ -1,8 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { formatCurrency, pointsToDiscount } from "@/lib/utils";
-import { CreditCard, MapPin, Clock, CheckCircle, Loader2, ChevronRight, Calendar } from "lucide-react";
+import { CreditCard, MapPin, CheckCircle, Loader2, ChevronRight, Calendar, UserCheck } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -14,12 +14,35 @@ export default function CheckoutPage() {
   const [step, setStep] = useState<"details" | "success">("details");
   const [orderId, setOrderId] = useState("");
   const [pickupCode, setPickupCode] = useState("");
+  const [prefilled, setPrefilled] = useState(false);
 
   const [form, setForm] = useState({
     name: "", email: "", phone: "",
     street: "", suburb: "", postcode: "",
     scheduledAt: "", paymentMethod: "card",
   });
+
+  // Auto-fill from logged-in user's profile
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.user) {
+          const u = d.user;
+          setForm((f) => ({
+            ...f,
+            name: [u.firstName, u.lastName].filter(Boolean).join(" ") || f.name,
+            email: u.email || f.email,
+            phone: u.phone || f.phone,
+            street: u.street || f.street,
+            suburb: u.suburb || f.suburb,
+            postcode: u.postcode || f.postcode,
+          }));
+          setPrefilled(true);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const subtotal = getSubtotal();
   const deliveryFee = orderType === "delivery" && subtotal < 60 ? 5 : 0;
@@ -148,9 +171,16 @@ export default function CheckoutPage() {
             <div className="lg:col-span-2 space-y-4">
               {/* Contact */}
               <div className="bg-white rounded-2xl border border-[#E8D5C0] p-5">
-                <h3 className="font-semibold text-[#1A0A00] mb-4 flex items-center gap-2">
-                  👤 Contact Details
-                </h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-[#1A0A00] flex items-center gap-2">
+                    👤 Contact Details
+                  </h3>
+                  {prefilled && (
+                    <span className="flex items-center gap-1.5 text-xs text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full font-medium">
+                      <UserCheck size={12} /> Pre-filled from your profile
+                    </span>
+                  )}
+                </div>
                 <div className="grid sm:grid-cols-2 gap-4">
                   {[
                     { key: "name", label: "Full Name", type: "text", placeholder: "John Smith" },
@@ -174,9 +204,16 @@ export default function CheckoutPage() {
               {/* Delivery address */}
               {orderType === "delivery" && (
                 <div className="bg-white rounded-2xl border border-[#E8D5C0] p-5">
-                  <h3 className="font-semibold text-[#1A0A00] mb-4 flex items-center gap-2">
-                    <MapPin size={16} className="text-[#FF6B00]" /> Delivery Address (Sydney only)
-                  </h3>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold text-[#1A0A00] flex items-center gap-2">
+                      <MapPin size={16} className="text-[#FF6B00]" /> Delivery Address
+                    </h3>
+                    {prefilled && form.street && (
+                      <span className="flex items-center gap-1.5 text-xs text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full font-medium">
+                        <UserCheck size={12} /> From your profile
+                      </span>
+                    )}
+                  </div>
                   <div className="space-y-3">
                     <div>
                       <label className="block text-xs font-medium text-gray-600 mb-1">Street Address</label>
