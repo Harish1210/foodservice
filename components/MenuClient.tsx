@@ -18,6 +18,7 @@ interface MenuItem {
   calories: number | null;
   allergens: string | null;
   prepTime: number;
+  image: string | null;
 }
 
 interface Category {
@@ -294,7 +295,11 @@ export default function MenuClient({ categories, settings, vendorId }: Props) {
       {/* Item detail modal */}
       {selectedItem && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/60" onClick={() => setSelectedItem(null)}>
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl animate-slide-up" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl animate-slide-up overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            {selectedItem.image && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={selectedItem.image} alt={selectedItem.name} className="w-full h-48 object-cover" />
+            )}
             <div className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
@@ -381,16 +386,25 @@ function ItemGrid({ items, onSelect, getQty, onAdd }: {
             className="bg-white rounded-2xl border border-[#E8D5C0] overflow-hidden hover:shadow-md hover:border-[#FF6B00]/40 transition-all group cursor-pointer"
             onClick={() => onSelect(item)}
           >
-            {/* Image placeholder with emoji */}
-            <div className="h-36 bg-gradient-to-br from-[#FFF0E0] to-[#FFE0C0] flex items-center justify-center text-5xl relative">
-              {item.isVeg ? "🥘" : item.isSpicy ? "🌶️" : "🍗"}
+            {/* Item image or emoji fallback */}
+            <div className="h-36 bg-gradient-to-br from-[#FFF0E0] to-[#FFE0C0] flex items-center justify-center text-5xl relative overflow-hidden">
+              {item.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              ) : (
+                <span>{item.isVeg ? "🥘" : item.isSpicy ? "🌶️" : "🍗"}</span>
+              )}
               {item.isFeatured && (
-                <span className="absolute top-2 right-2 bg-[#D4A017] text-white text-xs px-2 py-0.5 rounded-full font-semibold">
+                <span className="absolute top-2 right-2 bg-[#D4A017] text-white text-xs px-2 py-0.5 rounded-full font-semibold shadow">
                   ⭐ Popular
                 </span>
               )}
               {inCart > 0 && (
-                <span className="absolute top-2 left-2 bg-[#FF6B00] text-white text-xs px-2 py-0.5 rounded-full font-bold">
+                <span className="absolute top-2 left-2 bg-[#FF6B00] text-white text-xs px-2 py-0.5 rounded-full font-bold shadow">
                   {inCart} in cart
                 </span>
               )}

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import { formatCurrency } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { User, Mail, Phone, MapPin, Star, Package, ChevronRight, Edit3, Save, X, LogOut, Loader2, Building2 } from "lucide-react";
+import { User, Mail, Phone, MapPin, Star, Package, ChevronRight, Edit3, Save, X, LogOut, Loader2, Building2, Navigation } from "lucide-react";
 import toast from "react-hot-toast";
 
 type UserData = {
@@ -32,6 +32,7 @@ export default function ProfilePage() {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ firstName: "", lastName: "", phone: "", street: "", suburb: "", state: "NSW", postcode: "", businessName: "", businessAddress: "", lat: "", lng: "", isOpen: true });
+  const [detecting, setDetecting] = useState(false);
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -70,6 +71,57 @@ export default function ProfilePage() {
     toast.success("Signed out");
     router.push("/");
     router.refresh();
+  };
+
+  const detectLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser");
+      return;
+    }
+    setDetecting(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        setForm((f) => ({ ...f, lat: String(latitude), lng: String(longitude) }));
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+            { headers: { "Accept-Language": "en" } }
+          );
+          const data = await res.json();
+          if (data && data.address) {
+            const addr = data.address;
+            if (user?.role === "vendor") {
+              const fullAddress = data.display_name ?? `${addr.road ?? ""} ${addr.suburb ?? addr.city ?? ""} ${addr.state ?? ""} ${addr.postcode ?? ""}`.trim();
+              setForm((f) => ({ ...f, businessAddress: fullAddress, lat: String(latitude), lng: String(longitude) }));
+              toast.success("Location detected! Review and save your address.");
+            } else {
+              setForm((f) => ({
+                ...f,
+                street: [addr.house_number, addr.road].filter(Boolean).join(" "),
+                suburb: addr.suburb ?? addr.city_district ?? addr.city ?? "",
+                state: addr.state_code ?? addr.state ?? "NSW",
+                postcode: addr.postcode ?? "",
+                lat: String(latitude),
+                lng: String(longitude),
+              }));
+              toast.success("Location detected! Review and save your address.");
+            }
+          } else {
+            toast.success(`Coordinates set: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
+          }
+        } catch {
+          toast.success(`Coordinates set: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
+        } finally {
+          setDetecting(false);
+        }
+      },
+      () => {
+        setDetecting(false);
+        toast.error("Could not detect location. Please enter your address manually.");
+      },
+      { timeout: 10000, enableHighAccuracy: true }
+    );
   };
 
   if (loading) return (
@@ -196,6 +248,19 @@ export default function ProfilePage() {
             ))}
 
             {/* Address fields */}
+            {editing && user.role === "customer" && (
+              <div className="sm:col-span-2 flex justify-end">
+                <button
+                  type="button"
+                  onClick={detectLocation}
+                  disabled={detecting}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-[#FF6B00] border border-[#FF6B00] px-3 py-1.5 rounded-lg hover:bg-[#FF6B00] hover:text-white transition-colors disabled:opacity-60"
+                >
+                  {detecting ? <Loader2 size={12} className="animate-spin" /> : <Navigation size={12} />}
+                  {detecting ? "Detecting..." : "📍 Detect My Location"}
+                </button>
+              </div>
+            )}
             {[
               { icon: MapPin, label: "Street Address", value: form.street, key: "street", placeholder: "123 George St", span: true },
               { icon: MapPin, label: "Suburb", value: form.suburb, key: "suburb", placeholder: "Sydney", span: false },
@@ -222,7 +287,20 @@ export default function ProfilePage() {
           {/* Vendor business fields */}
           {user.role === "vendor" && (
             <div className="mt-6 pt-5 border-t border-[#E8D5C0]">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Kitchen Details</p>
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Kitchen Details</p>
+                {editing && (
+                  <button
+                    type="button"
+                    onClick={detectLocation}
+                    disabled={detecting}
+                    className="flex items-center gap-1.5 text-xs font-semibold text-[#FF6B00] border border-[#FF6B00] px-3 py-1.5 rounded-lg hover:bg-[#FF6B00] hover:text-white transition-colors disabled:opacity-60"
+                  >
+                    {detecting ? <Loader2 size={12} className="animate-spin" /> : <Navigation size={12} />}
+                    {detecting ? "Detecting..." : "📍 Detect My Location"}
+                  </button>
+                )}
+              </div>
               <div className="grid sm:grid-cols-2 gap-4">
                 {[
                   { icon: Building2, label: "Business / Kitchen Name", value: form.businessName, key: "businessName", placeholder: "Priya's Home Kitchen", span: true },
