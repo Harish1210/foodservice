@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 import { generateOrderNumber, generatePickupCode, calculateLoyaltyPoints } from "@/lib/utils";
+import { sendSMS, SMS } from "@/lib/sms";
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,6 +17,7 @@ export async function POST(req: NextRequest) {
 
     const loyaltyEarned = calculateLoyaltyPoints(total);
     const pickupCode = type === "pickup" ? generatePickupCode() : null;
+    const estimatedTime = type === "delivery" ? 40 : 20;
 
     const order = await prisma.order.create({
       data: {
@@ -31,7 +33,6 @@ export async function POST(req: NextRequest) {
         tableNumber: tableNumber ?? null,
         scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
         specialInstructions: specialInstructions ?? null,
-        // Store delivery address inline — no join needed for guests
         deliveryStreet: address?.street ?? null,
         deliverySuburb: address?.suburb ?? null,
         deliveryPostcode: address?.postcode ?? null,
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
         loyaltyPointsUsed: loyaltyPointsUsed ?? 0,
         loyaltyPointsEarned: loyaltyEarned,
         pickupCode,
-        estimatedTime: type === "delivery" ? 40 : 20,
+        estimatedTime,
         items: {
           create: items.map((item: { menuItemId: string; name: string; price: number; quantity: number; notes?: string }) => ({
             menuItemId: item.menuItemId,
@@ -56,6 +57,32 @@ export async function POST(req: NextRequest) {
       },
       include: { items: true },
     });
+
+    // ── SMS notifications (fire-and-forget, never block the response) ──
+    const smsPromises: Promise<boolean>[] = [];
+
+    // 1. Confirm to customer
+    if (guestPhone) {
+      smsPromises.push(
+        sendSMS(guestPhone, SMS.orderConfirmed(order.orderNumber, type, estimatedTime))
+      );
+    }
+
+    // 2. Alert the vendor
+    if (vendorId) {
+      const vendor = await prisma.user.findUnique({
+        where: { id: vendorId },
+        select: { phone: true },
+      });
+      if (vendor?.phone) {
+        smsPromises.push(
+          sendSMS(vendor.phone, SMS.newOrderAlert(order.orderNumber, type, items.length, total))
+        );
+      }
+    }
+
+    // Run all SMS sends in parallel (don't await — non-blocking)
+    Promise.allSettled(smsPromises).catch(() => {});
 
     return NextResponse.json({ order }, { status: 201 });
   } catch (err) {
