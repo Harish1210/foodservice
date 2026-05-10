@@ -17,7 +17,14 @@ export async function GET(req: NextRequest) {
       select: { id: true, firstName: true, businessName: true, phone: true, isApproved: true },
     });
 
-    if (!vendor) return NextResponse.json({ error: `No vendor found matching "${name}"` }, { status: 404 });
+    if (!vendor) {
+      // List all vendors to help find the right name
+      const all = await prisma.user.findMany({
+        where: { role: "vendor" },
+        select: { firstName: true, lastName: true, businessName: true, phone: true, isApproved: true },
+      });
+      return NextResponse.json({ error: `No vendor found matching "${name}"`, allVendors: all }, { status: 404 });
+    }
     if (!vendor.phone) return NextResponse.json({ error: "Vendor has no phone number" }, { status: 400 });
 
     const displayName = vendor.businessName ?? vendor.firstName ?? name;
