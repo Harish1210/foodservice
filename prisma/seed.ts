@@ -32,7 +32,11 @@ async function main() {
   });
 
   const adminPw = await bcrypt.hash("admin123", 10);
-  await prisma.user.upsert({ where: { email: "admin@homefoodservice.com.au" }, update: {}, create: { name: "Admin", email: "admin@homefoodservice.com.au", passwordHash: adminPw, role: "admin" } });
+  await prisma.user.upsert({
+    where:  { email: "harishlambu10@gmail.com" },
+    update: { firstName: "Lambu", lastName: "Harish", name: "Lambu Harish", phone: "+61426287362" },
+    create: { firstName: "Lambu", lastName: "Harish", name: "Lambu Harish", email: "harishlambu10@gmail.com", phone: "+61426287362", passwordHash: adminPw, role: "admin" },
+  });
 
   const vendorPw = await bcrypt.hash("vendor123", 10);
   await prisma.user.upsert({ where: { email: "vendor@homefoodservice.com.au" }, update: {}, create: { name: "Kitchen Staff", email: "vendor@homefoodservice.com.au", passwordHash: vendorPw, role: "vendor" } });
@@ -59,7 +63,7 @@ async function main() {
   ]);
 
   console.log("✅ Seeded successfully!");
-  console.log("📧 Admin:    admin@homefoodservice.com.au / admin123");
+  console.log("📧 Admin:    harishlambu10@gmail.com / admin123");
   console.log("👨‍🍳 Vendor:   vendor@homefoodservice.com.au / vendor123");
   console.log("👤 Customer: customer@test.com / customer123");
 }
