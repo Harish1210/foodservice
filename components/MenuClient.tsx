@@ -142,120 +142,93 @@ export default function MenuClient({ categories, settings, vendorId }: Props) {
     categories.find((c) => c.id === activeCategory)?.menuItems ?? [];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
+    <div className="w-full max-w-3xl mx-auto px-4 py-5">
       {/* Vendor context banner */}
       {vendorId && (
-        <div className="flex items-center justify-between bg-orange-50 border border-orange-200 rounded-2xl px-4 py-3 mb-5 gap-3">
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-lg">🍳</span>
-            <span className="text-[#1A0A00]">
-              Showing menu from <strong className="text-[#FF6B00]">{selectedVendorName ?? "this kitchen"}</strong>
+        <div className="flex items-center justify-between bg-white border border-[#E8D5C0] rounded-2xl px-4 py-3 mb-4 gap-3 shadow-sm">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-base shrink-0">🍳</span>
+            <span className="text-[#1A0A00] text-sm truncate">
+              Menu from <strong className="text-[#FF6B00]">{selectedVendorName ?? "this kitchen"}</strong>
             </span>
           </div>
-          <Link
-            href="/vendors"
-            className="shrink-0 text-xs font-semibold text-[#FF6B00] border border-[#FF6B00] px-3 py-1.5 rounded-xl hover:bg-[#FF6B00] hover:text-white transition-colors"
-          >
+          <Link href="/vendors"
+            className="shrink-0 text-xs font-bold text-[#FF6B00] border border-[#FF6B00]/50 px-3 py-1.5 rounded-xl hover:bg-[#FF6B00] hover:text-white active:scale-95 transition-all">
             Change Kitchen
           </Link>
         </div>
       )}
 
-      {/* Voice + Search bar */}
-      <div className="flex gap-3 mb-6">
-        <button
-          onClick={startVoice}
-          className={`relative flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-all ${
-            listening
-              ? "bg-red-500 text-white shadow-lg shadow-red-200"
-              : "bg-[#FF6B00] text-white hover:bg-[#CC5500]"
-          } voice-btn ${listening ? "listening" : ""}`}
-        >
+      {/* Search + Voice */}
+      <div className="flex gap-2 mb-4">
+        <button onClick={startVoice}
+          className={`shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center font-semibold transition-all active:scale-95 ${
+            listening ? "bg-red-500 text-white shadow-lg shadow-red-200" : "bg-[#FF6B00] text-white hover:bg-[#CC5500]"
+          } voice-btn ${listening ? "listening" : ""}`}>
           {listening ? <MicOff size={18} /> : <Mic size={18} />}
-          <span className="hidden sm:inline">{listening ? "Listening..." : "Voice Order"}</span>
         </button>
-        <div className="flex-1 relative">
-          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+        <div className="flex-1 relative min-w-0">
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
-            type="text"
-            value={search}
+            type="text" value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search dishes, ingredients..."
-            className="w-full pl-11 pr-4 py-3 rounded-xl border border-[#E8D5C0] bg-white focus:outline-none focus:ring-2 focus:ring-[#FF6B00] text-[#1A0A00]"
+            className="w-full pl-10 pr-9 py-3 rounded-2xl border border-[#E8D5C0] bg-white focus:outline-none focus:ring-2 focus:ring-[#FF6B00] text-[#1A0A00] text-sm shadow-sm"
           />
           {search && (
-            <button onClick={() => setSearch("")} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-              <X size={16} />
+            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+              <X size={15} />
             </button>
           )}
         </div>
       </div>
 
       {voiceText && (
-        <div className="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-xl text-sm text-orange-700 flex items-center gap-2">
+        <div className="mb-3 p-3 bg-orange-50 border border-orange-200 rounded-xl text-sm text-orange-700 flex items-center gap-2">
           <span>🎙️</span> I heard: <strong>&quot;{voiceText}&quot;</strong>
           <button onClick={() => setVoiceText("")} className="ml-auto"><X size={14} /></button>
         </div>
       )}
 
-      {/* Filters */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
-        {[{ key: "all", label: "All", icon: "🍽️" }, { key: "veg", label: "Vegetarian", icon: "🥦" }, { key: "spicy", label: "Spicy", icon: "🌶️" }, { key: "glutenfree", label: "Gluten Free", icon: "✨" }].map((f) => (
-          <button
-            key={f.key}
-            onClick={() => setFilter(f.key as typeof filter)}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+      {/* Diet filters */}
+      <div className="flex gap-2 mb-4 overflow-x-auto no-scrollbar">
+        {[
+          { key: "all", label: "All", icon: "🍽️" },
+          { key: "veg", label: "Vegetarian", icon: "🥦" },
+          { key: "spicy", label: "Spicy", icon: "🌶️" },
+          { key: "glutenfree", label: "Gluten Free", icon: "✨" },
+        ].map((f) => (
+          <button key={f.key} onClick={() => setFilter(f.key as typeof filter)}
+            className={`shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all active:scale-95 ${
               filter === f.key
-                ? "bg-[#FF6B00] text-white shadow"
-                : "bg-white text-[#7C4A1E] border border-[#E8D5C0] hover:border-[#FF6B00]"
-            }`}
-          >
+                ? "bg-[#FF6B00] text-white shadow-md shadow-orange-200"
+                : "bg-white text-gray-600 border border-[#E8D5C0]"
+            }`}>
             {f.icon} {f.label}
           </button>
         ))}
       </div>
 
-      <div className="flex gap-6">
-        {/* Category sidebar */}
-        <aside className="hidden lg:flex flex-col gap-1 w-52 shrink-0">
-          <button
-            onClick={() => setActiveCategory("all")}
-            className={`text-left px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-              activeCategory === "all"
-                ? "bg-[#FF6B00] text-white"
-                : "bg-white text-[#7C4A1E] hover:bg-orange-50 border border-[#E8D5C0]"
-            }`}
-          >
-            🍽️ All Items
+      {/* Category tabs — always horizontal scroll */}
+      <div className="flex gap-2 mb-5 overflow-x-auto no-scrollbar">
+        <button onClick={() => setActiveCategory("all")}
+          className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all active:scale-95 ${
+            activeCategory === "all" ? "bg-[#1A0A00] text-white" : "bg-white border border-[#E8D5C0] text-gray-600"
+          }`}>
+          All
+        </button>
+        {categories.map((cat) => (
+          <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
+            className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all active:scale-95 ${
+              activeCategory === cat.id ? "bg-[#1A0A00] text-white" : "bg-white border border-[#E8D5C0] text-gray-600"
+            }`}>
+            {cat.icon} {cat.name}
           </button>
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className={`text-left px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                activeCategory === cat.id
-                  ? "bg-[#FF6B00] text-white"
-                  : "bg-white text-[#7C4A1E] hover:bg-orange-50 border border-[#E8D5C0]"
-              }`}
-            >
-              {cat.icon} {cat.name}
-            </button>
-          ))}
-        </aside>
+        ))}
+      </div>
 
-        {/* Menu grid */}
-        <div className="flex-1">
-          {/* Mobile category scroll */}
-          <div className="lg:hidden flex gap-2 mb-4 overflow-x-auto pb-2">
-            <button onClick={() => setActiveCategory("all")} className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap ${activeCategory === "all" ? "bg-[#FF6B00] text-white" : "bg-white border border-[#E8D5C0] text-[#7C4A1E]"}`}>
-              All
-            </button>
-            {categories.map((cat) => (
-              <button key={cat.id} onClick={() => setActiveCategory(cat.id)} className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap ${activeCategory === cat.id ? "bg-[#FF6B00] text-white" : "bg-white border border-[#E8D5C0] text-[#7C4A1E]"}`}>
-                {cat.icon} {cat.name}
-              </button>
-            ))}
-          </div>
+      {/* Menu grid — full width, no sidebar on mobile */}
+      <div className="w-full">
 
           {categories.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -297,8 +270,8 @@ export default function MenuClient({ categories, settings, vendorId }: Props) {
 
       {/* Floating cart bar */}
       {cartCount > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 animate-slide-up w-max max-w-[calc(100vw-2rem)]">
-          <Link href="/cart" className="flex items-center gap-2 sm:gap-4 bg-[#1A0A00] text-white px-4 sm:px-6 py-3 sm:py-4 rounded-2xl shadow-2xl hover:bg-[#2A1500] transition-colors">
+        <div className="fixed bottom-6 left-4 right-4 z-40 animate-slide-up sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:w-auto">
+          <Link href="/cart" className="flex items-center gap-2 sm:gap-4 bg-[#1A0A00] text-white px-4 sm:px-6 py-3 sm:py-4 rounded-2xl shadow-2xl hover:bg-[#2A1500] transition-colors w-full justify-between sm:w-auto sm:justify-start">
             <div className="bg-[#FF6B00] rounded-lg p-1.5 shrink-0">
               <ShoppingCart size={18} />
             </div>
