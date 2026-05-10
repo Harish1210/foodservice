@@ -78,7 +78,7 @@ export default function VendorsPage() {
   useEffect(() => { fetchVendors(); getLocation(); /* eslint-disable-next-line */ }, []);
 
   const handleSelectVendor = (vendor: Vendor) => {
-    const name = vendor.businessName ?? [vendor.firstName, vendor.lastName].filter(Boolean).join(" ") || "Kitchen";
+    const name = (vendor.businessName ?? [vendor.firstName, vendor.lastName].filter(Boolean).join(" ")) || "Kitchen";
     setSelectedVendor(vendor.id, name);
     toast.success(`Viewing menu from ${name}`);
     router.push(`/menu?vendor=${vendor.id}`);
@@ -217,7 +217,7 @@ export default function VendorsPage() {
             </p>
             <div className="space-y-3">
               {filtered.map((vendor) => {
-                const name       = vendor.businessName ?? [vendor.firstName, vendor.lastName].filter(Boolean).join(" ") || "Kitchen";
+                const name       = (vendor.businessName ?? [vendor.firstName, vendor.lastName].filter(Boolean).join(" ")) || "Kitchen";
                 const isSelected = selectedVendorId === vendor.id;
                 const initial    = name[0].toUpperCase();
 
