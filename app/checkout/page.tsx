@@ -122,7 +122,8 @@ export default function CheckoutPage() {
       setPickupCode(data.order.pickupCode ?? "");
 
       if (isLoggedIn) {
-        // Already logged in — clear cart and go straight to success
+        // Already logged in — save address then go to success
+        await saveAddressToProfile();
         clearCart();
         setStep("success");
       } else {
@@ -148,7 +149,17 @@ export default function CheckoutPage() {
       const res  = await fetch("/api/auth/send-otp", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ name: form.name, email: form.email, phone: form.phone }),
+        // Pass delivery address so it's saved on the user record during upsert
+        body:    JSON.stringify({
+          name:  form.name,
+          email: form.email,
+          phone: form.phone,
+          ...(orderType === "delivery" && {
+            street:   form.street,
+            suburb:   form.suburb,
+            postcode: form.postcode,
+          }),
+        }),
       });
       const data = await res.json();
       if (!res.ok) { console.error("[sendOtp] API error:", data); return false; }
@@ -158,6 +169,18 @@ export default function CheckoutPage() {
       console.error("[sendOtp] fetch error:", err);
       return false;
     }
+  };
+
+  // ── Save address for logged-in users ─────────────────────────────────────────
+  const saveAddressToProfile = async () => {
+    if (orderType !== "delivery" || !form.street) return;
+    try {
+      await fetch("/api/auth/me", {
+        method:  "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ street: form.street, suburb: form.suburb, postcode: form.postcode }),
+      });
+    } catch { /* non-critical — ignore */ }
   };
 
   const handleResend = async () => {
@@ -425,7 +448,7 @@ export default function CheckoutPage() {
                     </h3>
                     {prefilled && form.street && (
                       <span className="flex items-center gap-1.5 text-xs text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full font-medium">
-                        <UserCheck size={12} /> From your profile
+                        <UserCheck size={12} /> Saved address — edit to update
                       </span>
                     )}
                   </div>

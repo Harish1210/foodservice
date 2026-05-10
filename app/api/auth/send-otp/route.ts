@@ -10,6 +10,8 @@ export async function POST(req: NextRequest) {
   try {
     const {
       name, email, phone,
+      // Delivery address (customer orders)
+      street, suburb, postcode,
       // Vendor-specific (only on registration)
       role, businessName, businessAddress,
       lat, lng,
@@ -35,6 +37,9 @@ export async function POST(req: NextRequest) {
         name:            name            ?? null,
         phone,
         role:            isVendor ? "vendor" : "customer",
+        street:          street          ?? null,
+        suburb:          suburb          ?? null,
+        postcode:        postcode        ?? null,
         businessName:    businessName    ?? null,
         businessAddress: businessAddress ?? null,
         lat:             lat ? parseFloat(lat) : null,
@@ -44,10 +49,14 @@ export async function POST(req: NextRequest) {
         otpExpiry: expiry,
       },
       update: {
-        // Always refresh OTP; update name/phone/vendor fields if provided
+        // Always refresh OTP; update name/phone/address if provided
         firstName:       firstName       ?? undefined,
         lastName:        lastName        ?? undefined,
         phone:           phone           ?? undefined,
+        // Save delivery address if provided
+        ...(street   && { street }),
+        ...(suburb   && { suburb }),
+        ...(postcode && { postcode }),
         // Only overwrite vendor fields when explicitly registering as vendor
         ...(isVendor && {
           role:            "vendor",
