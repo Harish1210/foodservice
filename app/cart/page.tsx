@@ -1,9 +1,10 @@
 "use client";
 import { useCartStore, OrderType } from "@/store/cartStore";
 import { formatCurrency, pointsToDiscount } from "@/lib/utils";
-import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Truck, Package, UtensilsCrossed } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Truck, Package, UtensilsCrossed, Clock } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const ORDER_TYPES: { type: OrderType; label: string; icon: React.ReactNode; desc: string }[] = [
   { type: "delivery", label: "Delivery", icon: <Truck size={20} />, desc: "~40 mins" },
@@ -12,12 +13,29 @@ const ORDER_TYPES: { type: OrderType; label: string; icon: React.ReactNode; desc
 ];
 
 export default function CartPage() {
-  const { items, orderType, loyaltyPointsToUse, updateQuantity, removeItem, setOrderType, setLoyaltyPointsToUse, getSubtotal } = useCartStore();
+  const { items, orderType, loyaltyPointsToUse, updateQuantity, removeItem, setOrderType, setLoyaltyPointsToUse, getSubtotal, selectedVendorId } = useCartStore();
   const subtotal = getSubtotal();
   const deliveryFee = orderType === "delivery" && subtotal < 60 ? 5 : 0;
   const loyaltyDiscount = pointsToDiscount(loyaltyPointsToUse);
   const tax = (subtotal + deliveryFee - loyaltyDiscount) * 0.1;
   const total = subtotal + deliveryFee - loyaltyDiscount + tax;
+
+  const [vendorIsOpen, setVendorIsOpen] = useState<boolean | null>(null);
+  const [vendorName,   setVendorName]   = useState<string>("");
+
+  useEffect(() => {
+    if (!selectedVendorId) { setVendorIsOpen(null); return; }
+    fetch(`/api/vendors/${selectedVendorId}`)
+      .then((r) => r.json())
+      .then((d) => {
+        const v = d.vendor ?? d;
+        setVendorIsOpen(v.isOpen ?? null);
+        setVendorName(v.businessName ?? v.firstName ?? "");
+      })
+      .catch(() => setVendorIsOpen(null));
+  }, [selectedVendorId]);
+
+  const kitchenClosed = vendorIsOpen === false;
 
   if (items.length === 0) {
     return (
@@ -160,12 +178,24 @@ export default function CartPage() {
                 </div>
               )}
 
-              <Link
-                href="/checkout"
-                className="flex items-center justify-center gap-2 w-full bg-[#FF6B00] text-white py-4 rounded-xl font-bold text-base hover:bg-[#CC5500] transition-colors shadow-lg shadow-orange-200"
-              >
-                Proceed to Checkout <ArrowRight size={18} />
-              </Link>
+              {kitchenClosed ? (
+                <div className="rounded-2xl border-2 border-red-200 bg-red-50 p-4 text-center">
+                  <div className="flex items-center justify-center gap-2 text-red-600 font-bold text-base mb-1">
+                    <Clock size={18} /> Kitchen is Closed
+                  </div>
+                  <p className="text-sm text-red-500 leading-snug">
+                    {vendorName ? `${vendorName} is` : "This kitchen is"} not taking orders right now.
+                    <br />Please check back later! 🙏
+                  </p>
+                </div>
+              ) : (
+                <Link
+                  href="/checkout"
+                  className="flex items-center justify-center gap-2 w-full bg-[#FF6B00] text-white py-4 rounded-xl font-bold text-base hover:bg-[#CC5500] transition-colors shadow-lg shadow-orange-200"
+                >
+                  Proceed to Checkout <ArrowRight size={18} />
+                </Link>
+              )}
 
               <Link href="/" className="block text-center text-sm text-[#FF6B00] mt-3 hover:underline">
                 + Add more items
