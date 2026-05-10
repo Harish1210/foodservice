@@ -120,15 +120,17 @@ export default function CheckoutPage() {
 
       setOrderId(data.order.id);
       setPickupCode(data.order.pickupCode ?? "");
-      clearCart();
 
       if (isLoggedIn) {
-        // Already logged in — go straight to success
+        // Already logged in — clear cart and go straight to success
+        clearCart();
         setStep("success");
       } else {
-        // Send OTP and move to verification step
-        await sendOtp();
+        // Set step FIRST so the empty-cart guard doesn't redirect,
+        // then send OTP, then clear cart.
         setStep("otp");
+        await sendOtp();
+        clearCart();
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
