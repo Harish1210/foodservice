@@ -191,7 +191,8 @@ export default function CheckoutPage() {
       const data = await res.json();
       if (!res.ok) { setOtpError(data.error ?? "Invalid code"); return; }
       toast.success(`Welcome, ${data.user?.firstName ?? ""}! 🎉`);
-      setStep("success");
+      // Full navigation so the new session cookie is picked up by the Navbar
+      window.location.href = `/orders/${orderId}`;
     } catch { setOtpError("Something went wrong — try again"); }
     finally { setOtpVerifying(false); }
   };
