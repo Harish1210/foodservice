@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import { formatCurrency } from "@/lib/utils";
-import { RefreshCw, ChefHat, Package, CheckCircle, Clock, AlertCircle, BarChart3, UtensilsCrossed, ShieldCheck, Star } from "lucide-react";
+import { RefreshCw, ChefHat, Package, CheckCircle, Clock, AlertCircle, BarChart3, UtensilsCrossed, ShieldCheck, Star, AlertTriangle, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import toast from "react-hot-toast";
@@ -52,6 +52,7 @@ export default function VendorDashboard() {
   const [updating, setUpdating] = useState<string | null>(null);
   const [isApproved, setIsApproved] = useState<boolean | null>(null);
   const [vendorName, setVendorName] = useState<string>("");
+  const [profileIncomplete, setProfileIncomplete] = useState(false);
 
   // Check approval status first
   useEffect(() => {
@@ -59,6 +60,7 @@ export default function VendorDashboard() {
       if (d.user) {
         setIsApproved(d.user.isApproved ?? false);
         setVendorName(d.user.businessName ?? d.user.firstName ?? "Vendor");
+        setProfileIncomplete(!d.user.businessName || !d.user.businessAddress);
       } else {
         setIsApproved(false);
       }
@@ -199,6 +201,27 @@ export default function VendorDashboard() {
             </Link>
           ))}
         </div>
+
+        {/* Kitchen profile incomplete banner */}
+        {profileIncomplete && (
+          <div className="mb-6 bg-amber-900/30 border border-amber-500/40 rounded-2xl p-5 flex items-start gap-4">
+            <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+              <AlertTriangle size={20} className="text-amber-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-amber-300 mb-1">Complete your kitchen profile</p>
+              <p className="text-sm text-amber-200/70 mb-3">
+                Your <strong>Kitchen Name</strong> and <strong>Kitchen Address</strong> are required before customers can discover and order from you.
+              </p>
+              <Link
+                href="/profile"
+                className="inline-flex items-center gap-2 bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-amber-600 transition-colors"
+              >
+                Complete kitchen profile <ArrowRight size={14} />
+              </Link>
+            </div>
+          </div>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">

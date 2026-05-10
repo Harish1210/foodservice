@@ -1,7 +1,12 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Edit2, Trash2, X, Save, Loader2, ImageIcon, ToggleLeft, ToggleRight, ChevronLeft } from "lucide-react";
+import Link from "next/link";
+import {
+  Plus, Edit2, Trash2, X, Save, Loader2, ImageIcon,
+  ToggleLeft, ToggleRight, ChevronLeft, UtensilsCrossed,
+  AlertTriangle, ArrowRight,
+} from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import toast from "react-hot-toast";
 import Navbar from "@/components/Navbar";
@@ -13,11 +18,21 @@ type MenuItem = {
   allergens: string | null; calories: number | null; prepTime: number;
   category: Category; categoryId: string;
 };
+type VendorProfile = {
+  businessName: string | null;
+  businessAddress: string | null;
+  firstName: string | null;
+};
 
-const EMPTY_FORM = { name: "", description: "", price: "", categoryId: "", isVeg: false, isSpicy: false, isGlutenFree: false, isFeatured: false, isAvailable: true, allergens: "", calories: "", prepTime: "15" };
+const EMPTY_FORM = {
+  name: "", description: "", price: "", categoryId: "",
+  isVeg: false, isSpicy: false, isGlutenFree: false, isFeatured: false,
+  isAvailable: true, allergens: "", calories: "", prepTime: "15",
+};
 
 export default function VendorMenuPage() {
   const router = useRouter();
+  const [vendor, setVendor] = useState<VendorProfile | null>(null);
   const [items, setItems] = useState<MenuItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,12 +47,14 @@ export default function VendorMenuPage() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // Auth check
     fetch("/api/auth/me").then((r) => r.json()).then((d) => {
       if (!d.user || d.user.role !== "vendor") { router.push("/login?role=vendor"); return; }
+      setVendor({ businessName: d.user.businessName, businessAddress: d.user.businessAddress, firstName: d.user.firstName });
     });
     loadItems();
-    fetch("/api/menu").then((r) => r.json()).then((d) => setCategories(d.categories?.map((c: { id: string; name: string }) => ({ id: c.id, name: c.name })) ?? []));
+    fetch("/api/menu").then((r) => r.json()).then((d) =>
+      setCategories(d.categories?.map((c: { id: string; name: string }) => ({ id: c.id, name: c.name })) ?? [])
+    );
   }, [router]);
 
   const loadItems = async () => {
@@ -54,7 +71,12 @@ export default function VendorMenuPage() {
   const openAdd = () => { setEditItem(null); setForm(EMPTY_FORM); setImageFile(null); setImagePreview(null); setShowForm(true); };
   const openEdit = (item: MenuItem) => {
     setEditItem(item);
-    setForm({ name: item.name, description: item.description ?? "", price: String(item.price), categoryId: item.categoryId, isVeg: item.isVeg, isSpicy: item.isSpicy, isGlutenFree: item.isGlutenFree, isFeatured: item.isFeatured, isAvailable: item.isAvailable, allergens: item.allergens ?? "", calories: item.calories ? String(item.calories) : "", prepTime: String(item.prepTime) });
+    setForm({
+      name: item.name, description: item.description ?? "", price: String(item.price),
+      categoryId: item.categoryId, isVeg: item.isVeg, isSpicy: item.isSpicy,
+      isGlutenFree: item.isGlutenFree, isFeatured: item.isFeatured, isAvailable: item.isAvailable,
+      allergens: item.allergens ?? "", calories: item.calories ? String(item.calories) : "", prepTime: String(item.prepTime),
+    });
     setImageFile(null);
     setImagePreview(item.image);
     setShowForm(true);
@@ -75,13 +97,11 @@ export default function VendorMenuPage() {
       const fd = new FormData();
       Object.entries(form).forEach(([k, v]) => fd.append(k, String(v)));
       if (imageFile) fd.append("image", imageFile);
-
       const url = editItem ? `/api/vendor/menu-items/${editItem.id}` : "/api/vendor/menu-items";
       const method = editItem ? "PATCH" : "POST";
       const res = await fetch(url, { method, body: fd });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-
       toast.success(editItem ? "Item updated!" : "Item added!");
       if (data.imageWarning) toast("⚠️ " + data.imageWarning, { icon: "📸" });
       setShowForm(false);
@@ -113,10 +133,12 @@ export default function VendorMenuPage() {
   };
 
   const filtered = filterCat === "all" ? items : items.filter((i) => i.categoryId === filterCat);
+  const profileIncomplete = vendor && !vendor.businessName;
 
   return (
     <div className="min-h-screen bg-[#0D0D0D] text-white">
       <Navbar />
+
       {/* Header */}
       <div className="bg-[#1A1A1A] border-b border-white/10 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -128,12 +150,39 @@ export default function VendorMenuPage() {
             <p className="text-xs text-gray-400">{items.length} items · {items.filter(i => i.isAvailable).length} available</p>
           </div>
         </div>
-        <button onClick={openAdd} className="flex items-center gap-2 bg-[#FF6B00] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#CC5500] transition-colors">
+        <button
+          onClick={openAdd}
+          disabled={!!profileIncomplete}
+          title={profileIncomplete ? "Complete your kitchen profile first" : undefined}
+          className="flex items-center gap-2 bg-[#FF6B00] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#CC5500] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        >
           <Plus size={16} /> Add Item
         </button>
       </div>
 
       <div className="max-w-5xl mx-auto px-4 py-6">
+
+        {/* Kitchen details incomplete banner */}
+        {profileIncomplete && (
+          <div className="mb-6 bg-amber-900/30 border border-amber-500/40 rounded-2xl p-5 flex items-start gap-4">
+            <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+              <AlertTriangle size={20} className="text-amber-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-amber-300 mb-1">Complete your kitchen profile first</p>
+              <p className="text-sm text-amber-200/70 mb-3">
+                Before adding menu items, you need to set your <strong>Kitchen Name</strong> and <strong>Kitchen Address</strong> so customers can find you.
+              </p>
+              <Link
+                href="/profile"
+                className="inline-flex items-center gap-2 bg-amber-500 text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-amber-600 transition-colors"
+              >
+                Set up kitchen profile <ArrowRight size={14} />
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* Category filter */}
         <div className="flex gap-2 overflow-x-auto pb-2 mb-6">
           {[{ id: "all", name: "All" }, ...categories].map((c) => (
@@ -145,12 +194,44 @@ export default function VendorMenuPage() {
         </div>
 
         {loading ? (
-          <div className="flex justify-center py-20"><Loader2 className="animate-spin text-[#FF6B00]" size={36} /></div>
+          <div className="flex justify-center py-20">
+            <Loader2 className="animate-spin text-[#FF6B00]" size={36} />
+          </div>
+        ) : filtered.length === 0 ? (
+          /* ── Empty state ── */
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="w-20 h-20 bg-[#1A1A1A] border border-white/10 rounded-3xl flex items-center justify-center mb-5">
+              <UtensilsCrossed size={36} className="text-gray-600" />
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2">
+              {filterCat === "all" ? "No menu items yet" : "No items in this category"}
+            </h2>
+            <p className="text-gray-400 text-sm mb-6 max-w-xs">
+              {filterCat === "all"
+                ? "Add your first dish to start accepting orders from customers."
+                : "Switch to 'All' or add a new item to this category."}
+            </p>
+            {filterCat !== "all" ? (
+              <button
+                onClick={() => setFilterCat("all")}
+                className="px-5 py-2.5 rounded-xl border border-white/20 text-sm font-semibold text-gray-300 hover:bg-white/10 transition-colors"
+              >
+                Show all items
+              </button>
+            ) : (
+              <button
+                onClick={openAdd}
+                disabled={!!profileIncomplete}
+                className="flex items-center gap-2 bg-[#FF6B00] text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-[#CC5500] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <Plus size={16} /> Add your first dish
+              </button>
+            )}
+          </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filtered.map((item) => (
               <div key={item.id} className={`bg-[#1A1A1A] rounded-2xl border overflow-hidden transition-all ${item.isAvailable ? "border-white/10" : "border-red-900/50 opacity-60"}`}>
-                {/* Image */}
                 <div className="relative h-40 bg-[#111] flex items-center justify-center overflow-hidden">
                   {item.image ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -158,13 +239,11 @@ export default function VendorMenuPage() {
                   ) : (
                     <ImageIcon size={36} className="text-gray-600" />
                   )}
-                  {/* Badges */}
                   <div className="absolute top-2 left-2 flex gap-1 flex-wrap">
                     {item.isVeg && <span className="text-xs bg-green-600 text-white px-1.5 py-0.5 rounded-full font-medium">🌱 Veg</span>}
                     {item.isSpicy && <span className="text-xs bg-red-600 text-white px-1.5 py-0.5 rounded-full font-medium">🌶 Spicy</span>}
                     {item.isFeatured && <span className="text-xs bg-yellow-500 text-white px-1.5 py-0.5 rounded-full font-medium">⭐</span>}
                   </div>
-                  {/* Toggle available */}
                   <button onClick={() => toggleAvailable(item)}
                     className="absolute top-2 right-2 bg-black/60 rounded-full p-1 hover:bg-black/80 transition-colors">
                     {item.isAvailable
@@ -208,7 +287,6 @@ export default function VendorMenuPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              {/* Image upload */}
               <div>
                 <label className="block text-xs font-medium text-gray-400 mb-2">Photo</label>
                 <div
@@ -282,7 +360,6 @@ export default function VendorMenuPage() {
                   className="w-full bg-[#111] border border-white/10 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#FF6B00] text-white placeholder-gray-600" />
               </div>
 
-              {/* Toggles */}
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { key: "isVeg", label: "🌱 Vegetarian" },
@@ -294,7 +371,9 @@ export default function VendorMenuPage() {
                   <button key={key} type="button"
                     onClick={() => setForm((f) => ({ ...f, [key]: !f[key as keyof typeof f] }))}
                     className={`flex items-center justify-between px-3 py-2.5 rounded-xl border text-sm font-medium transition-all ${
-                      form[key as keyof typeof form] ? "bg-[#FF6B00]/20 border-[#FF6B00]/50 text-[#FF6B00]" : "bg-white/5 border-white/10 text-gray-400"
+                      form[key as keyof typeof form]
+                        ? "bg-[#FF6B00]/20 border-[#FF6B00]/50 text-[#FF6B00]"
+                        : "bg-white/5 border-white/10 text-gray-400"
                     }`}>
                     <span>{label}</span>
                     {form[key as keyof typeof form]
