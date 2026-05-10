@@ -44,13 +44,14 @@ export async function POST(req: NextRequest) {
     // SMS — Web OTP API format: last line must be "@domain #code"
     const domain = process.env.NEXT_PUBLIC_DOMAIN ?? "foodservice-ruddy.vercel.app";
     const message =
-      `🔐 Dishly verification code: ${otp}\n` +
-      `Valid for 10 minutes. Do not share this code.\n\n` +
+      `Your Dishly code: ${otp}\n` +
+      `Valid 10 mins. Do not share.\n\n` +
       `@${domain} #${otp}`;
 
-    await sendSMS(phone, message);
+    const smsSent = await sendSMS(phone, message);
+    console.log(`[send-otp] SMS to ${phone}: ${smsSent ? "sent" : "FAILED"}`);
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, smsSent });
   } catch (err) {
     console.error("[send-otp]", err);
     return NextResponse.json({ error: "Failed to send OTP" }, { status: 500 });

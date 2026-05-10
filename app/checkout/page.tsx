@@ -129,7 +129,10 @@ export default function CheckoutPage() {
         // Set step FIRST so the empty-cart guard doesn't redirect,
         // then send OTP, then clear cart.
         setStep("otp");
-        await sendOtp();
+        const smsSent = await sendOtp();
+        if (!smsSent) {
+          toast.error("Could not send SMS — tap 'Resend code' to try again", { duration: 6000 });
+        }
         clearCart();
       }
     } catch (err) {
@@ -140,12 +143,21 @@ export default function CheckoutPage() {
   };
 
   // ── Send / resend OTP ───────────────────────────────────────────────────────
-  const sendOtp = async () => {
-    await fetch("/api/auth/send-otp", {
-      method:  "POST",
-      headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ name: form.name, email: form.email, phone: form.phone }),
-    });
+  const sendOtp = async (): Promise<boolean> => {
+    try {
+      const res  = await fetch("/api/auth/send-otp", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ name: form.name, email: form.email, phone: form.phone }),
+      });
+      const data = await res.json();
+      if (!res.ok) { console.error("[sendOtp] API error:", data); return false; }
+      if (!data.smsSent) { console.warn("[sendOtp] API ok but SMS not delivered"); }
+      return data.smsSent ?? false;
+    } catch (err) {
+      console.error("[sendOtp] fetch error:", err);
+      return false;
+    }
   };
 
   const handleResend = async () => {
@@ -153,8 +165,12 @@ export default function CheckoutPage() {
     setOtpError("");
     setOtpDigits(["", "", "", "", "", ""]);
     try {
-      await sendOtp();
-      toast.success("New code sent!");
+      const sent = await sendOtp();
+      if (sent) {
+        toast.success("New code sent!");
+      } else {
+        toast.error("Could not send SMS — check your mobile number");
+      }
       otpRefs.current[0]?.focus();
     } catch { toast.error("Could not resend — try again"); }
     finally { setOtpResending(false); }
