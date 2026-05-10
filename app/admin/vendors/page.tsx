@@ -200,7 +200,7 @@ export default function AdminVendorsPage() {
             <p className="text-sm text-gray-600 mb-5">
               You are about to permanently delete{" "}
               <span className="font-semibold text-[#1A0A00]">
-                {confirmDelete.businessName ?? `${confirmDelete.firstName ?? ""} ${confirmDelete.lastName ?? ""}`.trim() || confirmDelete.email}
+                {(confirmDelete.businessName ?? `${confirmDelete.firstName ?? ""} ${confirmDelete.lastName ?? ""}`.trim()) || confirmDelete.email}
               </span>
               . All their data will be lost.
             </p>
