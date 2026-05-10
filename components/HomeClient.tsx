@@ -232,12 +232,12 @@ export default function HomeClient({ session, userSuburb }: { session: unknown; 
         <div className="absolute top-4 right-4 z-20">
           <Link
             href="/login?role=vendor"
-            className="group flex items-center gap-3 bg-gradient-to-r from-[#FF6B00] to-[#e05c00] hover:from-[#e05c00] hover:to-[#c44d00] text-white font-bold px-5 py-3.5 rounded-2xl shadow-xl shadow-orange-900/50 hover:shadow-orange-900/70 transition-all hover:scale-105 border border-white/15"
+            className="group flex items-center gap-2 bg-gradient-to-r from-[#FF6B00] to-[#e05c00] hover:from-[#e05c00] hover:to-[#c44d00] text-white text-xs font-bold px-4 py-2.5 rounded-2xl shadow-lg shadow-orange-900/40 hover:shadow-orange-900/60 transition-all hover:scale-105 border border-white/10"
           >
-            <ChefHat size={22} className="shrink-0" />
+            <ChefHat size={15} className="shrink-0" />
             <div className="leading-tight">
-              <div className="text-xs font-normal text-orange-200 leading-none mb-1">Are you a chef?</div>
-              <div className="text-sm">Join as a Chef →</div>
+              <div className="text-[10px] font-normal text-orange-200 leading-none mb-0.5">Are you a chef?</div>
+              <div>Join as a Chef →</div>
             </div>
           </Link>
         </div>
