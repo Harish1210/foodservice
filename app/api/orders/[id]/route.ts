@@ -7,7 +7,11 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   try {
     const order = await prisma.order.findUnique({
       where: { id },
-      include: { items: true, address: true },
+      include: {
+        items: true,
+        address: true,
+        vendor: { select: { businessName: true, businessAddress: true, firstName: true, lastName: true } },
+      },
     });
     if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
     return NextResponse.json({ order });
@@ -24,11 +28,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     const order = await prisma.order.update({
       where: { id },
       data: { status, updatedAt: new Date() },
-      include: { items: true },
+      include: {
+        items: true,
+        vendor: { select: { businessAddress: true } },
+      },
     });
 
     // ── SMS on status change ──
-    const customerPhone = order.guestPhone;
+    const customerPhone   = order.guestPhone;
+    const vendorAddress   = order.vendor?.businessAddress ?? null;
     let smsPromise: Promise<boolean> | null = null;
 
     if (customerPhone) {
@@ -38,7 +46,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
           break;
         case "ready":
           smsPromise = order.type === "pickup" && order.pickupCode
-            ? sendSMS(customerPhone, SMS.orderReadyPickup(order.orderNumber, order.pickupCode))
+            ? sendSMS(customerPhone, SMS.orderReadyPickup(order.orderNumber, order.pickupCode, vendorAddress))
             : sendSMS(customerPhone, SMS.orderReadyDelivery(order.orderNumber));
           break;
         case "out_for_delivery":

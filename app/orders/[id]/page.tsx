@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import { formatCurrency } from "@/lib/utils";
 import {
   CheckCircle, Clock, ChefHat, Package, Truck, Home,
-  Loader2, Star, Send, MessageSquare, PartyPopper,
+  Loader2, Star, Send, MessageSquare, PartyPopper, MapPin,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import Link from "next/link";
@@ -39,6 +39,7 @@ type OrderData = {
   pickupCode?: string; total: number; subtotal: number;
   deliveryFee: number; tax: number; estimatedTime: number;
   vendorId?: string;
+  vendor?: { businessName: string | null; businessAddress: string | null } | null;
   items: Array<{ id: string; name: string; quantity: number; price: number }>;
 };
 
@@ -217,9 +218,25 @@ export default function OrderTrackingPage() {
 
         {/* Pickup code */}
         {order.pickupCode && order.type === "pickup" && !isDelivered && (
-          <div className="bg-orange-50 border-2 border-[#FF6B00] rounded-2xl p-5 text-center mb-6">
+          <div className="bg-orange-50 border-2 border-[#FF6B00] rounded-2xl p-5 text-center mb-4">
             <p className="text-sm font-medium text-[#7C4A1E] mb-1">Show this code at the counter</p>
             <p className="text-4xl font-bold text-[#FF6B00] tracking-widest">{order.pickupCode}</p>
+          </div>
+        )}
+
+        {/* Pickup address */}
+        {order.type === "pickup" && order.vendor?.businessAddress && (
+          <div className="bg-white border border-[#E8D5C0] rounded-2xl p-4 mb-6 flex items-start gap-3">
+            <div className="w-9 h-9 bg-orange-100 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+              <MapPin size={18} className="text-[#FF6B00]" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-[#7C4A1E] uppercase tracking-wide mb-0.5">Pickup Address</p>
+              <p className="text-sm font-medium text-[#1A0A00]">{order.vendor.businessAddress}</p>
+              {order.vendor.businessName && (
+                <p className="text-xs text-gray-400 mt-0.5">{order.vendor.businessName}</p>
+              )}
+            </div>
           </div>
         )}
 

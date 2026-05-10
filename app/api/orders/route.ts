@@ -58,27 +58,39 @@ export async function POST(req: NextRequest) {
       include: { items: true },
     });
 
-    // ── SMS notifications (awaited so they complete before response) ──
+    // ── Fetch vendor details for SMS ──
+    let vendorPhone: string | null = null;
+    let vendorPickupAddress: string | null = null;
+    if (vendorId) {
+      const vendor = await prisma.user.findUnique({
+        where: { id: vendorId },
+        select: { phone: true, businessAddress: true },
+      });
+      vendorPhone         = vendor?.phone          ?? null;
+      vendorPickupAddress = vendor?.businessAddress ?? null;
+    }
+
+    // ── SMS notifications ──
     const smsPromises: Promise<boolean>[] = [];
 
-    // 1. Confirm to customer
+    // 1. Confirm to customer (include pickup address for pickup orders)
     if (guestPhone) {
       smsPromises.push(
-        sendSMS(guestPhone, SMS.orderConfirmed(order.orderNumber, type, estimatedTime))
+        sendSMS(
+          guestPhone,
+          SMS.orderConfirmed(
+            order.orderNumber, type, estimatedTime,
+            type === "pickup" ? vendorPickupAddress : null
+          )
+        )
       );
     }
 
     // 2. Alert the vendor
-    if (vendorId) {
-      const vendor = await prisma.user.findUnique({
-        where: { id: vendorId },
-        select: { phone: true },
-      });
-      if (vendor?.phone) {
-        smsPromises.push(
-          sendSMS(vendor.phone, SMS.newOrderAlert(order.orderNumber, type, items.length, total))
-        );
-      }
+    if (vendorPhone) {
+      smsPromises.push(
+        sendSMS(vendorPhone, SMS.newOrderAlert(order.orderNumber, type, items.length, total))
+      );
     }
 
     // Await with a 10s safety timeout so SMS never blocks the order response indefinitely

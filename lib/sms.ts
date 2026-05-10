@@ -25,7 +25,7 @@ export function toE164(phone: string): string {
   const digits = phone.replace(/\D/g, "");
   if (digits.startsWith("61")) return `+${digits}`;
   if (digits.startsWith("0"))  return `+61${digits.slice(1)}`;
-  if (digits.length === 9)     return `+61${digits}`;      // already without leading 0
+  if (digits.length === 9)     return `+61${digits}`;
   return `+${digits}`;
 }
 
@@ -42,7 +42,7 @@ export async function sendSMS(to: string, body: string): Promise<boolean> {
   const toE164Number = toE164(to);
 
   try {
-    const url  = `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`;
+    const url   = `https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`;
     const creds = Buffer.from(`${sid}:${token}`).toString("base64");
 
     const res = await fetch(url, {
@@ -51,18 +51,11 @@ export async function sendSMS(to: string, body: string): Promise<boolean> {
         Authorization: `Basic ${creds}`,
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: new URLSearchParams({
-        From: from,
-        To:   toE164Number,
-        Body: body,
-      }),
+      body: new URLSearchParams({ From: from, To: toE164Number, Body: body }),
     });
 
     const data = await res.json() as { sid?: string; message?: string };
-    if (!res.ok) {
-      console.error("[SMS] Twilio error:", data.message);
-      return false;
-    }
+    if (!res.ok) { console.error("[SMS] Twilio error:", data.message); return false; }
     console.log(`[SMS] Sent to ${toE164Number} — SID: ${data.sid}`);
     return true;
   } catch (err) {
@@ -76,18 +69,24 @@ const APP = "Dishly";
 
 export const SMS = {
   /** Sent to customer immediately after placing an order */
-  orderConfirmed: (orderNumber: string, type: string, estimatedMins: number) =>
-    `🧾 ${APP}: Order #${orderNumber} confirmed! ` +
-    `Type: ${type === "dine-in" ? "Dine-in" : type === "pickup" ? "Pickup" : "Delivery"}. ` +
-    `Est. time: ~${estimatedMins} mins. We'll keep you updated!`,
+  orderConfirmed: (orderNumber: string, type: string, estimatedMins: number, pickupAddress?: string | null) => {
+    const typeLabel = type === "dine-in" ? "Dine-in" : type === "pickup" ? "Pickup" : "Delivery";
+    const base = `🧾 ${APP}: Order #${orderNumber} confirmed! Type: ${typeLabel}. Est. ~${estimatedMins} mins.`;
+    if (type === "pickup" && pickupAddress) {
+      return `${base} Pickup address: ${pickupAddress}. We'll SMS you when ready!`;
+    }
+    return `${base} We'll keep you updated!`;
+  },
 
   /** Sent to customer when vendor starts cooking */
   orderPreparing: (orderNumber: string) =>
     `🍳 ${APP}: Great news! Your order #${orderNumber} is now being prepared fresh in the kitchen.`,
 
   /** Sent to customer when food is ready (pickup orders) */
-  orderReadyPickup: (orderNumber: string, pickupCode: string) =>
-    `✅ ${APP}: Your order #${orderNumber} is READY for pickup! Show code ${pickupCode} at the counter.`,
+  orderReadyPickup: (orderNumber: string, pickupCode: string, pickupAddress?: string | null) => {
+    const base = `✅ ${APP}: Order #${orderNumber} is READY for pickup! Show code: ${pickupCode}.`;
+    return pickupAddress ? `${base} Address: ${pickupAddress}` : base;
+  },
 
   /** Sent to customer when food is ready (delivery orders) */
   orderReadyDelivery: (orderNumber: string) =>
