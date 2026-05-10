@@ -27,6 +27,10 @@ export async function POST(req: NextRequest) {
     const lastName  = name?.split(" ").slice(1).join(" ") || null;
     const isVendor  = role === "vendor";
 
+    // Check existing user role BEFORE upserting — never downgrade an admin
+    const existing = await prisma.user.findUnique({ where: { email }, select: { role: true } });
+    const isAdmin  = existing?.role === "admin";
+
     // Upsert user — create if new, update OTP if existing
     await prisma.user.upsert({
       where:  { email },
@@ -58,7 +62,8 @@ export async function POST(req: NextRequest) {
         ...(suburb   && { suburb }),
         ...(postcode && { postcode }),
         // Only overwrite vendor fields when explicitly registering as vendor
-        ...(isVendor && {
+        // AND never touch role/business fields if the user is already an admin
+        ...(!isAdmin && isVendor && {
           role:            "vendor",
           businessName:    businessName    ?? undefined,
           businessAddress: businessAddress ?? undefined,
