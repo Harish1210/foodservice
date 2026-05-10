@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { sendSMS } from "@/lib/sms";
 
 async function requireAdmin() {
   const session = await getSession();
@@ -50,12 +51,24 @@ export async function PATCH(req: NextRequest) {
 
   try {
     switch (action) {
-      case "approve":
-        await prisma.user.update({
+      case "approve": {
+        const vendor = await prisma.user.update({
           where: { id: vendorId },
-          data: { isApproved: true, isOnHold: false },
+          data:  { isApproved: true, isOnHold: false },
+          select: { firstName: true, businessName: true, phone: true },
         });
+        // SMS the vendor to let them know they're live
+        if (vendor.phone) {
+          const name    = vendor.businessName ?? vendor.firstName ?? "Chef";
+          const message =
+            `🎉 Congratulations ${name}! Your kitchen has been approved on Dishly.\n\n` +
+            `You can now log in and start adding your menu items:\n` +
+            `https://foodservice-ruddy.vercel.app/login?role=vendor\n\n` +
+            `Once your menu is ready, customers can start ordering. Welcome aboard! 🍽️`;
+          sendSMS(vendor.phone, message).catch(() => {});
+        }
         return NextResponse.json({ success: true, message: "Vendor approved" });
+      }
 
       case "disapprove":
         await prisma.user.update({
