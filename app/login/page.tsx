@@ -19,21 +19,33 @@ const inputCls = "w-full border border-[#E8D5C0] rounded-xl px-3 py-2.5 text-sm 
 // ─────────────────────────────────────────────────────────────────────────────
 function OtpEntry({
   digits, error, verifying, resending,
-  onChange, onKeyDown, onPaste, onVerify, onResend, onBack, maskedPhone,
+  onChange, onPaste, onVerify, onResend, onBack, maskedPhone,
 }: {
   digits:      string[];
   error:       string;
   verifying:   boolean;
   resending:   boolean;
   onChange:    (i: number, v: string) => void;
-  onKeyDown:   (i: number, e: React.KeyboardEvent<HTMLInputElement>) => void;
   onPaste:     (e: React.ClipboardEvent) => void;
   onVerify:    () => void;
   onResend:    () => void;
   onBack:      () => void;
   maskedPhone: string;
 }) {
+  // Refs live here so focus is reliable — no querySelector needed
   const refs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const handleChange = (idx: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const digit = e.target.value.replace(/\D/g, "").slice(-1);
+    onChange(idx, digit);
+    if (digit && idx < 5) refs.current[idx + 1]?.focus();
+  };
+
+  const handleKeyDown = (idx: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !digits[idx] && idx > 0)
+      refs.current[idx - 1]?.focus();
+  };
+
   return (
     <div className="text-center">
       <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
@@ -53,8 +65,8 @@ function OtpEntry({
             type="text" inputMode="numeric"
             autoComplete={i === 0 ? "one-time-code" : "off"}
             maxLength={1} value={d}
-            onChange={(e) => onChange(i, e.target.value)}
-            onKeyDown={(e) => onKeyDown(i, e)}
+            onChange={(e) => handleChange(i, e)}
+            onKeyDown={(e) => handleKeyDown(i, e)}
             onFocus={(e) => e.target.select()}
             autoFocus={i === 0}
             className={`w-11 h-14 text-center text-xl font-bold rounded-xl border-2 focus:outline-none transition-all ${
@@ -141,17 +153,12 @@ function useOtp(step: OtpStep, email: string, phone: string, onSuccess: () => vo
     finally  { setResending(false); }
   };
 
-  const onChange = (idx: number, val: string, sendFn?: () => void) => {
+  const onChange = (idx: number, val: string) => {
     const digit = val.replace(/\D/g, "").slice(-1);
     const next  = [...digits]; next[idx] = digit;
     setDigits(next); setError("");
-    if (digit && idx < 5) document.querySelectorAll<HTMLInputElement>(".otp-input")[idx + 1]?.focus();
+    // Focus is handled inside OtpEntry via refs — no querySelector needed
     if (next.every((d) => d)) verify(next.join(""));
-  };
-
-  const onKeyDown = (idx: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && !digits[idx] && idx > 0)
-      document.querySelectorAll<HTMLInputElement>(".otp-input")[idx - 1]?.focus();
   };
 
   const onPaste = (e: React.ClipboardEvent) => {
@@ -165,7 +172,7 @@ function useOtp(step: OtpStep, email: string, phone: string, onSuccess: () => vo
 
   const masked = phone.replace(/(\d{4})(\d+)(\d{3})/, "$1 •••• $3");
 
-  return { digits, verifying, resending, error, verify, resend, onChange, onKeyDown, onPaste, masked, setDigits, setError };
+  return { digits, verifying, resending, error, verify, resend, onChange, onPaste, masked, setDigits, setError };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -203,7 +210,7 @@ function CustomerOtpFlow({ redirectTo }: { redirectTo: string }) {
         <OtpEntry
           digits={otp.digits} error={otp.error} verifying={otp.verifying} resending={otp.resending}
           onChange={(i, v) => otp.onChange(i, v)}
-          onKeyDown={otp.onKeyDown} onPaste={otp.onPaste}
+          onPaste={otp.onPaste}
           onVerify={() => otp.verify()} onResend={() => otp.resend(sendOtp)}
           onBack={() => { setStep("details"); otp.setDigits(["","","","","",""]); otp.setError(""); }}
           maskedPhone={otp.masked}
@@ -323,7 +330,7 @@ function VendorOtpFlow({ redirectTo }: { redirectTo: string }) {
         <OtpEntry
           digits={otp.digits} error={otp.error} verifying={otp.verifying} resending={otp.resending}
           onChange={(i, v) => otp.onChange(i, v)}
-          onKeyDown={otp.onKeyDown} onPaste={otp.onPaste}
+          onPaste={otp.onPaste}
           onVerify={() => otp.verify()} onResend={() => otp.resend(sendOtp)}
           onBack={() => { setStep("details"); otp.setDigits(["","","","","",""]); otp.setError(""); }}
           maskedPhone={otp.masked}
