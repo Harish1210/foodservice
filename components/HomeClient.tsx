@@ -228,8 +228,8 @@ export default function HomeClient({ session, userSuburb }: { session: unknown; 
           <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-orange-900/20 rounded-full blur-2xl" />
         </div>
 
-        {/* ── ARE YOU A CHEF? floating top-right ── */}
-        <div className="absolute top-4 right-4 z-20">
+        {/* ── ARE YOU A CHEF? — desktop: floating top-right, mobile: inline below tagline ── */}
+        <div className="hidden md:block absolute top-4 right-4 z-20">
           <Link
             href="/login?role=vendor"
             className="group flex items-center gap-2 bg-gradient-to-r from-[#FF6B00] to-[#e05c00] hover:from-[#e05c00] hover:to-[#c44d00] text-white text-xs font-bold px-4 py-2.5 rounded-2xl shadow-lg shadow-orange-900/40 hover:shadow-orange-900/60 transition-all hover:scale-105 border border-white/10"
@@ -247,6 +247,15 @@ export default function HomeClient({ session, userSuburb }: { session: unknown; 
           <img src="/logo.jpg" alt="Dishly" className="w-14 h-14 rounded-full object-cover ring-4 ring-[#FF6B00]/30 shadow-2xl mb-3" />
           <h1 className="text-4xl md:text-5xl font-black text-white mb-1 tracking-tight">Dishly</h1>
           <p className="text-white/50 text-[11px] font-medium tracking-[0.22em] uppercase mb-6">Every dish, every kitchen, delivered</p>
+
+          {/* Mobile-only Chef CTA — sits below tagline, no overlap */}
+          <Link
+            href="/login?role=vendor"
+            className="md:hidden flex items-center gap-2 bg-gradient-to-r from-[#FF6B00] to-[#e05c00] text-white text-xs font-bold px-4 py-2.5 rounded-2xl shadow-lg border border-white/10 mb-6"
+          >
+            <ChefHat size={14} className="shrink-0" />
+            <span>Are you a chef? Join as a Chef →</span>
+          </Link>
 
           {/* ── SEARCH BAR + DROPDOWN ── */}
           <div className="w-full max-w-xl relative mb-4">
