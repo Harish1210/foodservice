@@ -263,7 +263,7 @@ function VendorCard({
   onDelete: () => void;
 }) {
   const fullName      = `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim();
-  const name          = vendor.businessName ?? fullName || vendor.email ?? "Unnamed Kitchen";
+  const name          = (vendor.businessName ?? fullName) || (vendor.email ?? "Unnamed Kitchen");
   const profileIncomplete = !vendor.businessName;
   const isBusy = actionId === vendor.id;
 
