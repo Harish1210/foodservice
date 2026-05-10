@@ -221,9 +221,12 @@ export default function HomeClient({ session, userSuburb }: { session: unknown; 
       <Navbar />
 
       {/* ── HERO + SEARCH ── */}
-      <div className="relative overflow-hidden" style={{ background: "linear-gradient(135deg,#0D0500 0%,#3D1200 40%,#7C2D12 75%,#1A0A00 100%)" }}>
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FF6B00]/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-orange-900/20 rounded-full blur-2xl pointer-events-none" />
+      <div className="relative" style={{ background: "linear-gradient(135deg,#0D0500 0%,#3D1200 40%,#7C2D12 75%,#1A0A00 100%)" }}>
+        {/* Decorative blobs — clipped inside their own div so dropdown can overflow */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#FF6B00]/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-orange-900/20 rounded-full blur-2xl" />
+        </div>
 
         <div className="relative z-10 max-w-3xl mx-auto px-4 pt-10 pb-8 flex flex-col items-center text-center">
           {/* Brand */}
@@ -257,7 +260,7 @@ export default function HomeClient({ session, userSuburb }: { session: unknown; 
 
             {/* ── DROPDOWN ── */}
             {showDropdown && (
-              <div ref={dropdownRef} className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 max-h-[420px] overflow-y-auto">
+              <div ref={dropdownRef} className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[100] max-h-[420px] overflow-y-auto">
                 {suggestions.length === 0 && !suggLoading ? (
                   <div className="px-4 py-6 text-center text-gray-400 text-sm">
                     <div className="text-3xl mb-2">🔍</div>
