@@ -8,15 +8,22 @@ function generateOtp(): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, phone } = await req.json();
+    const {
+      name, email, phone,
+      // Vendor-specific (only on registration)
+      role, businessName, businessAddress,
+      lat, lng,
+    } = await req.json();
+
     if (!email || !phone) {
       return NextResponse.json({ error: "Email and phone are required" }, { status: 400 });
     }
 
-    const otp      = generateOtp();
-    const expiry   = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    const otp       = generateOtp();
+    const expiry    = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
     const firstName = name?.split(" ")[0] ?? null;
     const lastName  = name?.split(" ").slice(1).join(" ") || null;
+    const isVendor  = role === "vendor";
 
     // Upsert user — create if new, update OTP if existing
     await prisma.user.upsert({
@@ -25,17 +32,30 @@ export async function POST(req: NextRequest) {
         email,
         firstName,
         lastName,
-        name:     name ?? null,
+        name:            name            ?? null,
         phone,
-        role:     "customer",
+        role:            isVendor ? "vendor" : "customer",
+        businessName:    businessName    ?? null,
+        businessAddress: businessAddress ?? null,
+        lat:             lat ? parseFloat(lat) : null,
+        lng:             lng ? parseFloat(lng) : null,
+        isApproved:      false,
         otp,
         otpExpiry: expiry,
       },
       update: {
-        // Keep existing name/phone if already set; always refresh OTP
-        firstName: firstName ?? undefined,
-        lastName:  lastName  ?? undefined,
-        phone:     phone     ?? undefined,
+        // Always refresh OTP; update name/phone/vendor fields if provided
+        firstName:       firstName       ?? undefined,
+        lastName:        lastName        ?? undefined,
+        phone:           phone           ?? undefined,
+        // Only overwrite vendor fields when explicitly registering as vendor
+        ...(isVendor && {
+          role:            "vendor",
+          businessName:    businessName    ?? undefined,
+          businessAddress: businessAddress ?? undefined,
+          lat:             lat ? parseFloat(lat) : undefined,
+          lng:             lng ? parseFloat(lng) : undefined,
+        }),
         otp,
         otpExpiry: expiry,
       },

@@ -3,265 +3,280 @@ import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
-  Eye, EyeOff, Loader2, ChefHat, User,
-  Navigation, MapPin, ShieldCheck, RefreshCw, Phone,
+  Loader2, ChefHat, User, Navigation, MapPin,
+  ShieldCheck, RefreshCw, Phone,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
-type Role         = "customer" | "vendor";
-type VendorMode   = "login" | "register";
-type CustomerStep = "details" | "otp";
+type Role      = "customer" | "vendor";
+type OtpStep   = "details" | "otp";
+type VendorMode = "login" | "register";
+
+const inputCls = "w-full border border-[#E8D5C0] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Customer OTP flow
+// Shared OTP digit entry
 // ─────────────────────────────────────────────────────────────────────────────
-function CustomerOtpFlow({ redirectTo }: { redirectTo: string }) {
-  const [step,        setStep]        = useState<CustomerStep>("details");
-  const [form,        setForm]        = useState({ name: "", email: "", phone: "" });
-  const [sending,     setSending]     = useState(false);
-  const [otpDigits,   setOtpDigits]   = useState(["","","","","",""]);
-  const [otpVerifying,setOtpVerifying]= useState(false);
-  const [otpResending,setOtpResending]= useState(false);
-  const [otpError,    setOtpError]    = useState("");
-  const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-  const inputCls = "w-full border border-[#E8D5C0] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]";
-
-  // Web OTP API — Android Chrome auto-fill
-  useEffect(() => {
-    if (step !== "otp" || typeof window === "undefined") return;
-    if (!("OTPCredential" in window)) return;
-    const ac = new AbortController();
-    (navigator.credentials as unknown as { get: (o: unknown) => Promise<{ code: string }> })
-      .get({ otp: { transport: ["sms"] }, signal: ac.signal })
-      .then((c) => { if (c?.code) handleVerify(c.code); })
-      .catch(() => {});
-    return () => ac.abort();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step]);
-
-  const sendOtp = async () => {
-    const res  = await fetch("/api/auth/send-otp", {
-      method:  "POST",
-      headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify(form),
-    });
-    return res.ok;
-  };
-
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.email || !form.phone) {
-      toast.error("Please enter your email and mobile number");
-      return;
-    }
-    setSending(true);
-    try {
-      const ok = await sendOtp();
-      if (!ok) throw new Error("Failed to send code");
-      setStep("otp");
-      setTimeout(() => otpRefs.current[0]?.focus(), 100);
-    } catch { toast.error("Could not send code — try again"); }
-    finally  { setSending(false); }
-  };
-
-  const handleResend = async () => {
-    setOtpResending(true);
-    setOtpError("");
-    setOtpDigits(["","","","","",""]);
-    try {
-      const ok = await sendOtp();
-      if (ok) { toast.success("New code sent!"); otpRefs.current[0]?.focus(); }
-      else      toast.error("Could not resend — try again");
-    } catch    { toast.error("Could not resend — try again"); }
-    finally    { setOtpResending(false); }
-  };
-
-  const handleVerify = async (code?: string) => {
-    const otp = (code ?? otpDigits.join("")).trim();
-    if (otp.length !== 6) return;
-    setOtpVerifying(true);
-    setOtpError("");
-    try {
-      const res  = await fetch("/api/auth/verify-otp", {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ email: form.email, otp }),
-      });
-      const data = await res.json();
-      if (!res.ok) { setOtpError(data.error ?? "Invalid code"); return; }
-      toast.success(`Welcome, ${data.user?.firstName ?? ""}! 🎉`);
-      window.location.href = redirectTo;
-    } catch { setOtpError("Something went wrong — try again"); }
-    finally { setOtpVerifying(false); }
-  };
-
-  const handleOtpChange = (idx: number, val: string) => {
-    const digit = val.replace(/\D/g, "").slice(-1);
-    const next  = [...otpDigits]; next[idx] = digit;
-    setOtpDigits(next);
-    setOtpError("");
-    if (digit && idx < 5) otpRefs.current[idx + 1]?.focus();
-    if (next.every((d) => d !== "")) handleVerify(next.join(""));
-  };
-
-  const handleOtpKeyDown = (idx: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && !otpDigits[idx] && idx > 0) otpRefs.current[idx - 1]?.focus();
-  };
-
-  const handleOtpPaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
-    if (!pasted) return;
-    const digits = pasted.split("").concat(Array(6 - pasted.length).fill(""));
-    setOtpDigits(digits);
-    if (pasted.length === 6) handleVerify(pasted);
-    else otpRefs.current[pasted.length]?.focus();
-  };
-
-  // ── Step 1: email + phone ──────────────────────────────────────────────────
-  if (step === "details") {
-    return (
-      <div className="bg-white rounded-3xl border border-[#E8D5C0] p-8 shadow-xl">
-        <h1 className="text-2xl font-bold text-[#1A0A00] mb-1">Sign in or Register</h1>
-        <p className="text-gray-500 text-sm mb-6">
-          Enter your details — we&apos;ll send a code to your mobile. No password needed!
-        </p>
-
-        <form onSubmit={handleSend} className="space-y-4">
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Full Name (optional for existing users)</label>
-            <input
-              value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              placeholder="Lambu Harish" className={inputCls}
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Email *</label>
-            <input
-              type="email" required
-              value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-              placeholder="you@example.com" className={inputCls}
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Mobile Number *</label>
-            <input
-              type="tel" required
-              value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-              placeholder="+61 400 000 000" className={inputCls}
-            />
-          </div>
-
-          <button
-            type="submit" disabled={sending}
-            className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-white bg-[#FF6B00] hover:bg-[#CC5500] transition-colors disabled:opacity-60 shadow-lg shadow-orange-100"
-          >
-            {sending ? <Loader2 size={18} className="animate-spin" /> : <Phone size={18} />}
-            {sending ? "Sending code…" : "Send Verification Code"}
-          </button>
-
-          <p className="text-xs text-center text-gray-400 flex items-center justify-center gap-1">
-            <ShieldCheck size={12} className="text-[#FF6B00]" />
-            A 6-digit code will be sent to your mobile via SMS
-          </p>
-        </form>
-      </div>
-    );
-  }
-
-  // ── Step 2: OTP entry ──────────────────────────────────────────────────────
-  const maskedPhone = form.phone.replace(/(\d{4})(\d+)(\d{3})/, "$1 •••• $3");
+function OtpEntry({
+  digits, error, verifying, resending,
+  onChange, onKeyDown, onPaste, onVerify, onResend, onBack, maskedPhone,
+}: {
+  digits:      string[];
+  error:       string;
+  verifying:   boolean;
+  resending:   boolean;
+  onChange:    (i: number, v: string) => void;
+  onKeyDown:   (i: number, e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onPaste:     (e: React.ClipboardEvent) => void;
+  onVerify:    () => void;
+  onResend:    () => void;
+  onBack:      () => void;
+  maskedPhone: string;
+}) {
+  const refs = useRef<(HTMLInputElement | null)[]>([]);
   return (
-    <div className="bg-white rounded-3xl border border-[#E8D5C0] p-8 shadow-xl text-center">
+    <div className="text-center">
       <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
         <ShieldCheck size={32} className="text-[#FF6B00]" />
       </div>
-
       <h2 className="text-xl font-bold text-[#1A0A00] mb-1">Verify your number</h2>
       <p className="text-gray-500 text-sm mb-6 leading-relaxed">
         We sent a 6-digit code to<br />
         <span className="font-semibold text-[#1A0A00]">{maskedPhone}</span>
       </p>
 
-      <div className="flex gap-2 justify-center mb-4" onPaste={handleOtpPaste}>
-        {otpDigits.map((d, i) => (
+      <div className="flex gap-2 justify-center mb-4" onPaste={onPaste}>
+        {digits.map((d, i) => (
           <input
             key={i}
-            ref={(el) => { otpRefs.current[i] = el; }}
+            ref={(el) => { refs.current[i] = el; }}
             type="text" inputMode="numeric"
             autoComplete={i === 0 ? "one-time-code" : "off"}
             maxLength={1} value={d}
-            onChange={(e) => handleOtpChange(i, e.target.value)}
-            onKeyDown={(e) => handleOtpKeyDown(i, e)}
+            onChange={(e) => onChange(i, e.target.value)}
+            onKeyDown={(e) => onKeyDown(i, e)}
             onFocus={(e) => e.target.select()}
             autoFocus={i === 0}
             className={`w-11 h-14 text-center text-xl font-bold rounded-xl border-2 focus:outline-none transition-all ${
-              otpError
-                ? "border-red-400 bg-red-50 text-red-600"
-                : d
-                  ? "border-[#FF6B00] bg-orange-50 text-[#FF6B00]"
-                  : "border-[#E8D5C0] text-[#1A0A00] focus:border-[#FF6B00]"
+              error ? "border-red-400 bg-red-50 text-red-600"
+                : d  ? "border-[#FF6B00] bg-orange-50 text-[#FF6B00]"
+                     : "border-[#E8D5C0] text-[#1A0A00] focus:border-[#FF6B00]"
             }`}
           />
         ))}
       </div>
 
-      {otpError && <p className="text-red-500 text-sm mb-3 font-medium">{otpError}</p>}
+      {error && <p className="text-red-500 text-sm mb-3 font-medium">{error}</p>}
 
-      {otpVerifying && (
+      {verifying && (
         <div className="flex items-center justify-center gap-2 text-[#FF6B00] text-sm mb-3">
           <Loader2 size={16} className="animate-spin" /> Verifying…
         </div>
       )}
-
-      {!otpVerifying && (
-        <button
-          onClick={() => handleVerify()}
-          disabled={otpDigits.some((d) => d === "")}
-          className="w-full bg-[#FF6B00] text-white py-3.5 rounded-xl font-bold text-sm hover:bg-[#CC5500] transition-colors disabled:opacity-40 mb-4"
-        >
+      {!verifying && (
+        <button onClick={onVerify} disabled={digits.some((d) => !d)}
+          className="w-full bg-[#FF6B00] text-white py-3.5 rounded-xl font-bold text-sm hover:bg-[#CC5500] transition-colors disabled:opacity-40 mb-4">
           Confirm & Sign In
         </button>
       )}
 
-      <button
-        onClick={handleResend} disabled={otpResending}
-        className="flex items-center justify-center gap-1.5 w-full text-sm text-gray-400 hover:text-[#FF6B00] transition-colors disabled:opacity-50 mb-4"
-      >
-        {otpResending ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
-        {otpResending ? "Sending…" : "Resend code"}
+      <button onClick={onResend} disabled={resending}
+        className="flex items-center justify-center gap-1.5 w-full text-sm text-gray-400 hover:text-[#FF6B00] transition-colors disabled:opacity-50 mb-4">
+        {resending ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
+        {resending ? "Sending…" : "Resend code"}
       </button>
 
-      <button
-        onClick={() => { setStep("details"); setOtpDigits(["","","","","",""]); setOtpError(""); }}
-        className="text-xs text-gray-400 hover:text-gray-600 underline"
-      >
-        ← Change email or number
+      <button onClick={onBack} className="text-xs text-gray-400 hover:text-gray-600 underline">
+        ← Change details
       </button>
     </div>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Vendor password flow (unchanged)
+// Shared OTP hook logic
 // ─────────────────────────────────────────────────────────────────────────────
-function VendorPasswordFlow({ redirectTo }: { redirectTo: string }) {
-  const router    = useRouter();
-  const [mode,    setMode]    = useState<VendorMode>("login");
-  const [showPw,  setShowPw]  = useState(false);
-  const [loading, setLoading] = useState(false);
+function useOtp(step: OtpStep, email: string, phone: string, onSuccess: () => void) {
+  const [digits,    setDigits]    = useState(["","","","","",""]);
+  const [verifying, setVerifying] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [error,     setError]     = useState("");
+
+  // Web OTP API — Android Chrome auto-fill
+  useEffect(() => {
+    if (step !== "otp" || typeof window === "undefined" || !("OTPCredential" in window)) return;
+    const ac = new AbortController();
+    (navigator.credentials as unknown as { get: (o: unknown) => Promise<{ code: string }> })
+      .get({ otp: { transport: ["sms"] }, signal: ac.signal })
+      .then((c) => { if (c?.code) verify(c.code); })
+      .catch(() => {});
+    return () => ac.abort();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
+  const verify = async (code?: string) => {
+    const otp = (code ?? digits.join("")).trim();
+    if (otp.length !== 6) return;
+    setVerifying(true); setError("");
+    try {
+      const res  = await fetch("/api/auth/verify-otp", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error ?? "Invalid code"); return; }
+      toast.success(`Welcome, ${data.user?.firstName ?? ""}! 🎉`);
+      onSuccess();
+    } catch { setError("Something went wrong — try again"); }
+    finally   { setVerifying(false); }
+  };
+
+  const resend = async (sendFn: () => Promise<boolean>) => {
+    setResending(true); setError(""); setDigits(["","","","","",""]);
+    try {
+      const ok = await sendFn();
+      if (ok) toast.success("New code sent!");
+      else    toast.error("Could not resend — try again");
+    } catch { toast.error("Could not resend — try again"); }
+    finally  { setResending(false); }
+  };
+
+  const onChange = (idx: number, val: string, sendFn?: () => void) => {
+    const digit = val.replace(/\D/g, "").slice(-1);
+    const next  = [...digits]; next[idx] = digit;
+    setDigits(next); setError("");
+    if (digit && idx < 5) document.querySelectorAll<HTMLInputElement>(".otp-input")[idx + 1]?.focus();
+    if (next.every((d) => d)) verify(next.join(""));
+  };
+
+  const onKeyDown = (idx: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !digits[idx] && idx > 0)
+      document.querySelectorAll<HTMLInputElement>(".otp-input")[idx - 1]?.focus();
+  };
+
+  const onPaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (!pasted) return;
+    const next = pasted.split("").concat(Array(6 - pasted.length).fill(""));
+    setDigits(next);
+    if (pasted.length === 6) verify(pasted);
+  };
+
+  const masked = phone.replace(/(\d{4})(\d+)(\d{3})/, "$1 •••• $3");
+
+  return { digits, verifying, resending, error, verify, resend, onChange, onKeyDown, onPaste, masked, setDigits, setError };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Customer OTP flow
+// ─────────────────────────────────────────────────────────────────────────────
+function CustomerOtpFlow({ redirectTo }: { redirectTo: string }) {
+  const [step,    setStep]    = useState<OtpStep>("details");
+  const [form,    setForm]    = useState({ name: "", email: "", phone: "" });
+  const [sending, setSending] = useState(false);
+
+  const sendOtp = async () => {
+    const res = await fetch("/api/auth/send-otp", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+    return res.ok;
+  };
+
+  const otp = useOtp(step, form.email, form.phone, () => { window.location.href = redirectTo; });
+
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.email || !form.phone) { toast.error("Please enter your email and mobile number"); return; }
+    setSending(true);
+    try {
+      if (!(await sendOtp())) throw new Error();
+      setStep("otp");
+    } catch { toast.error("Could not send code — try again"); }
+    finally  { setSending(false); }
+  };
+
+  if (step === "otp") {
+    return (
+      <div className="bg-white rounded-3xl border border-[#E8D5C0] p-8 shadow-xl">
+        <OtpEntry
+          digits={otp.digits} error={otp.error} verifying={otp.verifying} resending={otp.resending}
+          onChange={(i, v) => otp.onChange(i, v)}
+          onKeyDown={otp.onKeyDown} onPaste={otp.onPaste}
+          onVerify={() => otp.verify()} onResend={() => otp.resend(sendOtp)}
+          onBack={() => { setStep("details"); otp.setDigits(["","","","","",""]); otp.setError(""); }}
+          maskedPhone={otp.masked}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-3xl border border-[#E8D5C0] p-8 shadow-xl">
+      <h1 className="text-2xl font-bold text-[#1A0A00] mb-1">Sign in or Register</h1>
+      <p className="text-gray-500 text-sm mb-6">
+        No password needed — we&apos;ll send a code to your mobile.
+      </p>
+      <form onSubmit={handleSend} className="space-y-4">
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">Full Name <span className="text-gray-400">(optional for existing users)</span></label>
+          <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+            placeholder="Lambu Harish" className={inputCls} />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">Email *</label>
+          <input type="email" required value={form.email}
+            onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+            placeholder="you@example.com" className={inputCls} />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">Mobile Number *</label>
+          <input type="tel" required value={form.phone}
+            onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+            placeholder="+61 400 000 000" className={inputCls} />
+        </div>
+        <button type="submit" disabled={sending}
+          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-white bg-[#FF6B00] hover:bg-[#CC5500] transition-colors disabled:opacity-60 shadow-lg shadow-orange-100">
+          {sending ? <Loader2 size={18} className="animate-spin" /> : <Phone size={18} />}
+          {sending ? "Sending code…" : "Send Verification Code"}
+        </button>
+        <p className="text-xs text-center text-gray-400 flex items-center justify-center gap-1">
+          <ShieldCheck size={12} className="text-[#FF6B00]" />
+          A 6-digit code will be sent to your mobile via SMS
+        </p>
+      </form>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Vendor OTP flow
+// ─────────────────────────────────────────────────────────────────────────────
+function VendorOtpFlow({ redirectTo }: { redirectTo: string }) {
+  const [mode,      setMode]      = useState<VendorMode>("login");
+  const [step,      setStep]      = useState<OtpStep>("details");
+  const [sending,   setSending]   = useState(false);
   const [detecting, setDetecting] = useState(false);
   const [form, setForm] = useState({
     firstName: "", lastName: "", email: "", phone: "",
-    password: "", confirmPassword: "",
-    street: "", suburb: "", state: "NSW", postcode: "",
-    businessName: "", businessAddress: "",
-    lat: "", lng: "",
+    businessName: "", businessAddress: "", lat: "", lng: "",
   });
 
-  const up  = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
-  const inputCls = "w-full border border-[#E8D5C0] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]";
+  const up = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
+
+  const sendOtp = async () => {
+    const body = mode === "register"
+      ? { name: `${form.firstName} ${form.lastName}`.trim(), email: form.email, phone: form.phone, role: "vendor", businessName: form.businessName, businessAddress: form.businessAddress, lat: form.lat, lng: form.lng }
+      : { email: form.email, phone: form.phone, role: "vendor" };
+    const res = await fetch("/api/auth/send-otp", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    return res.ok;
+  };
+
+  const otp = useOtp(step, form.email, form.phone, () => { window.location.href = "/vendor"; });
 
   const detectLocation = () => {
     if (!navigator.geolocation) { toast.error("Geolocation not supported — enter address manually."); return; }
@@ -276,62 +291,71 @@ function VendorPasswordFlow({ redirectTo }: { redirectTo: string }) {
           );
           const data = await res.json();
           if (data?.address) {
-            const a = data.address;
-            const full = data.display_name ??
-              `${a.road ?? ""} ${a.suburb ?? a.city ?? ""} ${a.state ?? ""} ${a.postcode ?? ""}`.trim();
+            const full = data.display_name ?? "";
             setForm((f) => ({ ...f, businessAddress: full, lat: String(latitude), lng: String(longitude) }));
             toast.success("Location detected!");
           } else {
             setForm((f) => ({ ...f, lat: String(latitude), lng: String(longitude) }));
-            toast("Coordinates captured — please fill address manually.", { icon: "📍" });
           }
-        } catch {
-          setForm((f) => ({ ...f, lat: String(latitude), lng: String(longitude) }));
-        } finally { setDetecting(false); }
+        } catch { setForm((f) => ({ ...f, lat: String(latitude), lng: String(longitude) })); }
+        finally { setDetecting(false); }
       },
       () => { setDetecting(false); toast.error("Location denied — enter address manually."); },
       { timeout: 10000, enableHighAccuracy: true },
     );
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (mode === "register") {
-      if (form.password !== form.confirmPassword) { toast.error("Passwords do not match"); return; }
-      if (!form.businessAddress.trim()) { toast.error("Kitchen address is required"); return; }
-    }
-    setLoading(true);
+    if (!form.email || !form.phone) { toast.error("Please enter your email and mobile number"); return; }
+    if (mode === "register" && !form.businessAddress.trim()) { toast.error("Kitchen address is required"); return; }
+    setSending(true);
     try {
-      const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/register";
-      const body     = mode === "login"
-        ? { email: form.email, password: form.password }
-        : { ...form, role: "vendor" };
-      const res  = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Something went wrong");
-
-      if (mode === "register") {
-        toast.success("Account created! Your application is pending admin approval.");
-      } else {
-        toast.success(`Welcome back, ${data.user.firstName}!`);
-      }
-      router.push("/vendor");
-      router.refresh();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
-    } finally { setLoading(false); }
+      if (!(await sendOtp())) throw new Error();
+      setStep("otp");
+    } catch { toast.error("Could not send code — try again"); }
+    finally  { setSending(false); }
   };
+
+  if (step === "otp") {
+    return (
+      <div className="bg-white rounded-3xl border border-[#E8D5C0] p-8 shadow-xl">
+        <OtpEntry
+          digits={otp.digits} error={otp.error} verifying={otp.verifying} resending={otp.resending}
+          onChange={(i, v) => otp.onChange(i, v)}
+          onKeyDown={otp.onKeyDown} onPaste={otp.onPaste}
+          onVerify={() => otp.verify()} onResend={() => otp.resend(sendOtp)}
+          onBack={() => { setStep("details"); otp.setDigits(["","","","","",""]); otp.setError(""); }}
+          maskedPhone={otp.masked}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-3xl border border-[#E8D5C0] p-8 shadow-xl">
-      <h1 className="text-2xl font-bold text-[#1A0A00] mb-1">
+      {/* Login / Register toggle */}
+      <div className="flex bg-[#FFF8F0] rounded-xl p-1 border border-[#E8D5C0] mb-6">
+        {(["login","register"] as VendorMode[]).map((m) => (
+          <button key={m} type="button" onClick={() => setMode(m)}
+            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+              mode === m ? "bg-[#1A0A00] text-white shadow" : "text-gray-500 hover:text-[#1A0A00]"
+            }`}>
+            {m === "login" ? "Sign In" : "Register Kitchen"}
+          </button>
+        ))}
+      </div>
+
+      <h1 className="text-xl font-bold text-[#1A0A00] mb-1">
         {mode === "login" ? "Chef Sign In" : "Join as a Chef"}
       </h1>
-      <p className="text-gray-500 text-sm mb-6">
-        {mode === "login" ? "Sign in to your kitchen dashboard" : "Register your kitchen on Dishly"}
+      <p className="text-gray-500 text-sm mb-5">
+        {mode === "login"
+          ? "Enter your email & mobile — we'll send a verification code."
+          : "Register your kitchen. No password needed!"}
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSend} className="space-y-4">
         {mode === "register" && (
           <>
             <div className="grid grid-cols-2 gap-3">
@@ -346,23 +370,18 @@ function VendorPasswordFlow({ redirectTo }: { redirectTo: string }) {
                   placeholder="Sharma" required className={inputCls} />
               </div>
             </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Phone Number</label>
-              <input value={form.phone} onChange={(e) => up("phone", e.target.value)}
-                type="tel" placeholder="+61 400 000 000" className={inputCls} />
-            </div>
 
             {/* Kitchen address */}
             <div className="border border-[#E8D5C0] rounded-2xl p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <MapPin size={14} className="text-[#FF6B00]" />
-                  <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Kitchen Address *</p>
+                  <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Kitchen Details *</p>
                 </div>
                 <button type="button" onClick={detectLocation} disabled={detecting}
                   className="flex items-center gap-1.5 text-xs font-semibold text-[#FF6B00] border border-[#FF6B00] px-3 py-1.5 rounded-lg hover:bg-[#FF6B00] hover:text-white transition-colors disabled:opacity-60">
                   {detecting ? <Loader2 size={12} className="animate-spin" /> : <Navigation size={12} />}
-                  {detecting ? "Detecting…" : "📍 Use My Location"}
+                  {detecting ? "Detecting…" : "📍 My Location"}
                 </button>
               </div>
               <div>
@@ -393,49 +412,28 @@ function VendorPasswordFlow({ redirectTo }: { redirectTo: string }) {
 
         <div>
           <label className="block text-xs font-medium text-gray-600 mb-1">Email *</label>
-          <input value={form.email} onChange={(e) => up("email", e.target.value)}
-            type="email" placeholder="chef@example.com" required className={inputCls} />
+          <input type="email" required value={form.email} onChange={(e) => up("email", e.target.value)}
+            placeholder="chef@example.com" className={inputCls} />
         </div>
-
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">Password *</label>
-          <div className="relative">
-            <input value={form.password} onChange={(e) => up("password", e.target.value)}
-              type={showPw ? "text" : "password"} placeholder="Min. 6 characters" required
-              className={`${inputCls} pr-10`} />
-            <button type="button" onClick={() => setShowPw(!showPw)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-              {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
-            </button>
-          </div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">Mobile Number *</label>
+          <input type="tel" required value={form.phone} onChange={(e) => up("phone", e.target.value)}
+            placeholder="+61 400 000 000" className={inputCls} />
         </div>
 
-        {mode === "register" && (
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Confirm Password *</label>
-            <input value={form.confirmPassword} onChange={(e) => up("confirmPassword", e.target.value)}
-              type={showPw ? "text" : "password"} placeholder="Repeat password" required className={inputCls} />
-          </div>
-        )}
-
-        <button type="submit" disabled={loading}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-white bg-[#1A0A00] hover:bg-[#2D1500] transition-colors disabled:opacity-60 shadow-lg">
-          {loading ? <Loader2 size={18} className="animate-spin" /> : null}
-          {mode === "login" ? "Sign In" : "Create Chef Account"}
+        <button type="submit" disabled={sending}
+          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-white bg-[#1A0A00] hover:bg-[#2D1500] transition-colors disabled:opacity-60 shadow-lg">
+          {sending ? <Loader2 size={18} className="animate-spin" /> : <Phone size={18} />}
+          {sending ? "Sending code…" : "Send Verification Code"}
         </button>
-      </form>
 
-      <div className="mt-5 text-center text-sm text-gray-500">
-        {mode === "login" ? (
-          <>Don&apos;t have an account?{" "}
-            <button onClick={() => setMode("register")} className="text-[#FF6B00] font-semibold hover:underline">Register</button>
-          </>
-        ) : (
-          <>Already have an account?{" "}
-            <button onClick={() => setMode("login")} className="text-[#FF6B00] font-semibold hover:underline">Sign in</button>
-          </>
-        )}
-      </div>
+        <p className="text-xs text-center text-gray-400 flex items-center justify-center gap-1">
+          <ShieldCheck size={12} className="text-[#FF6B00]" />
+          {mode === "register"
+            ? "Your application will be reviewed before approval."
+            : "A 6-digit code will be sent to your mobile via SMS"}
+        </p>
+      </form>
     </div>
   );
 }
@@ -444,15 +442,15 @@ function VendorPasswordFlow({ redirectTo }: { redirectTo: string }) {
 // Main page
 // ─────────────────────────────────────────────────────────────────────────────
 function LoginPageInner() {
-  const searchParams  = useSearchParams();
-  const defaultRole   = (searchParams.get("role") as Role) ?? "customer";
+  const searchParams    = useSearchParams();
+  const defaultRole     = (searchParams.get("role") as Role) ?? "customer";
   const [role, setRole] = useState<Role>(defaultRole);
-  const redirectTo    = searchParams.get("from") ?? "/";
+  const redirectTo      = searchParams.get("from") ?? "/";
 
   return (
     <div className="min-h-screen bg-[#FFF8F0] flex flex-col">
       {/* Top bar */}
-      <div className="bg-[#1A0A00] px-6 py-4 flex items-center justify-between">
+      <div className="bg-[#1A0A00] px-6 py-4 flex items-center">
         <Link href="/" className="flex items-center gap-2.5">
           <img src="/logo.jpg" alt="Logo" className="w-9 h-9 rounded-full object-cover ring-2 ring-[#FF6B00]/40" />
           <div>
@@ -482,7 +480,7 @@ function LoginPageInner() {
 
           {role === "customer"
             ? <CustomerOtpFlow redirectTo={redirectTo} />
-            : <VendorPasswordFlow redirectTo={redirectTo} />
+            : <VendorOtpFlow   redirectTo={redirectTo} />
           }
         </div>
       </div>
