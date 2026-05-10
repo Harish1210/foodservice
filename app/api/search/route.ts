@@ -38,10 +38,9 @@ export async function GET(req: NextRequest) {
   const menuItems = await prisma.menuItem.findMany({
     where: {
       isAvailable: true,
-      OR: [
-        { name:        { contains: q, mode: "insensitive" } },
-        { description: { contains: q, mode: "insensitive" } },
-      ],
+      // Search by name only — description matching causes irrelevant autocomplete results
+      // (e.g. "bi" matching "wasabi" in Salmon Sushi Platter)
+      name: { contains: q, mode: "insensitive" },
       vendor: { isApproved: true, isOnHold: false },
     },
     select: {
