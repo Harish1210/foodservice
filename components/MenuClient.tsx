@@ -265,7 +265,6 @@ export default function MenuClient({ categories, settings, vendorId }: Props) {
               )
             ))
           )}
-        </div>
       </div>
 
       {/* Floating cart bar */}
