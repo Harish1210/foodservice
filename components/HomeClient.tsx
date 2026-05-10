@@ -31,7 +31,7 @@ const GRADIENTS = [
 ];
 
 function vendorName(v: Pick<Vendor, "businessName" | "firstName" | "lastName">) {
-  return v.businessName ?? `${v.firstName ?? ""} ${v.lastName ?? ""}`.trim() || "Kitchen";
+  return (v.businessName ?? `${v.firstName ?? ""} ${v.lastName ?? ""}`.trim()) || "Kitchen";
 }
 function distLabel(d: number | null) {
   if (d === null) return null;

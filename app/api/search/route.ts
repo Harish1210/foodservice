@@ -84,7 +84,7 @@ export async function GET(req: NextRequest) {
     .map((item) => {
       const v = item.vendor;
       if (!v) return null;
-      const name     = v.businessName ?? `${v.firstName ?? ""} ${v.lastName ?? ""}`.trim() || "Kitchen";
+      const name     = (v.businessName ?? `${v.firstName ?? ""} ${v.lastName ?? ""}`.trim()) || "Kitchen";
       const distance = hasLocation && v.lat != null && v.lng != null
         ? haversineKm(lat, lng, v.lat, v.lng) : null;
       if (hasLocation && distance !== null && distance > radius) return null;
