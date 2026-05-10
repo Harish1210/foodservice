@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Search, X, MapPin, Navigation, Loader2, ChefHat,
-  Filter, Star, UtensilsCrossed, Clock, ChevronRight, Plus,
+  Filter, Star, UtensilsCrossed, Clock, ChevronRight, Plus, Pencil, Check,
 } from "lucide-react";
 import Navbar from "./Navbar";
 import Link from "next/link";
@@ -58,8 +58,13 @@ export default function HomeClient({ session }: { session: unknown }) {
   const [radius, setRadius]               = useState(5);
   const [showOnlyOpen, setShowOnlyOpen]   = useState(false);
 
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const inputRef    = useRef<HTMLInputElement>(null);
+  const [locEditMode, setLocEditMode] = useState(false);
+  const [locInput, setLocInput]       = useState("");
+  const [geocoding, setGeocoding]     = useState(false);
+
+  const debounceRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const inputRef     = useRef<HTMLInputElement>(null);
+  const locInputRef  = useRef<HTMLInputElement>(null);
 
   // ── Fetch vendors ────────────────────────────────────────────────────────
   const fetchVendors = useCallback(async (lat?: number, lng?: number, r = radius) => {
@@ -94,6 +99,32 @@ export default function HomeClient({ session }: { session: unknown }) {
       { timeout: 8000 }
     );
   }, [fetchVendors, radius]);
+
+  // ── Manual suburb geocode ────────────────────────────────────────────────
+  const geocodeSuburb = async () => {
+    const q = locInput.trim();
+    if (!q) return;
+    setGeocoding(true);
+    try {
+      const res  = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q + " Australia")}&format=json&limit=1`, { headers: { "Accept-Language": "en" } });
+      const data = await res.json();
+      if (data?.[0]) {
+        const lat = parseFloat(data[0].lat);
+        const lng = parseFloat(data[0].lon);
+        // Use display name shortened to suburb/city level
+        const parts = (data[0].display_name as string).split(",");
+        const label = parts[0].trim();
+        setUserLocation({ lat, lng });
+        setLocationLabel(label);
+        setLocEditMode(false);
+        setLocInput("");
+        fetchVendors(lat, lng, radius);
+      } else {
+        toast.error(`Couldn't find "${q}" — try a suburb name`);
+      }
+    } catch { toast.error("Geocoding failed, try again"); }
+    finally  { setGeocoding(false); }
+  };
 
   useEffect(() => { fetchVendors(); getLocation(); /* eslint-disable-next-line */ }, []);
 
@@ -181,10 +212,39 @@ export default function HomeClient({ session }: { session: unknown }) {
 
           {/* Location strip */}
           <div className="flex flex-wrap items-center justify-center gap-2 text-xs">
-            <div className="flex items-center gap-1.5 bg-white/10 border border-white/15 text-white/60 px-3 py-1.5 rounded-full">
-              {locating ? <Loader2 size={11} className="animate-spin" /> : <MapPin size={11} />}
-              {locating ? "Locating…" : locationLabel || "All areas"}
-            </div>
+
+            {/* Editable location pill */}
+            {locEditMode ? (
+              <div className="flex items-center gap-1 bg-white rounded-full px-2 py-1 shadow-lg">
+                <MapPin size={11} className="text-[#FF6B00] shrink-0" />
+                <input
+                  ref={locInputRef}
+                  autoFocus
+                  value={locInput}
+                  onChange={(e) => setLocInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") geocodeSuburb(); if (e.key === "Escape") { setLocEditMode(false); setLocInput(""); } }}
+                  placeholder="Type suburb…"
+                  className="text-xs text-[#1A0A00] font-medium bg-transparent outline-none w-32 placeholder-gray-400"
+                />
+                <button onClick={geocodeSuburb} disabled={geocoding || !locInput.trim()} className="text-[#FF6B00] hover:text-[#CC5500] disabled:opacity-40 transition-colors">
+                  {geocoding ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
+                </button>
+                <button onClick={() => { setLocEditMode(false); setLocInput(""); }} className="text-gray-400 hover:text-gray-600 transition-colors ml-0.5">
+                  <X size={11} />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => { setLocEditMode(true); setTimeout(() => locInputRef.current?.focus(), 50); }}
+                className="flex items-center gap-1.5 bg-white/10 border border-white/15 text-white/70 px-3 py-1.5 rounded-full hover:bg-white/20 hover:border-white/30 transition-all group"
+                title="Click to change location"
+              >
+                {locating ? <Loader2 size={11} className="animate-spin" /> : <MapPin size={11} />}
+                <span>{locating ? "Locating…" : locationLabel || "All areas"}</span>
+                {!locating && <Pencil size={9} className="opacity-0 group-hover:opacity-60 transition-opacity" />}
+              </button>
+            )}
+
             <select
               value={radius}
               onChange={(e) => { const r = parseInt(e.target.value); setRadius(r); if (userLocation) fetchVendors(userLocation.lat, userLocation.lng, r); else fetchVendors(undefined, undefined, r); }}
