@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
     take: 10,
   });
 
-  // ── Map & filter dishes ────────────────────────────────────────────────────
+  // ── Map dishes (no radius filter — show all vendors, sort by distance) ────
   const dishes = menuItems
     .map((item) => {
       const v = item.vendor;
@@ -87,7 +87,6 @@ export async function GET(req: NextRequest) {
       const name     = (v.businessName ?? `${v.firstName ?? ""} ${v.lastName ?? ""}`.trim()) || "Kitchen";
       const distance = hasLocation && v.lat != null && v.lng != null
         ? haversineKm(lat, lng, v.lat, v.lng) : null;
-      if (hasLocation && distance !== null && distance > radius) return null;
       return {
         id: item.id, name: item.name, price: item.price,
         description: item.description, image: item.image,

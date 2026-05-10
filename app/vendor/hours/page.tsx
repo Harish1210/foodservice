@@ -40,10 +40,13 @@ function fmt12(time24: string): string {
 
 export default function VendorHoursPage() {
   const router = useRouter();
-  const [hours, setHours]     = useState<Hours>(DEFAULT_HOURS);
-  const [isOpen, setIsOpen]   = useState(true);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving]   = useState(false);
+  const [hours, setHours]                   = useState<Hours>(DEFAULT_HOURS);
+  const [isOpen, setIsOpen]                 = useState(true);
+  const [supportsDelivery, setDelivery]     = useState(true);
+  const [supportsPickup, setPickup]         = useState(true);
+  const [loading, setLoading]               = useState(true);
+  const [saving, setSaving]                 = useState(false);
+  const [savingFulfillment, setSavingFulfi] = useState(false);
 
   useEffect(() => {
     fetch("/api/auth/me").then((r) => r.json()).then((d) => {
@@ -53,7 +56,25 @@ export default function VendorHoursPage() {
       if (d.hours) setHours(d.hours);
       setIsOpen(d.isOpen ?? true);
     }).finally(() => setLoading(false));
+    fetch("/api/vendor/fulfillment").then((r) => r.json()).then((d) => {
+      setDelivery(d.supportsDelivery ?? true);
+      setPickup(d.supportsPickup ?? true);
+    });
   }, [router]);
+
+  const saveFulfillment = async (delivery: boolean, pickup: boolean) => {
+    if (!delivery && !pickup) { toast.error("Enable at least one of delivery or pickup"); return; }
+    setSavingFulfi(true);
+    try {
+      await fetch("/api/vendor/fulfillment", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ supportsDelivery: delivery, supportsPickup: pickup }),
+      });
+      toast.success("Fulfillment settings saved!");
+    } catch { toast.error("Failed to save"); }
+    finally { setSavingFulfi(false); }
+  };
 
   const updateDay = (day: DayKey, field: keyof DayHours, value: string | boolean) => {
     setHours((h) => ({ ...h, [day]: { ...h[day], [field]: value } }));
@@ -145,6 +166,44 @@ export default function VendorHoursPage() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
+
+        {/* ── Fulfillment options ── */}
+        <div className="bg-[#1A1A1A] border border-white/10 rounded-2xl p-5">
+          <h2 className="font-bold text-sm text-gray-200 mb-1 flex items-center gap-2">🚚 Order Fulfillment</h2>
+          <p className="text-xs text-gray-500 mb-4">Choose how customers can receive their orders from your kitchen.</p>
+          <div className="grid grid-cols-2 gap-3">
+            {/* Delivery toggle */}
+            <button
+              onClick={() => { const next = !supportsDelivery; setDelivery(next); saveFulfillment(next, supportsPickup); }}
+              disabled={savingFulfillment}
+              className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left ${supportsDelivery ? "border-[#FF6B00] bg-[#FF6B00]/10" : "border-white/10 bg-white/5 opacity-60"}`}
+            >
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 ${supportsDelivery ? "bg-[#FF6B00]" : "bg-white/10"}`}>🚚</div>
+              <div className="min-w-0">
+                <p className="font-bold text-sm text-white">Delivery</p>
+                <p className="text-xs text-gray-400">{supportsDelivery ? "Enabled" : "Disabled"}</p>
+              </div>
+              <div className={`ml-auto shrink-0 w-5 h-5 rounded-full border-2 ${supportsDelivery ? "bg-[#FF6B00] border-[#FF6B00]" : "border-gray-600"} flex items-center justify-center`}>
+                {supportsDelivery && <span className="text-white text-xs font-black">✓</span>}
+              </div>
+            </button>
+            {/* Pickup toggle */}
+            <button
+              onClick={() => { const next = !supportsPickup; setPickup(next); saveFulfillment(supportsDelivery, next); }}
+              disabled={savingFulfillment}
+              className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left ${supportsPickup ? "border-blue-500 bg-blue-500/10" : "border-white/10 bg-white/5 opacity-60"}`}
+            >
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 ${supportsPickup ? "bg-blue-500" : "bg-white/10"}`}>🏃</div>
+              <div className="min-w-0">
+                <p className="font-bold text-sm text-white">Pickup</p>
+                <p className="text-xs text-gray-400">{supportsPickup ? "Enabled" : "Disabled"}</p>
+              </div>
+              <div className={`ml-auto shrink-0 w-5 h-5 rounded-full border-2 ${supportsPickup ? "bg-blue-500 border-blue-500" : "border-gray-600"} flex items-center justify-center`}>
+                {supportsPickup && <span className="text-white text-xs font-black">✓</span>}
+              </div>
+            </button>
+          </div>
+        </div>
 
         {/* Live status banner */}
         <div className={`rounded-2xl border p-4 flex items-center justify-between ${

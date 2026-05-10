@@ -15,6 +15,7 @@ type Vendor = {
   id: string; firstName: string | null; lastName: string | null;
   businessName: string | null; businessAddress: string | null;
   lat: number | null; lng: number | null; isOpen: boolean;
+  supportsDelivery: boolean; supportsPickup: boolean;
   distance: number | null; menuItemCount: number;
   avgRating: number | null; reviewCount: number;
 };
@@ -39,9 +40,9 @@ function distLabel(d: number | null) {
 }
 
 // ── Component ──────────────────────────────────────────────────────────────
-export default function HomeClient({ session }: { session: unknown }) {
+export default function HomeClient({ session, userSuburb }: { session: unknown; userSuburb?: string | null }) {
   const router = useRouter();
-  const addItem         = useCartStore((s) => s.addItem);
+  const addItem           = useCartStore((s) => s.addItem);
   const setSelectedVendor = useCartStore((s) => s.setSelectedVendor);
   const selectedVendorId  = useCartStore((s) => s.selectedVendorId);
   const cartItems         = useCartStore((s) => s.items);
@@ -52,7 +53,7 @@ export default function HomeClient({ session }: { session: unknown }) {
   const [vendorHits, setVendorHits]       = useState<Vendor[]>([]);
   const [vendorLoading, setVendorLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
-  const [locating, setLocating]           = useState(false);
+  const [locating, setLocating]           = useState(true);   // start true → shows "Locating…" immediately
   const [userLocation, setUserLocation]   = useState<{ lat: number; lng: number } | null>(null);
   const [locationLabel, setLocationLabel] = useState("");
   const [radius, setRadius]               = useState(5);
@@ -95,7 +96,22 @@ export default function HomeClient({ session }: { session: unknown }) {
         setLocating(false);
         fetchVendors(lat, lng, radius);
       },
-      () => { setLocating(false); fetchVendors(); },
+      async () => {
+        // GPS failed — try profile suburb
+        if (userSuburb) {
+          try {
+            const res  = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(userSuburb + " Australia")}&format=json&limit=1`, { headers: { "Accept-Language": "en" } });
+            const data = await res.json();
+            if (data?.[0]) {
+              const lat = parseFloat(data[0].lat); const lng = parseFloat(data[0].lon);
+              setUserLocation({ lat, lng }); setLocationLabel(userSuburb);
+              fetchVendors(lat, lng, radius);
+              setLocating(false); return;
+            }
+          } catch { /* fall through */ }
+        }
+        setLocating(false); fetchVendors();
+      },
       { timeout: 8000 }
     );
   }, [fetchVendors, radius]);
@@ -126,7 +142,30 @@ export default function HomeClient({ session }: { session: unknown }) {
     finally  { setGeocoding(false); }
   };
 
-  useEffect(() => { fetchVendors(); getLocation(); /* eslint-disable-next-line */ }, []);
+  useEffect(() => {
+    fetchVendors();
+    if (navigator.geolocation) {
+      // Try GPS first
+      getLocation();
+    } else if (userSuburb) {
+      // No GPS support — fall back to profile suburb
+      (async () => {
+        try {
+          const res  = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(userSuburb + " Australia")}&format=json&limit=1`, { headers: { "Accept-Language": "en" } });
+          const data = await res.json();
+          if (data?.[0]) {
+            const lat = parseFloat(data[0].lat);
+            const lng = parseFloat(data[0].lon);
+            setUserLocation({ lat, lng });
+            setLocationLabel(userSuburb);
+            fetchVendors(lat, lng, 5);
+          }
+        } finally { setLocating(false); }
+      })();
+    } else {
+      setLocating(false);
+    }
+  /* eslint-disable-next-line */ }, []);
 
   // ── Debounced search ─────────────────────────────────────────────────────
   useEffect(() => {
@@ -479,8 +518,11 @@ export default function HomeClient({ session }: { session: unknown }) {
                               <span className="text-xs text-gray-400 bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100 flex items-center gap-1">
                                 <Clock size={10} /> ~20–40 min
                               </span>
-                              {v.isOpen && (
-                                <span className="text-xs text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">🚚 Delivery</span>
+                              {v.supportsDelivery && (
+                                <span className="text-xs text-[#FF6B00] bg-orange-50 px-2.5 py-1 rounded-full border border-orange-100">🚚 Delivery</span>
+                              )}
+                              {v.supportsPickup && (
+                                <span className="text-xs text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">🏃 Pickup</span>
                               )}
                             </div>
                           </div>
