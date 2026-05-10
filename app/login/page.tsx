@@ -222,7 +222,7 @@ function CustomerOtpFlow({ redirectTo }: { redirectTo: string }) {
         <div>
           <label className="block text-xs font-medium text-gray-600 mb-1">Full Name <span className="text-gray-400">(optional for existing users)</span></label>
           <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-            placeholder="Lambu Harish" className={inputCls} />
+            placeholder="John Smith" className={inputCls} />
         </div>
         <div>
           <label className="block text-xs font-medium text-gray-600 mb-1">Email *</label>
