@@ -129,14 +129,14 @@ export default function VendorsPage() {
         <div className="absolute top-0 left-1/3 w-64 h-64 bg-[#FF6B00]/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-48 h-48 bg-orange-900/20 rounded-full blur-2xl pointer-events-none" />
 
-        <div className="relative z-10 max-w-3xl mx-auto px-4 py-12 text-center">
-          <div className="inline-flex items-center gap-2 bg-[#FF6B00]/20 border border-[#FF6B00]/40 text-[#FF8C38] text-xs font-semibold px-4 py-1.5 rounded-full mb-4 tracking-widest uppercase">
+        <div className="relative z-10 max-w-3xl mx-auto px-4 py-8 sm:py-12 text-center">
+          <div className="inline-flex items-center gap-2 bg-[#FF6B00]/20 border border-[#FF6B00]/40 text-[#FF8C38] text-xs font-semibold px-3 py-1.5 rounded-full mb-3 tracking-widest uppercase">
             🍳 Home Kitchens Near You
           </div>
-          <h1 className="text-3xl md:text-4xl font-black text-white mb-2 leading-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-2 leading-tight">
             Find Your Perfect Kitchen
           </h1>
-          <p className="text-[#FFB87A] text-base mb-6">
+          <p className="text-[#FFB87A] text-sm sm:text-base mb-5">
             Local kitchens & restaurants near you — order fresh, eat happy.
           </p>
 
@@ -171,35 +171,36 @@ export default function VendorsPage() {
             <div className="flex-1 min-w-0">
               <p className="text-xs text-gray-400">Searching near</p>
               <p className="text-sm font-semibold text-[#1A0A00] truncate">
-                {locating ? "Detecting your location…" : userLocation ? locationLabel || "Your location" : "Everywhere (no location set)"}
+                {locating ? "Detecting your location…" : userLocation ? locationLabel || "Your location" : "Everywhere"}
               </p>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <select
-                value={radius}
-                onChange={(e) => {
-                  const r = parseInt(e.target.value);
-                  setRadius(r);
-                  if (userLocation) fetchVendors(userLocation.lat, userLocation.lng, r);
-                  else fetchVendors(undefined, undefined, r);
-                }}
-                className="text-sm border border-[#E8D5C0] rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#FF6B00] bg-white text-[#1A0A00] font-medium"
-              >
-                <option value={2}>2 km</option>
-                <option value={5}>5 km</option>
-                <option value={10}>10 km</option>
-                <option value={20}>20 km</option>
-                <option value={50}>50 km</option>
-              </select>
-              <button
-                onClick={getLocation}
-                disabled={locating}
-                className="flex items-center gap-1.5 px-4 py-2 bg-[#FF6B00] text-white rounded-xl text-sm font-semibold hover:bg-[#CC5500] disabled:opacity-60 transition-colors shadow-sm shadow-orange-200"
-              >
-                {locating ? <Loader2 size={14} className="animate-spin" /> : <Navigation size={14} />}
-                {locating ? "Locating…" : "Locate Me"}
-              </button>
-            </div>
+          </div>
+          {/* Controls row — stacks nicely on mobile */}
+          <div className="flex items-center gap-2 mt-3">
+            <select
+              value={radius}
+              onChange={(e) => {
+                const r = parseInt(e.target.value);
+                setRadius(r);
+                if (userLocation) fetchVendors(userLocation.lat, userLocation.lng, r);
+                else fetchVendors(undefined, undefined, r);
+              }}
+              className="flex-1 text-sm border border-[#E8D5C0] rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#FF6B00] bg-white text-[#1A0A00] font-medium"
+            >
+              <option value={2}>Within 2 km</option>
+              <option value={5}>Within 5 km</option>
+              <option value={10}>Within 10 km</option>
+              <option value={20}>Within 20 km</option>
+              <option value={50}>Within 50 km</option>
+            </select>
+            <button
+              onClick={getLocation}
+              disabled={locating}
+              className="flex items-center gap-1.5 px-4 py-2.5 bg-[#FF6B00] text-white rounded-xl text-sm font-semibold hover:bg-[#CC5500] active:scale-95 disabled:opacity-60 transition-all shadow-sm shadow-orange-200 shrink-0"
+            >
+              {locating ? <Loader2 size={14} className="animate-spin" /> : <Navigation size={14} />}
+              {locating ? "Locating…" : "Locate Me"}
+            </button>
           </div>
         </div>
 

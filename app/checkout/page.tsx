@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { formatCurrency, pointsToDiscount } from "@/lib/utils";
-import { CreditCard, MapPin, CheckCircle, Loader2, ChevronRight, Calendar, UserCheck, ShieldCheck, RefreshCw } from "lucide-react";
+import { CreditCard, MapPin, CheckCircle, Loader2, ChevronRight, Calendar, UserCheck, ShieldCheck, RefreshCw, Lock } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -395,13 +395,13 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen bg-[#FFF8F0]">
       <Navbar />
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-[#1A0A00] mb-6 flex items-center gap-2">
-          <CreditCard className="text-[#FF6B00]" /> Checkout
+      <div className="max-w-5xl mx-auto px-4 py-6 pb-36 lg:pb-8">
+        <h1 className="text-xl sm:text-2xl font-bold text-[#1A0A00] mb-5 flex items-center gap-2">
+          <CreditCard className="text-[#FF6B00]" size={22} /> Checkout
         </h1>
 
         <form onSubmit={handleSubmit}>
-          <div className="grid lg:grid-cols-3 gap-6">
+          <div className="grid lg:grid-cols-3 gap-5">
             <div className="lg:col-span-2 space-y-4">
               {/* Contact */}
               <div className="bg-white rounded-2xl border border-[#E8D5C0] p-5">
@@ -527,42 +527,71 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Summary sidebar */}
-            <div>
-              <div className="bg-white rounded-2xl border border-[#E8D5C0] p-5 sticky top-24">
+            {/* Summary sidebar — desktop only */}
+            <div className="hidden lg:block">
+              <div className="bg-white rounded-2xl border border-[#E8D5C0] p-5 sticky top-24 shadow-sm">
                 <h3 className="font-bold text-[#1A0A00] mb-4">Order Summary</h3>
-                <div className="space-y-2 text-sm mb-4 max-h-48 overflow-y-auto">
+                <div className="space-y-1.5 text-sm mb-4 max-h-40 overflow-y-auto">
                   {items.map((item) => (
                     <div key={item.id} className="flex justify-between text-gray-600">
-                      <span className="truncate">{item.quantity}x {item.name}</span>
+                      <span className="truncate">{item.quantity}× {item.name}</span>
                       <span className="shrink-0 ml-2">{formatCurrency(item.price * item.quantity)}</span>
                     </div>
                   ))}
                 </div>
                 <div className="border-t border-[#E8D5C0] pt-3 space-y-2 text-sm">
                   <div className="flex justify-between text-gray-600"><span>Subtotal</span><span>{formatCurrency(subtotal)}</span></div>
-                  {orderType === "delivery" && <div className="flex justify-between text-gray-600"><span>Delivery</span><span>{deliveryFee === 0 ? <span className="text-green-600">FREE</span> : formatCurrency(deliveryFee)}</span></div>}
+                  {orderType === "delivery" && (
+                    <div className="flex justify-between text-gray-600">
+                      <span>Delivery</span>
+                      <span>{deliveryFee === 0 ? <span className="text-green-600">FREE</span> : formatCurrency(deliveryFee)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-gray-600"><span>GST (10%)</span><span>{formatCurrency(tax)}</span></div>
-                  <div className="flex justify-between font-bold text-[#1A0A00] text-base pt-1 border-t border-[#E8D5C0]">
+                  <div className="flex justify-between font-bold text-[#1A0A00] text-base pt-2 border-t border-[#E8D5C0]">
                     <span>Total</span>
                     <span className="text-[#FF6B00]">{formatCurrency(total)}</span>
                   </div>
                 </div>
-
                 <button type="submit" disabled={loading}
                   className="w-full mt-5 flex items-center justify-center gap-2 bg-[#FF6B00] text-white py-4 rounded-xl font-bold hover:bg-[#CC5500] transition-colors disabled:opacity-60 shadow-lg shadow-orange-200">
-                  {loading ? <><Loader2 size={18} className="animate-spin" /> Processing...</> : <>Place Order — {formatCurrency(total)}</>}
+                  {loading ? <><Loader2 size={18} className="animate-spin" /> Processing…</> : <>Place Order — {formatCurrency(total)}</>}
                 </button>
                 {!isLoggedIn && (
-                  <p className="text-[10px] text-center text-gray-400 mt-2">
-                    📱 A verification code will be sent to your mobile
-                  </p>
+                  <p className="text-[10px] text-center text-gray-400 mt-2">📱 A verification code will be sent to your mobile</p>
                 )}
-                <p className="text-xs text-center text-gray-400 mt-1">🔒 Secure checkout</p>
+                <p className="text-xs text-center text-gray-400 mt-1 flex items-center justify-center gap-1"><Lock size={10} /> Secure checkout</p>
               </div>
             </div>
           </div>
         </form>
+      </div>
+
+      {/* ── Mobile sticky bottom bar ── */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[#E8D5C0] shadow-2xl shadow-black/10 px-4 pt-3 pb-6">
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-sm text-gray-500">
+            {items.length} item{items.length > 1 ? "s" : ""} · {orderType}
+          </div>
+          <div className="text-right">
+            <p className="text-xs text-gray-400">Total incl. GST</p>
+            <p className="text-lg font-black text-[#FF6B00]">{formatCurrency(total)}</p>
+          </div>
+        </div>
+        <button
+          type="submit"
+          form="checkout-form"
+          disabled={loading}
+          onClick={handleSubmit}
+          className="w-full flex items-center justify-center gap-2 bg-[#FF6B00] text-white py-4 rounded-2xl font-bold text-base hover:bg-[#CC5500] active:scale-[0.98] transition-all disabled:opacity-60 shadow-lg shadow-orange-300"
+        >
+          {loading
+            ? <><Loader2 size={18} className="animate-spin" /> Processing…</>
+            : <>Place Order — {formatCurrency(total)}</>}
+        </button>
+        {!isLoggedIn && (
+          <p className="text-[10px] text-center text-gray-400 mt-2">📱 We&apos;ll verify your number via SMS after ordering</p>
+        )}
       </div>
     </div>
   );
