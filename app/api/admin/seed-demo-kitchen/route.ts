@@ -99,12 +99,27 @@ export async function GET() {
       return NextResponse.json({ message: "Demo kitchen already exists", id: existing.id });
     }
 
+    // ── Upsert categories ──────────────────────────────────────────────
+    const categoryNames = [...new Set(MENU_ITEMS.map((i) => i.category))];
+    const categoryMap: Record<string, string> = {};
+
+    for (const name of categoryNames) {
+      const existing = await prisma.category.findFirst({ where: { name } });
+      if (existing) {
+        categoryMap[name] = existing.id;
+      } else {
+        const created = await prisma.category.create({ data: { name, isActive: true } });
+        categoryMap[name] = created.id;
+      }
+    }
+
+    // ── Create vendor ──────────────────────────────────────────────────
     const passwordHash = await bcrypt.hash("DemoKitchen2025!", 10);
 
     const vendor = await prisma.user.create({
       data: {
-        email:        DEMO_EMAIL,
-        passwordHash: passwordHash,
+        email:           DEMO_EMAIL,
+        passwordHash:    passwordHash,
         role:            "vendor",
         firstName:       "Delicious",
         lastName:        "Food Service",
@@ -112,12 +127,12 @@ export async function GET() {
         businessName:    "Delicious Food Service",
         businessAddress: "200 George Street, Sydney NSW 2000",
         phone:           "+61 2 9000 5678",
-        // No lat/lng — always visible to all users regardless of location
+        // null lat/lng → always visible to all users (vendors API: distance=null → always included)
         lat:             null,
         lng:             null,
         isApproved:      true,
         isOnHold:        false,
-        isOpen:          false,           // always closed — demo only
+        isOpen:          false,
         supportsDelivery: true,
         supportsPickup:   true,
         openingHours: JSON.stringify({
@@ -135,11 +150,11 @@ export async function GET() {
             name:        item.name,
             description: item.description,
             price:       item.price,
-            category:    item.category,
             image:       item.image,
             isVeg:       item.isVeg,
             isSpicy:     item.isSpicy,
             isAvailable: true,
+            category:    { connect: { id: categoryMap[item.category] } },
           })),
         },
       },
