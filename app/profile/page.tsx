@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import { formatCurrency } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { User, Mail, Phone, MapPin, Star, Package, ChevronRight, Edit3, Save, X, LogOut, Loader2, Building2, Navigation } from "lucide-react";
+import { User, Mail, Phone, MapPin, Star, Package, ChevronRight, Edit3, Save, X, LogOut, Loader2, Building2, Navigation, AlertTriangle } from "lucide-react";
 import toast from "react-hot-toast";
 
 type UserData = {
@@ -41,6 +41,10 @@ export default function ProfilePage() {
         if (!d.user) { router.push("/login"); return; }
         setUser(d.user);
         setForm({ firstName: d.user.firstName ?? "", lastName: d.user.lastName ?? "", phone: d.user.phone ?? "", street: d.user.street ?? "", suburb: d.user.suburb ?? "", state: d.user.state ?? "NSW", postcode: d.user.postcode ?? "", businessName: d.user.businessName ?? "", businessAddress: d.user.businessAddress ?? "", lat: d.user.lat != null ? String(d.user.lat) : "", lng: d.user.lng != null ? String(d.user.lng) : "", isOpen: d.user.isOpen ?? true });
+        // Auto-open edit mode if vendor hasn't filled kitchen details
+        if (d.user.role === "vendor" && (!d.user.businessName || !d.user.businessAddress)) {
+          setEditing(true);
+        }
         // Fetch orders for this user
         return fetch(`/api/orders?email=${encodeURIComponent(d.user.email)}&limit=10`);
       })
@@ -301,29 +305,58 @@ export default function ProfilePage() {
                   </button>
                 )}
               </div>
+
+              {/* Required fields warning banner */}
+              {(!user.businessName || !user.businessAddress) && (
+                <div className="mb-4 flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl p-4">
+                  <AlertTriangle size={18} className="text-red-500 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-red-700">Required fields missing</p>
+                    <p className="text-xs text-red-500 mt-0.5">
+                      Kitchen Name and Kitchen Address are mandatory before customers can order from you.
+                      {!editing && <button onClick={() => setEditing(true)} className="ml-1 underline font-semibold">Edit now →</button>}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               <div className="grid sm:grid-cols-2 gap-4">
                 {[
-                  { icon: Building2, label: "Business / Kitchen Name", value: form.businessName, key: "businessName", placeholder: "Priya's Home Kitchen", span: true },
-                  { icon: MapPin, label: "Kitchen Address", value: form.businessAddress, key: "businessAddress", placeholder: "123 Main St, Sydney NSW 2000", span: true },
-                  { icon: MapPin, label: "Latitude", value: form.lat, key: "lat", placeholder: "-33.8688" },
-                  { icon: MapPin, label: "Longitude", value: form.lng, key: "lng", placeholder: "151.2093" },
-                ].map(({ icon: Icon, label, value, key, placeholder, span }) => (
+                  { icon: Building2, label: "Business / Kitchen Name", value: form.businessName, key: "businessName", placeholder: "e.g. Priya's Home Kitchen", span: true, required: true },
+                  { icon: MapPin, label: "Kitchen Address", value: form.businessAddress, key: "businessAddress", placeholder: "123 Main St, Sydney NSW 2000", span: true, required: true },
+                  { icon: MapPin, label: "Latitude", value: form.lat, key: "lat", placeholder: "-33.8688", required: false },
+                  { icon: MapPin, label: "Longitude", value: form.lng, key: "lng", placeholder: "151.2093", required: false },
+                ].map(({ icon: Icon, label, value, key, placeholder, span, required }) => {
+                  const isEmpty = required && !value;
+                  return (
                   <div key={label} className={`flex items-start gap-3 ${span ? "sm:col-span-2" : ""}`}>
-                    <div className="w-9 h-9 bg-[#FFF0E0] rounded-xl flex items-center justify-center shrink-0 mt-0.5">
-                      <Icon size={15} className="text-[#FF6B00]" />
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${isEmpty ? "bg-red-100" : "bg-[#FFF0E0]"}`}>
+                      <Icon size={15} className={isEmpty ? "text-red-500" : "text-[#FF6B00]"} />
                     </div>
                     <div className="flex-1">
-                      <p className="text-xs text-gray-400 mb-0.5">{label}</p>
+                      <p className={`text-xs mb-0.5 font-medium ${isEmpty ? "text-red-500" : "text-gray-400"}`}>
+                        {label}{required && <span className="ml-0.5 text-red-500">*</span>}
+                      </p>
                       {editing ? (
-                        <input value={value} onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
+                        <input
+                          value={value}
+                          onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
                           placeholder={placeholder}
-                          className="w-full border border-[#E8D5C0] rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]" />
+                          className={`w-full rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 border ${
+                            isEmpty
+                              ? "border-red-300 bg-red-50 focus:ring-red-400 placeholder-red-300"
+                              : "border-[#E8D5C0] focus:ring-[#FF6B00]"
+                          }`}
+                        />
                       ) : (
-                        <p className="text-sm font-medium text-[#1A0A00]">{value || <span className="text-gray-300 font-normal">Not set</span>}</p>
+                        <p className={`text-sm font-medium ${isEmpty ? "text-red-400 italic" : "text-[#1A0A00]"}`}>
+                          {value || "Not set — required"}
+                        </p>
                       )}
                     </div>
                   </div>
-                ))}
+                  );
+                })}
 
                 {/* isOpen toggle */}
                 <div className="sm:col-span-2 flex items-center justify-between p-3 bg-[#FFF8F0] rounded-xl border border-[#E8D5C0]">
