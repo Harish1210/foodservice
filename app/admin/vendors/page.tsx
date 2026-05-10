@@ -200,7 +200,7 @@ export default function AdminVendorsPage() {
             <p className="text-sm text-gray-600 mb-5">
               You are about to permanently delete{" "}
               <span className="font-semibold text-[#1A0A00]">
-                {confirmDelete.businessName ?? `${confirmDelete.firstName} ${confirmDelete.lastName}`.trim()}
+                {confirmDelete.businessName ?? `${confirmDelete.firstName ?? ""} ${confirmDelete.lastName ?? ""}`.trim() || confirmDelete.email}
               </span>
               . All their data will be lost.
             </p>
@@ -262,7 +262,9 @@ function VendorCard({
   setConfirmDelete: (v: Vendor) => void;
   onDelete: () => void;
 }) {
-  const name = vendor.businessName ?? (`${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim() || "Unnamed Kitchen");
+  const fullName      = `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim();
+  const name          = vendor.businessName ?? fullName || vendor.email ?? "Unnamed Kitchen";
+  const profileIncomplete = !vendor.businessName;
   const isBusy = actionId === vendor.id;
 
   const statusBadge = vendor.isOnHold
@@ -284,7 +286,14 @@ function VendorCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-3 flex-wrap">
             <div>
-              <h3 className="font-bold text-[#1A0A00]">{name}</h3>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="font-bold text-[#1A0A00]">{name}</h3>
+                {profileIncomplete && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 border border-yellow-200">
+                    <AlertTriangle size={10} /> Kitchen details not set
+                  </span>
+                )}
+              </div>
               <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full mt-0.5 ${statusBadge.cls}`}>
                 {statusBadge.icon} {statusBadge.label}
               </span>
