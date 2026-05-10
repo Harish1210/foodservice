@@ -7,15 +7,21 @@
  *   TWILIO_PHONE_NUMBER=+61xxxxxxxxx   (your Twilio number)
  */
 
-/** Strip BOM that some editors/copy-paste add — it breaks HTTP headers.
- *  Handles both the Unicode BOM (U+FEFF) and the UTF-8 BOM stored as
- *  three Latin-1 chars (0xEF 0xBB 0xBF → ï»¿) which is what Vercel env
- *  vars end up with when copied from certain terminals/editors. */
+/** Strip ALL leading BOM markers + trim whitespace.
+ *  Vercel env vars copied from some terminals end up with a double-BOM:
+ *  the 3-byte UTF-8 BOM (0xEF 0xBB 0xBF stored as ï»¿) followed by the
+ *  Unicode BOM (U+FEFF). Loop until nothing more can be stripped. */
 function stripBom(s: string): string {
-  if (s.charCodeAt(0) === 0xfeff) return s.slice(1);                       // U+FEFF
-  if (s.charCodeAt(0) === 0xef && s.charCodeAt(1) === 0xbb && s.charCodeAt(2) === 0xbf)
-    return s.slice(3);                                                       // ï»¿
-  return s;
+  let prev = "";
+  while (s !== prev) {
+    prev = s;
+    // Unicode BOM (U+FEFF)
+    if (s.charCodeAt(0) === 0xfeff) { s = s.slice(1); continue; }
+    // UTF-8 BOM stored as three Latin-1 chars: ï(0xEF) »(0xBB) ¿(0xBF)
+    if (s.charCodeAt(0) === 0xef && s.charCodeAt(1) === 0xbb && s.charCodeAt(2) === 0xbf)
+      { s = s.slice(3); continue; }
+  }
+  return s.trim();
 }
 
 function getCreds() {
