@@ -1,8 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { formatCurrency, pointsToDiscount } from "@/lib/utils";
-import { CreditCard, MapPin, CheckCircle, Loader2, ChevronRight, Calendar, UserCheck } from "lucide-react";
+import { CreditCard, MapPin, CheckCircle, Loader2, ChevronRight, Calendar, UserCheck, ShieldCheck, RefreshCw } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -10,11 +10,20 @@ import toast from "react-hot-toast";
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, orderType, tableNumber, specialInstructions, loyaltyPointsToUse, clearCart, getSubtotal, selectedVendorId } = useCartStore();
-  const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState<"details" | "success">("details");
-  const [orderId, setOrderId] = useState("");
+
+  const [loading,    setLoading]    = useState(false);
+  const [step,       setStep]       = useState<"details" | "otp" | "success">("details");
+  const [orderId,    setOrderId]    = useState("");
   const [pickupCode, setPickupCode] = useState("");
-  const [prefilled, setPrefilled] = useState(false);
+  const [prefilled,  setPrefilled]  = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // OTP state
+  const [otpDigits,    setOtpDigits]    = useState(["", "", "", "", "", ""]);
+  const [otpVerifying, setOtpVerifying] = useState(false);
+  const [otpResending, setOtpResending] = useState(false);
+  const [otpError,     setOtpError]     = useState("");
+  const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const [form, setForm] = useState({
     name: "", email: "", phone: "",
@@ -22,27 +31,27 @@ export default function CheckoutPage() {
     scheduledAt: "", paymentMethod: "card",
   });
 
-  // Redirect to cart if empty (must be in useEffect, not render body)
   useEffect(() => {
-    if (items.length === 0 && step !== "success") {
+    if (items.length === 0 && step !== "success" && step !== "otp") {
       router.push("/cart");
     }
   }, [items.length, step, router]);
 
-  // Auto-fill from logged-in user's profile
+  // Check login status + prefill
   useEffect(() => {
     fetch("/api/auth/me")
       .then((r) => r.json())
       .then((d) => {
         if (d.user) {
           const u = d.user;
+          setIsLoggedIn(true);
           setForm((f) => ({
             ...f,
-            name: [u.firstName, u.lastName].filter(Boolean).join(" ") || f.name,
-            email: u.email || f.email,
-            phone: u.phone || f.phone,
-            street: u.street || f.street,
-            suburb: u.suburb || f.suburb,
+            name:     [u.firstName, u.lastName].filter(Boolean).join(" ") || f.name,
+            email:    u.email    || f.email,
+            phone:    u.phone    || f.phone,
+            street:   u.street   || f.street,
+            suburb:   u.suburb   || f.suburb,
             postcode: u.postcode || f.postcode,
           }));
           setPrefilled(true);
@@ -51,14 +60,34 @@ export default function CheckoutPage() {
       .catch(() => {});
   }, []);
 
-  const subtotal = getSubtotal();
-  const deliveryFee = orderType === "delivery" && subtotal < 60 ? 5 : 0;
+  // Web OTP API — auto-fill on Android Chrome
+  useEffect(() => {
+    if (step !== "otp" || typeof window === "undefined") return;
+    if (!("OTPCredential" in window)) return;
+    const ac = new AbortController();
+    (navigator.credentials as unknown as { get: (opts: unknown) => Promise<{ code: string }> })
+      .get({ otp: { transport: ["sms"] }, signal: ac.signal })
+      .then((credential) => {
+        if (credential?.code) {
+          const digits = credential.code.slice(0, 6).split("");
+          setOtpDigits(digits.concat(Array(6 - digits.length).fill("")));
+          handleVerifyOtp(credential.code);
+        }
+      })
+      .catch(() => {});
+    return () => ac.abort();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
+  const subtotal       = getSubtotal();
+  const deliveryFee    = orderType === "delivery" && subtotal < 60 ? 5 : 0;
   const loyaltyDiscount = pointsToDiscount(loyaltyPointsToUse);
-  const tax = (subtotal + deliveryFee - loyaltyDiscount) * 0.1;
-  const total = subtotal + deliveryFee - loyaltyDiscount + tax;
+  const tax            = (subtotal + deliveryFee - loyaltyDiscount) * 0.1;
+  const total          = subtotal + deliveryFee - loyaltyDiscount + tax;
 
   const update = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
+  // ── Place order ─────────────────────────────────────────────────────────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.phone) {
@@ -70,19 +99,14 @@ export default function CheckoutPage() {
       return;
     }
     setLoading(true);
-
     try {
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          guestName: form.name,
-          guestEmail: form.email,
-          guestPhone: form.phone,
-          type: orderType,
-          tableNumber: tableNumber ?? null,
-          scheduledAt: form.scheduledAt || null,
-          specialInstructions,
+          guestName: form.name, guestEmail: form.email, guestPhone: form.phone,
+          type: orderType, tableNumber: tableNumber ?? null,
+          scheduledAt: form.scheduledAt || null, specialInstructions,
           paymentMethod: form.paymentMethod,
           address: orderType === "delivery" ? { street: form.street, suburb: form.suburb, postcode: form.postcode } : null,
           items: items.map((i) => ({ menuItemId: i.menuItemId, name: i.name, price: i.price, quantity: i.quantity, notes: i.notes })),
@@ -91,14 +115,21 @@ export default function CheckoutPage() {
           vendorId: selectedVendorId ?? null,
         }),
       });
-
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Order failed");
 
       setOrderId(data.order.id);
       setPickupCode(data.order.pickupCode ?? "");
-      setStep("success");
       clearCart();
+
+      if (isLoggedIn) {
+        // Already logged in — go straight to success
+        setStep("success");
+      } else {
+        // Send OTP and move to verification step
+        await sendOtp();
+        setStep("otp");
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -106,8 +137,164 @@ export default function CheckoutPage() {
     }
   };
 
-  if (items.length === 0 && step !== "success") return null;
+  // ── Send / resend OTP ───────────────────────────────────────────────────────
+  const sendOtp = async () => {
+    await fetch("/api/auth/send-otp", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ name: form.name, email: form.email, phone: form.phone }),
+    });
+  };
 
+  const handleResend = async () => {
+    setOtpResending(true);
+    setOtpError("");
+    setOtpDigits(["", "", "", "", "", ""]);
+    try {
+      await sendOtp();
+      toast.success("New code sent!");
+      otpRefs.current[0]?.focus();
+    } catch { toast.error("Could not resend — try again"); }
+    finally { setOtpResending(false); }
+  };
+
+  // ── Verify OTP ──────────────────────────────────────────────────────────────
+  const handleVerifyOtp = async (code?: string) => {
+    const otp = (code ?? otpDigits.join("")).trim();
+    if (otp.length !== 6) return;
+    setOtpVerifying(true);
+    setOtpError("");
+    try {
+      const res  = await fetch("/api/auth/verify-otp", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ email: form.email, otp }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setOtpError(data.error ?? "Invalid code"); return; }
+      toast.success(`Welcome, ${data.user?.firstName ?? ""}! 🎉`);
+      setStep("success");
+    } catch { setOtpError("Something went wrong — try again"); }
+    finally { setOtpVerifying(false); }
+  };
+
+  // ── OTP input key handling ──────────────────────────────────────────────────
+  const handleOtpChange = (idx: number, val: string) => {
+    const digit = val.replace(/\D/g, "").slice(-1);
+    const next  = [...otpDigits];
+    next[idx]   = digit;
+    setOtpDigits(next);
+    setOtpError("");
+    if (digit && idx < 5) otpRefs.current[idx + 1]?.focus();
+    if (next.every((d) => d !== "")) handleVerifyOtp(next.join(""));
+  };
+
+  const handleOtpKeyDown = (idx: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !otpDigits[idx] && idx > 0) otpRefs.current[idx - 1]?.focus();
+  };
+
+  const handleOtpPaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (!pasted) return;
+    const digits = pasted.split("").concat(Array(6 - pasted.length).fill(""));
+    setOtpDigits(digits);
+    if (pasted.length === 6) handleVerifyOtp(pasted);
+    else otpRefs.current[pasted.length]?.focus();
+  };
+
+  // ── Guards ──────────────────────────────────────────────────────────────────
+  if (items.length === 0 && step === "details") return null;
+
+  // ── OTP verification screen ─────────────────────────────────────────────────
+  if (step === "otp") {
+    const maskedPhone = form.phone.replace(/(\d{4})(\d+)(\d{3})/, "$1 •••• $3");
+    return (
+      <div className="min-h-screen bg-[#FFF8F0]">
+        <Navbar />
+        <div className="max-w-sm mx-auto px-4 py-16 text-center">
+          <div className="bg-white rounded-3xl border border-[#E8D5C0] p-8 shadow-xl">
+
+            {/* Icon */}
+            <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
+              <ShieldCheck size={32} className="text-[#FF6B00]" />
+            </div>
+
+            <h2 className="text-xl font-bold text-[#1A0A00] mb-1">Verify your number</h2>
+            <p className="text-gray-500 text-sm mb-6 leading-relaxed">
+              We sent a 6-digit code to<br />
+              <span className="font-semibold text-[#1A0A00]">{maskedPhone}</span>
+            </p>
+
+            {/* 6-digit boxes */}
+            <div className="flex gap-2 justify-center mb-4" onPaste={handleOtpPaste}>
+              {otpDigits.map((d, i) => (
+                <input
+                  key={i}
+                  ref={(el) => { otpRefs.current[i] = el; }}
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete={i === 0 ? "one-time-code" : "off"}
+                  maxLength={1}
+                  value={d}
+                  onChange={(e) => handleOtpChange(i, e.target.value)}
+                  onKeyDown={(e) => handleOtpKeyDown(i, e)}
+                  onFocus={(e) => e.target.select()}
+                  autoFocus={i === 0}
+                  className={`w-11 h-14 text-center text-xl font-bold rounded-xl border-2 focus:outline-none transition-all ${
+                    otpError
+                      ? "border-red-400 bg-red-50 text-red-600"
+                      : d
+                        ? "border-[#FF6B00] bg-orange-50 text-[#FF6B00]"
+                        : "border-[#E8D5C0] text-[#1A0A00] focus:border-[#FF6B00]"
+                  }`}
+                />
+              ))}
+            </div>
+
+            {/* Error */}
+            {otpError && (
+              <p className="text-red-500 text-sm mb-3 font-medium">{otpError}</p>
+            )}
+
+            {/* Verifying spinner */}
+            {otpVerifying && (
+              <div className="flex items-center justify-center gap-2 text-[#FF6B00] text-sm mb-3">
+                <Loader2 size={16} className="animate-spin" /> Verifying…
+              </div>
+            )}
+
+            {/* Verify button (manual fallback) */}
+            {!otpVerifying && (
+              <button
+                onClick={() => handleVerifyOtp()}
+                disabled={otpDigits.some((d) => d === "") || otpVerifying}
+                className="w-full bg-[#FF6B00] text-white py-3.5 rounded-xl font-bold text-sm hover:bg-[#CC5500] transition-colors disabled:opacity-40 mb-4"
+              >
+                Confirm & Create Account
+              </button>
+            )}
+
+            {/* Resend */}
+            <button
+              onClick={handleResend}
+              disabled={otpResending}
+              className="flex items-center justify-center gap-1.5 w-full text-sm text-gray-400 hover:text-[#FF6B00] transition-colors disabled:opacity-50"
+            >
+              {otpResending ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
+              {otpResending ? "Sending…" : "Resend code"}
+            </button>
+
+            <p className="text-xs text-gray-400 mt-5">
+              Your order is confirmed! ✅<br />Verify to track it and earn loyalty points.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Success screen ──────────────────────────────────────────────────────────
   if (step === "success") {
     return (
       <div className="min-h-screen bg-[#FFF8F0]">
@@ -162,6 +349,7 @@ export default function CheckoutPage() {
     );
   }
 
+  // ── Checkout form ───────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-[#FFF8F0]">
       <Navbar />
@@ -176,9 +364,7 @@ export default function CheckoutPage() {
               {/* Contact */}
               <div className="bg-white rounded-2xl border border-[#E8D5C0] p-5">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-[#1A0A00] flex items-center gap-2">
-                    👤 Contact Details
-                  </h3>
+                  <h3 className="font-semibold text-[#1A0A00] flex items-center gap-2">👤 Contact Details</h3>
                   {prefilled && (
                     <span className="flex items-center gap-1.5 text-xs text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full font-medium">
                       <UserCheck size={12} /> Pre-filled from your profile
@@ -187,9 +373,9 @@ export default function CheckoutPage() {
                 </div>
                 <div className="grid sm:grid-cols-2 gap-4">
                   {[
-                    { key: "name", label: "Full Name *", type: "text", placeholder: "John Smith", required: true },
-                    { key: "email", label: "Email *", type: "email", placeholder: "john@example.com", required: true },
-                    { key: "phone", label: "Mobile Number * (for SMS updates)", type: "tel", placeholder: "+61 400 000 000", required: true },
+                    { key: "name",  label: "Full Name *",                           type: "text", placeholder: "John Smith",         required: true },
+                    { key: "email", label: "Email *",                               type: "email", placeholder: "john@example.com",   required: true },
+                    { key: "phone", label: "Mobile Number * (for SMS updates)",     type: "tel",  placeholder: "+61 400 000 000",     required: true },
                   ].map((f) => (
                     <div key={f.key} className={f.key === "email" ? "sm:col-span-2" : ""}>
                       <label className="block text-xs font-medium text-gray-600 mb-1">{f.label}</label>
@@ -204,6 +390,11 @@ export default function CheckoutPage() {
                     </div>
                   ))}
                 </div>
+                {!isLoggedIn && (
+                  <p className="text-xs text-[#FF6B00] mt-3 flex items-center gap-1.5">
+                    <ShieldCheck size={12} /> We&apos;ll send a verification code to your mobile to create your account automatically.
+                  </p>
+                )}
               </div>
 
               {/* Delivery address */}
@@ -244,8 +435,7 @@ export default function CheckoutPage() {
                   <Calendar size={16} className="text-[#FF6B00]" /> Schedule Order (Optional)
                 </h3>
                 <input
-                  type="datetime-local"
-                  value={form.scheduledAt}
+                  type="datetime-local" value={form.scheduledAt}
                   onChange={(e) => update("scheduledAt", e.target.value)}
                   min={new Date().toISOString().slice(0, 16)}
                   className="w-full border border-[#E8D5C0] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B00]"
@@ -264,14 +454,8 @@ export default function CheckoutPage() {
                     { key: "cash", label: "💵 Cash", desc: "Pay on arrival" },
                     { key: "applepay", label: "🍎 Apple Pay", desc: "Quick checkout" },
                   ].map((p) => (
-                    <button
-                      key={p.key}
-                      type="button"
-                      onClick={() => update("paymentMethod", p.key)}
-                      className={`flex flex-col items-center p-2 sm:p-3 rounded-xl border-2 transition-all text-center ${
-                        form.paymentMethod === p.key ? "border-[#FF6B00] bg-orange-50" : "border-[#E8D5C0] hover:border-[#FF6B00]/50"
-                      }`}
-                    >
+                    <button key={p.key} type="button" onClick={() => update("paymentMethod", p.key)}
+                      className={`flex flex-col items-center p-2 sm:p-3 rounded-xl border-2 transition-all text-center ${form.paymentMethod === p.key ? "border-[#FF6B00] bg-orange-50" : "border-[#E8D5C0] hover:border-[#FF6B00]/50"}`}>
                       <span className="text-lg">{p.label.split(" ")[0]}</span>
                       <span className="text-[11px] sm:text-xs font-medium mt-1 leading-tight">{p.label.split(" ").slice(1).join(" ")}</span>
                       <span className="hidden sm:block text-xs text-gray-400">{p.desc}</span>
@@ -323,18 +507,16 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full mt-5 flex items-center justify-center gap-2 bg-[#FF6B00] text-white py-4 rounded-xl font-bold hover:bg-[#CC5500] transition-colors disabled:opacity-60 shadow-lg shadow-orange-200"
-                >
-                  {loading ? (
-                    <><Loader2 size={18} className="animate-spin" /> Processing...</>
-                  ) : (
-                    <>Place Order — {formatCurrency(total)}</>
-                  )}
+                <button type="submit" disabled={loading}
+                  className="w-full mt-5 flex items-center justify-center gap-2 bg-[#FF6B00] text-white py-4 rounded-xl font-bold hover:bg-[#CC5500] transition-colors disabled:opacity-60 shadow-lg shadow-orange-200">
+                  {loading ? <><Loader2 size={18} className="animate-spin" /> Processing...</> : <>Place Order — {formatCurrency(total)}</>}
                 </button>
-                <p className="text-xs text-center text-gray-400 mt-2">🔒 Secure checkout</p>
+                {!isLoggedIn && (
+                  <p className="text-[10px] text-center text-gray-400 mt-2">
+                    📱 A verification code will be sent to your mobile
+                  </p>
+                )}
+                <p className="text-xs text-center text-gray-400 mt-1">🔒 Secure checkout</p>
               </div>
             </div>
           </div>
