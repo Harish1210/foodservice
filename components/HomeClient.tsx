@@ -237,7 +237,7 @@ export default function HomeClient({ session, userSuburb }: { session: unknown; 
             <ChefHat size={22} className="shrink-0" />
             <div className="leading-tight">
               <div className="text-xs font-normal text-orange-200 leading-none mb-1">Are you a chef?</div>
-              <div className="text-sm">Join as a vendor →</div>
+              <div className="text-sm">Join as a Chef →</div>
             </div>
           </Link>
         </div>
