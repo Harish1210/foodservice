@@ -13,7 +13,6 @@ export default async function MenuPage({
   searchParams: Promise<{ vendor?: string }>;
 }) {
   const { vendor: vendorId } = await searchParams;
-
   if (!vendorId) redirect("/vendors");
 
   const [categories, settings, vendor] = await Promise.all([
@@ -30,66 +29,76 @@ export default async function MenuPage({
     prisma.businessSettings.findFirst(),
     prisma.user.findUnique({
       where: { id: vendorId },
-      select: { id: true, businessName: true, firstName: true, lastName: true, businessAddress: true, isOpen: true },
+      select: {
+        id: true, businessName: true, firstName: true, lastName: true,
+        businessAddress: true, isOpen: true,
+      },
     }),
   ]);
 
   if (!vendor) redirect("/vendors");
 
-  const vendorName = vendor.businessName ?? `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim();
+  const vendorName =
+    vendor.businessName ??
+    `${vendor.firstName ?? ""} ${vendor.lastName ?? ""}`.trim();
 
   return (
-    <div className="w-full min-h-screen bg-[#F7F3EE] overflow-x-hidden">
+    <div className="w-full min-h-screen bg-[#F6F6F6] overflow-x-hidden">
       <Navbar />
 
       {/* ── Vendor hero ── */}
-      <div
-        className="w-full relative"
-        style={{ background: "linear-gradient(150deg,#0D0500 0%,#3D1200 50%,#7C2D12 90%,#1A0A00 100%)" }}
-      >
-        {/* Subtle texture overlay */}
-        <div className="absolute inset-0 bg-[url('/logo.jpg')] bg-center bg-cover opacity-[0.04] pointer-events-none" />
-        <div className="absolute top-0 right-0 w-48 h-48 bg-[#FF6B00]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="w-full relative bg-gray-900">
+        {/* Subtle background texture */}
+        <div
+          className="absolute inset-0 opacity-20 pointer-events-none"
+          style={{ background: "linear-gradient(135deg, #FF6B00 0%, transparent 60%)" }}
+        />
 
-        <div className="relative z-10 max-w-2xl mx-auto px-4 py-8 text-center">
-          {/* Avatar */}
-          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-[#FF6B00] to-[#CC5500] rounded-2xl flex items-center justify-center text-white text-2xl sm:text-3xl font-black mx-auto mb-3 shadow-xl shadow-orange-900/50">
-            {(vendorName || "K")[0].toUpperCase()}
-          </div>
+        <div className="relative z-10 max-w-3xl mx-auto px-4 py-7 sm:py-10">
+          <div className="flex items-start gap-4">
+            {/* Avatar */}
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-[#FF6B00] to-[#E55A00] rounded-2xl flex items-center justify-center text-white text-2xl sm:text-3xl font-black shrink-0 shadow-lg shadow-orange-900/30">
+              {(vendorName || "K")[0].toUpperCase()}
+            </div>
 
-          <h1 className="text-2xl sm:text-3xl font-black text-white mb-1.5 leading-tight px-2">
-            {vendorName || "Kitchen Menu"}
-          </h1>
+            <div className="flex-1 min-w-0 pt-1">
+              <h1 className="text-xl sm:text-2xl font-black text-white leading-tight mb-1 truncate">
+                {vendorName || "Kitchen Menu"}
+              </h1>
 
-          {vendor.businessAddress && (
-            <p className="text-[#FFB87A] text-xs sm:text-sm mb-3 flex items-center justify-center gap-1.5 px-4">
-              📍 <span className="line-clamp-1">{vendor.businessAddress}</span>
-            </p>
-          )}
+              {vendor.businessAddress && (
+                <p className="text-gray-400 text-xs sm:text-sm mb-2 flex items-center gap-1.5">
+                  📍 <span className="line-clamp-1">{vendor.businessAddress}</span>
+                </p>
+              )}
 
-          {/* Status pill */}
-          <div className="inline-flex items-center gap-2 mb-4 bg-white/10 border border-white/20 px-4 py-1.5 rounded-full">
-            <span className={`w-2 h-2 rounded-full shrink-0 ${vendor.isOpen ? "bg-green-400 shadow-sm shadow-green-400 animate-pulse" : "bg-gray-400"}`} />
-            <span className={`text-xs sm:text-sm font-semibold ${vendor.isOpen ? "text-green-300" : "text-gray-400"}`}>
-              {vendor.isOpen ? "Open — accepting orders" : "Currently closed"}
-            </span>
-          </div>
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Open/closed status */}
+                <span className={`flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full ${
+                  vendor.isOpen
+                    ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                    : "bg-gray-700 text-gray-400 border border-gray-600"
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${vendor.isOpen ? "bg-green-400 animate-pulse" : "bg-gray-500"}`} />
+                  {vendor.isOpen ? "Open now" : "Closed"}
+                </span>
 
-          {/* Info pills */}
-          <div className="flex flex-wrap justify-center gap-2 text-xs">
-            {[
-              { icon: "🚚", label: `Delivery from $${settings?.deliveryFee?.toFixed(2) ?? "5.00"}` },
-              { icon: "🎁", label: `Free over $${settings?.freeDeliveryOver?.toFixed(0) ?? "60"}` },
-              { icon: "⏱", label: `~${settings?.estimatedPrepTime ?? 20} mins` },
-            ].map((p) => (
-              <span key={p.label} className="bg-white/10 border border-white/15 text-white/80 px-3 py-1.5 rounded-full font-medium backdrop-blur-sm">
-                {p.icon} {p.label}
-              </span>
-            ))}
+                {/* Info pills */}
+                {[
+                  `🚚 From $${settings?.deliveryFee?.toFixed(2) ?? "5.00"}`,
+                  `🎁 Free over $${settings?.freeDeliveryOver?.toFixed(0) ?? "60"}`,
+                  `⏱ ~${settings?.estimatedPrepTime ?? 20} min`,
+                ].map((p) => (
+                  <span key={p} className="text-xs text-gray-400 bg-white/10 border border-white/10 px-2.5 py-1 rounded-full">
+                    {p}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Reviews ticker — contained inside hero */}
+        {/* Reviews ticker */}
         <div className="w-full overflow-hidden">
           <ReviewsTicker vendorId={vendorId} />
         </div>

@@ -210,7 +210,7 @@ export default function HomeClient({ session, userSuburb }: { session: unknown; 
   const openCount       = vendors.filter((v) => v.isOpen).length;
 
   return (
-    <div className="min-h-screen bg-[#F7F3EE]">
+    <div className="min-h-screen bg-[#F6F6F6]">
       <Navbar />
 
       {/* ── HERO ── */}

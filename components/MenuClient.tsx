@@ -142,10 +142,10 @@ export default function MenuClient({ categories, settings, vendorId }: Props) {
     categories.find((c) => c.id === activeCategory)?.menuItems ?? [];
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 py-5">
+    <div className="w-full max-w-3xl mx-auto px-4 py-5 pb-24 md:pb-8">
       {/* Vendor context banner */}
       {vendorId && (
-        <div className="flex items-center justify-between bg-white border border-[#E8D5C0] rounded-2xl px-4 py-3 mb-4 gap-3 shadow-sm">
+        <div className="flex items-center justify-between bg-white border border-gray-100 rounded-2xl px-4 py-3 mb-4 gap-3 shadow-sm">
           <div className="flex items-center gap-2 min-w-0">
             <span className="text-base shrink-0">🍳</span>
             <span className="text-[#1A0A00] text-sm truncate">
@@ -173,7 +173,7 @@ export default function MenuClient({ categories, settings, vendorId }: Props) {
             type="text" value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search dishes, ingredients..."
-            className="w-full pl-10 pr-9 py-3 rounded-2xl border border-[#E8D5C0] bg-white focus:outline-none focus:ring-2 focus:ring-[#FF6B00] text-[#1A0A00] text-sm shadow-sm"
+            className="w-full pl-10 pr-9 py-3 rounded-2xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#FF6B00] text-gray-900 text-sm shadow-sm"
           />
           {search && (
             <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -202,7 +202,7 @@ export default function MenuClient({ categories, settings, vendorId }: Props) {
             className={`shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all active:scale-95 ${
               filter === f.key
                 ? "bg-[#FF6B00] text-white shadow-md shadow-orange-200"
-                : "bg-white text-gray-600 border border-[#E8D5C0]"
+                : "bg-white text-gray-600 border border-gray-200"
             }`}>
             {f.icon} {f.label}
           </button>
@@ -257,7 +257,7 @@ export default function MenuClient({ categories, settings, vendorId }: Props) {
             categories.map((cat) => (
               cat.menuItems.length > 0 && (
                 <div key={cat.id} id={cat.id} className="mb-10">
-                  <h2 className="text-xl font-bold text-[#1A0A00] mb-4 flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <span>{cat.icon}</span> {cat.name}
                   </h2>
                   <ItemGrid items={cat.menuItems} onSelect={setSelectedItem} getQty={getItemQtyInCart} onAdd={handleAddToCart} />
@@ -294,7 +294,7 @@ export default function MenuClient({ categories, settings, vendorId }: Props) {
             <div className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h3 className="text-xl font-bold text-[#1A0A00]">{selectedItem.name}</h3>
+                  <h3 className="text-xl font-bold text-gray-900">{selectedItem.name}</h3>
                   <div className="flex gap-2 mt-1">
                     {selectedItem.isVeg ? (
                       <span className="inline-flex items-center gap-1 bg-green-50 text-green-700 border border-green-600 rounded px-2 py-0.5 text-xs font-semibold">
@@ -374,7 +374,7 @@ function ItemGrid({ items, onSelect, getQty, onAdd }: {
         return (
           <div
             key={item.id}
-            className="bg-white rounded-2xl border border-[#E8D5C0] overflow-hidden hover:shadow-md hover:border-[#FF6B00]/40 transition-all group cursor-pointer"
+            className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md hover:border-[#FF6B00]/30 transition-all group cursor-pointer shadow-sm"
             onClick={() => onSelect(item)}
           >
             {/* Item image or emoji fallback */}
@@ -403,7 +403,7 @@ function ItemGrid({ items, onSelect, getQty, onAdd }: {
 
             <div className="p-4">
               <div className="flex items-start justify-between gap-2 mb-1">
-                <h3 className="font-semibold text-[#1A0A00] text-sm leading-tight group-hover:text-[#FF6B00] transition-colors">
+                <h3 className="font-semibold text-gray-900 text-sm leading-tight group-hover:text-[#FF6B00] transition-colors">
                   {item.name}
                 </h3>
                 <div className="flex gap-1 shrink-0">
