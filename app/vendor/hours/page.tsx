@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Clock, Save, Loader2, ChevronLeft, ToggleLeft, ToggleRight, AlertCircle, CheckCircle } from "lucide-react";
+import { Clock, Save, Loader2, ChevronLeft, ToggleLeft, ToggleRight, AlertCircle, CheckCircle, MapPin } from "lucide-react";
 import toast from "react-hot-toast";
 import Navbar from "@/components/Navbar";
 
@@ -48,6 +48,12 @@ export default function VendorHoursPage() {
   const [saving, setSaving]                 = useState(false);
   const [savingFulfillment, setSavingFulfi] = useState(false);
 
+  // Kitchen details
+  const [businessName,    setBusinessName]    = useState("");
+  const [businessAddress, setBusinessAddress] = useState("");
+  const [phone,           setPhone]           = useState("");
+  const [savingDetails,   setSavingDetails]   = useState(false);
+
   useEffect(() => {
     fetch("/api/auth/me").then((r) => r.json()).then((d) => {
       if (!d.user || d.user.role !== "vendor") { router.push("/login?role=vendor"); }
@@ -60,7 +66,29 @@ export default function VendorHoursPage() {
       setDelivery(d.supportsDelivery ?? true);
       setPickup(d.supportsPickup ?? true);
     });
+    fetch("/api/auth/me").then((r) => r.json()).then((d) => {
+      if (d.user) {
+        setBusinessName(d.user.businessName ?? "");
+        setBusinessAddress(d.user.businessAddress ?? "");
+        setPhone(d.user.phone ?? "");
+      }
+    });
   }, [router]);
+
+  const saveDetails = async () => {
+    if (!businessAddress.trim()) { toast.error("Please enter your pickup address"); return; }
+    setSavingDetails(true);
+    try {
+      const res = await fetch("/api/auth/me", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ businessName, businessAddress, phone }),
+      });
+      if (!res.ok) throw new Error("Save failed");
+      toast.success("Kitchen details saved!");
+    } catch { toast.error("Failed to save details"); }
+    finally { setSavingDetails(false); }
+  };
 
   const saveFulfillment = async (delivery: boolean, pickup: boolean) => {
     if (!delivery && !pickup) { toast.error("Enable at least one of delivery or pickup"); return; }
@@ -166,6 +194,53 @@ export default function VendorHoursPage() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
+
+        {/* ── Kitchen details ── */}
+        <div className="bg-[#1A1A1A] border border-white/10 rounded-2xl p-5">
+          <h2 className="font-bold text-sm text-gray-200 mb-1 flex items-center gap-2">
+            <MapPin size={15} className="text-[#FF6B00]" /> Kitchen Details
+          </h2>
+          <p className="text-xs text-gray-500 mb-4">Your pickup address appears in SMS notifications sent to customers.</p>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">Kitchen / Business Name</label>
+              <input
+                value={businessName}
+                onChange={(e) => setBusinessName(e.target.value)}
+                placeholder="e.g. Dimple Kitchen"
+                className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#FF6B00] placeholder-gray-600"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">Pickup Address *</label>
+              <input
+                value={businessAddress}
+                onChange={(e) => setBusinessAddress(e.target.value)}
+                placeholder="e.g. 12 Smith St, Newtown NSW 2042"
+                className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#FF6B00] placeholder-gray-600"
+              />
+              <p className="text-[11px] text-gray-600 mt-1">This is shown to customers who select pickup</p>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">Contact Phone</label>
+              <input
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="e.g. 0412 000 000"
+                type="tel"
+                className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#FF6B00] placeholder-gray-600"
+              />
+            </div>
+          </div>
+          <button
+            onClick={saveDetails}
+            disabled={savingDetails}
+            className="mt-4 flex items-center gap-2 bg-[#FF6B00] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#CC5500] transition-colors disabled:opacity-60"
+          >
+            {savingDetails ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+            Save Details
+          </button>
+        </div>
 
         {/* ── Fulfillment options ── */}
         <div className="bg-[#1A1A1A] border border-white/10 rounded-2xl p-5">
