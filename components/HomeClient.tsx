@@ -228,6 +228,20 @@ export default function HomeClient({ session, userSuburb }: { session: unknown; 
           <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-orange-900/20 rounded-full blur-2xl" />
         </div>
 
+        {/* ── ARE YOU A CHEF? floating top-right ── */}
+        <div className="absolute top-4 right-4 z-20">
+          <Link
+            href="/login?role=vendor"
+            className="group flex items-center gap-2 bg-gradient-to-r from-[#FF6B00] to-[#e05c00] hover:from-[#e05c00] hover:to-[#c44d00] text-white text-xs font-bold px-4 py-2.5 rounded-2xl shadow-lg shadow-orange-900/40 hover:shadow-orange-900/60 transition-all hover:scale-105 border border-white/10"
+          >
+            <ChefHat size={15} className="shrink-0" />
+            <div className="leading-tight">
+              <div className="text-[10px] font-normal text-orange-200 leading-none mb-0.5">Are you a chef?</div>
+              <div>Join as a vendor →</div>
+            </div>
+          </Link>
+        </div>
+
         <div className="relative z-10 max-w-3xl mx-auto px-4 pt-10 pb-8 flex flex-col items-center text-center">
           {/* Brand */}
           <img src="/logo.jpg" alt="Dishly" className="w-14 h-14 rounded-full object-cover ring-4 ring-[#FF6B00]/30 shadow-2xl mb-3" />
@@ -466,12 +480,6 @@ export default function HomeClient({ session, userSuburb }: { session: unknown; 
           </div>
         )}
 
-        <div className="py-10 text-center border-t border-[#E8D5C0] mt-8">
-          <p className="text-gray-400 text-sm mb-2">Cook for others? Join as a chef.</p>
-          <Link href="/login?role=vendor" className="inline-flex items-center gap-2 text-[#FF6B00] font-bold hover:underline text-sm">
-            <ChefHat size={14} /> Become a vendor →
-          </Link>
-        </div>
       </div>
     </div>
   );
