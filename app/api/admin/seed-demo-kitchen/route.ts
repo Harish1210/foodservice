@@ -103,8 +103,8 @@ export async function GET() {
 
     const vendor = await prisma.user.create({
       data: {
-        email:           DEMO_EMAIL,
-        password:        passwordHash,
+        email:        DEMO_EMAIL,
+        passwordHash: passwordHash,
         role:            "vendor",
         firstName:       "Delicious",
         lastName:        "Food Service",
