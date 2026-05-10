@@ -56,6 +56,10 @@ body {
 .animate-slide-up { animation: slideUp 0.4s ease forwards; }
 .animate-fade-in { animation: fadeIn 0.3s ease forwards; }
 
+/* Hide scrollbar but keep scroll functionality */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
 .voice-btn.listening::before {
   content: '';
   position: absolute;
