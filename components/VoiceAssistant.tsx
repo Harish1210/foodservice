@@ -202,7 +202,7 @@ export default function VoiceAssistant() {
       {/* Floating button */}
       <button
         onClick={() => setOpen(true)}
-        className={`fixed bottom-6 right-6 z-50 flex items-center gap-2 shadow-2xl transition-all ${
+        className={`fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-50 flex items-center gap-2 shadow-2xl transition-all ${
           open ? "hidden" : "flex"
         } bg-[#1A0A00] text-white pl-4 pr-5 py-3 rounded-2xl hover:bg-[#2A1500] border border-[#FF6B00]/40`}
       >

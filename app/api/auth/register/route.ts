@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { signToken, COOKIE_NAME } from "@/lib/auth";
+import { sendSMS, SMS, toE164 } from "@/lib/sms";
 
 export async function POST(req: NextRequest) {
   try {
@@ -45,6 +46,17 @@ export async function POST(req: NextRequest) {
         isApproved,
       },
     });
+
+    // Notify admin by SMS when a new chef/vendor registers
+    if (userRole === "vendor") {
+      const adminPhone = process.env.ADMIN_PHONE;
+      if (adminPhone) {
+        sendSMS(
+          toE164(adminPhone),
+          SMS.newChefRegistered(firstName, lastName, email, businessName ?? null)
+        ).catch(() => {}); // fire-and-forget, never block registration
+      }
+    }
 
     const token = signToken({ userId: user.id, email: user.email, role: user.role, firstName: user.firstName ?? undefined, lastName: user.lastName ?? undefined });
 

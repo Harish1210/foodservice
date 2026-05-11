@@ -121,4 +121,10 @@ export const SMS = {
   /** Sent to vendor when order is cancelled */
   orderCancelled: (orderNumber: string) =>
     `❌ ${APP}: Order #${orderNumber} has been cancelled.`,
+
+  /** Sent to admin when a new chef/vendor registers */
+  newChefRegistered: (firstName: string, lastName: string, email: string, businessName?: string | null) => {
+    const name = businessName ? `${businessName} (${firstName} ${lastName})` : `${firstName} ${lastName}`;
+    return `👨‍🍳 ${APP}: New Chef registered!\nName: ${name}\nEmail: ${email}\nPending approval in admin dashboard.`;
+  },
 };
