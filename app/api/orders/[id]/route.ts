@@ -25,9 +25,19 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   try {
     const { status } = await req.json();
 
+    // Stamp the audit timestamp for this status transition
+    const now = new Date();
+    const auditTimestamp: Record<string, Date> = {};
+    if (status === "confirmed")        auditTimestamp.confirmedAt      = now;
+    if (status === "preparing")        auditTimestamp.preparingAt      = now;
+    if (status === "ready")            auditTimestamp.readyAt          = now;
+    if (status === "out_for_delivery") auditTimestamp.outForDeliveryAt = now;
+    if (status === "delivered")        auditTimestamp.deliveredAt      = now;
+    if (status === "cancelled")        auditTimestamp.cancelledAt      = now;
+
     const order = await prisma.order.update({
       where: { id },
-      data: { status, updatedAt: new Date() },
+      data: { status, updatedAt: now, ...auditTimestamp },
       include: {
         items: true,
         vendor: { select: { businessAddress: true } },

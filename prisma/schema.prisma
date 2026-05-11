@@ -137,6 +137,14 @@ model Order {
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
+  // ── Audit timestamps ──────────────────────────────────────────────────────
+  confirmedAt         DateTime?   // when order moves from pending → confirmed
+  preparingAt         DateTime?   // when vendor starts cooking
+  readyAt             DateTime?   // when food is ready
+  outForDeliveryAt    DateTime?   // when driver picks up (delivery only)
+  deliveredAt         DateTime?   // when order is delivered / collected
+  cancelledAt         DateTime?   // if order is cancelled
+
   user    User?      @relation("CustomerOrders", fields: [userId], references: [id])
   vendor  User?      @relation("VendorOrders", fields: [vendorId], references: [id])
   address Address?   @relation(fields: [addressId], references: [id])

@@ -35,6 +35,13 @@ type OrderData = {
   pickupCode?: string; total: number; subtotal: number;
   deliveryFee: number; tax: number; estimatedTime: number;
   vendorId?: string;
+  createdAt: string;
+  confirmedAt?: string | null;
+  preparingAt?: string | null;
+  readyAt?: string | null;
+  outForDeliveryAt?: string | null;
+  deliveredAt?: string | null;
+  cancelledAt?: string | null;
   vendor?: { businessName: string | null; businessAddress: string | null } | null;
   items: Array<{ id: string; name: string; quantity: number; price: number }>;
 };
@@ -335,6 +342,45 @@ export default function OrderTrackingPage() {
             )}
           </>
         )}
+
+        {/* ── Audit Timeline ── */}
+        {(() => {
+          const fmt = (ts?: string | null) =>
+            ts ? new Date(ts).toLocaleString("en-AU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: true }) : null;
+
+          const events: { label: string; ts: string | null | undefined; icon: string }[] = [
+            { label: "Order Placed",       ts: order.createdAt,        icon: "🛒" },
+            { label: "Order Confirmed",    ts: order.confirmedAt,      icon: "✅" },
+            { label: "Preparation Started", ts: order.preparingAt,    icon: "🍳" },
+            { label: "Ready",              ts: order.readyAt,          icon: "📦" },
+            ...(order.type === "delivery"
+              ? [{ label: "Out for Delivery", ts: order.outForDeliveryAt, icon: "🚚" }]
+              : []),
+            { label: order.type === "pickup" ? "Collected" : order.type === "dine-in" ? "Served" : "Delivered",
+              ts: order.deliveredAt, icon: "🎉" },
+            ...(order.cancelledAt ? [{ label: "Cancelled", ts: order.cancelledAt, icon: "❌" }] : []),
+          ];
+
+          const filled = events.filter((e) => e.ts);
+          if (filled.length === 0) return null;
+
+          return (
+            <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+              <p className="font-bold text-gray-900 text-sm mb-4">Order Timeline</p>
+              <div className="space-y-3">
+                {filled.map((e, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-gray-50 rounded-xl flex items-center justify-center text-base shrink-0">{e.icon}</div>
+                    <div className="flex-1 flex items-center justify-between gap-2">
+                      <p className="text-sm font-semibold text-gray-800">{e.label}</p>
+                      <p className="text-xs text-gray-400 tabular-nums shrink-0">{fmt(e.ts)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Order details */}
         <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
